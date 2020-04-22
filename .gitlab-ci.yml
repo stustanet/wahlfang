@@ -1,0 +1,10 @@
+image: python:3.8-buster
+
+stages:
+  - test
+
+all_tests:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - python3 manage.py test

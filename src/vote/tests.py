@@ -3,7 +3,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 
-from vote.models import Token, Election
+from vote.models import User, Election
 
 
 def gen_token():
@@ -12,7 +12,9 @@ def gen_token():
         start_date=timezone.now(),
         end_date=timezone.now() + datetime.timedelta(days=10)
     )
-    token = Token.objects.create(
+    token = User.objects.create(
+        first_name='Test',
+        last_name='Test',
         email='spam@spam.spam',
         election=election
     )

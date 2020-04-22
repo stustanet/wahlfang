@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Application
+from vote.models import Application, User
 
 
 class TokenAuthenticationForm(forms.Form):
@@ -50,6 +50,28 @@ class TokenAuthenticationForm(forms.Form):
 
 
 class ApplicationUploadForm(forms.ModelForm):
+    first_name = forms.CharField(disabled=True)
+    last_name = forms.CharField(disabled=True)
+
+    field_order = ['first_name', 'last_name', 'text', 'avatar']
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = User.objects.get(token=request.user.username)
+        self.request = request
+
+        self.fields['first_name'].initial = self.user.first_name
+        self.fields['last_name'].initial = self.user.first_name
+
     class Meta:
         model = Application
-        fields = '__all__'
+        fields = ('text', 'avatar')
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.user = self.user
+
+        if commit:
+            instance.save()
+
+        return instance

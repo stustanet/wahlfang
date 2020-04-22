@@ -2,10 +2,20 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="card shadow">
-      <div class="card-body">
-        {% crispy form %}
+  <div class="row pt-3 justify-content-center">
+    <div class="col-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <form action="{% url 'upload-application' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <h4>Bewerbung als Hausadmin</h4>
+            </div>
+            <hr>
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>

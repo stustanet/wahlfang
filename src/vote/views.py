@@ -21,14 +21,14 @@ def vote(request):
 @login_required
 def upload_application(request):
     context = {
-        'form': ApplicationUploadForm()
+        'form': ApplicationUploadForm(request)
     }
 
     if request.POST:
-        form = ApplicationUploadForm(request.POST, request.FILES)
+        form = ApplicationUploadForm(request, request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            redirect('index')
+            return redirect('index')
         else:
             context['form'] = form
 

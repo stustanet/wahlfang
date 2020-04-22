@@ -1,17 +1,17 @@
 from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as DjangoUser
 
-from vote.models import Token
+from vote.models import User
 
 
 class TokenBackend(BaseBackend):
     def authenticate(self, request, token=None):
-        token = Token.objects.filter(uuid=token).first()
+        voter = User.objects.filter(token=token).first()
 
         if not token:
             return None
 
-        user = User.objects.get_or_create(username=token.uuid)[0]
+        user = DjangoUser.objects.get_or_create(username=voter.token)[0]
         user.set_unusable_password()
         user.is_staff = False
         user.is_superuser = False
@@ -24,4 +24,4 @@ class TokenBackend(BaseBackend):
         return user
 
     def get_user(self, user_id):
-        return User.objects.filter(pk=user_id).first()
+        return DjangoUser.objects.filter(pk=user_id).first()

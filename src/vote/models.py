@@ -34,8 +34,8 @@ class User(models.Model):
 
 class Application(models.Model):
     text = models.TextField()
-    avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True)
-    user = models.ForeignKey(User, related_name='applications', on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True, blank=True)
+    user = models.OneToOneField(User, related_name='applications', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'Application of {self.user}'

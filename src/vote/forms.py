@@ -1,9 +1,12 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
 from django import forms
 from django.contrib.auth import authenticate
+from django.db import transaction
 
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Application, User
+from vote.models import Application, User, VOTE_CHOICES, Vote
 
 
 class TokenAuthenticationForm(forms.Form):
@@ -75,3 +78,42 @@ class ApplicationUploadForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+class VoteForm(forms.Form):
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = User.objects.get(token=request.user.username)
+        self.election = self.user.election
+        self.request = request
+
+        for application in self.election.applications:
+            self.fields[f'{application.pk}'] = forms.ChoiceField(
+                label=f'{application.user.first_name} {application.user.last_name}',
+                choices=VOTE_CHOICES,
+                widget=forms.RadioSelect)
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout()
+
+    def clean(self):
+        super().clean()
+        if not self.user.can_vote:
+            raise forms.ValidationError('User is not allowed to vote')
+
+    def save(self, commit=True):
+        votes = [
+            Vote(
+                election=self.election,
+                candidate=Application.objects.get(pk=int(name)),
+                vote=value
+            ) for name, value in self.cleaned_data.items()
+        ]
+
+        if commit:
+            with transaction.atomic():
+                Vote.objects.bulk_create(votes)
+                self.user.voted = True
+                self.user.save()
+
+        return votes

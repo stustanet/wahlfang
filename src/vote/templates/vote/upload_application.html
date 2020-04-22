@@ -1,7 +1,12 @@
 {% extends 'vote/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="row">
-    upload application
+  <div class="row justify-content-center">
+    <div class="card shadow">
+      <div class="card-body">
+        {% crispy form %}
+      </div>
+    </div>
   </div>
 {% endblock %}

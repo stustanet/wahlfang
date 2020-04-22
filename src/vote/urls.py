@@ -6,7 +6,8 @@ from vote import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('vote', views.vote, name='vote')
+    path('vote', views.vote, name='vote'),
+    path('upload_application', views.upload_application, name='upload-application'),
 ]
 
 # account management stuff

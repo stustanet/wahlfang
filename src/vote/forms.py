@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Candidate
+from vote.models import Application
 
 
 class TokenAuthenticationForm(forms.Form):
@@ -51,5 +51,5 @@ class TokenAuthenticationForm(forms.Form):
 
 class ApplicationUploadForm(forms.ModelForm):
     class Meta:
-        model = Candidate
+        model = Application
         fields = '__all__'

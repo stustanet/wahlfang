@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
+from vote.forms import ApplicationUploadForm
 
 
 @login_required
@@ -13,4 +15,22 @@ def index(request):
 def vote(request):
     context = {}
 
+    return render(request, template_name='vote/vote.html', context=context)
+
+
+@login_required
+def upload_application(request):
+    context = {
+        'form': ApplicationUploadForm()
+    }
+
+    if request.POST:
+        form = ApplicationUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            redirect('index')
+        else:
+            context['form'] = form
+
     return render(request, template_name='vote/upload_application.html', context=context)
+

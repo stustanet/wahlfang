@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'vote',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +67,11 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = {
+    'vote.authentication.TokenBackend',
+    'django.contrib.auth.backends.ModelBackend'
+}
 
 WSGI_APPLICATION = 'wahlfang.wsgi.application'
 
@@ -99,6 +105,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = '/login'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -118,6 +126,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+# Mail
+
+EMAIL_HOST = 'mail.stusta.de'
+EMAIL_SENDER = 'noreply@stustanet.de'
+EMAIL_PORT = 25
 
 
 # File upload, etc...

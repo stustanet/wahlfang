@@ -18,12 +18,14 @@ class Election(models.Model):
 class Token(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     used = models.BooleanField(default=False)
-    ip = models.CharField()  # TODO
+    # ip = models.CharField()  # TODO
+    # last_name = models.CharField(max_length=256)
+    # first_name = models.CharField(max_length=256)
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='tokens', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'Token'
+        return f'Token of {self.email}'
 
     @property
     def valid(self):
@@ -31,18 +33,18 @@ class Token(models.Model):
 
 
 class Candidate(models.Model):
-    lastname = models.CharField(max_length=256)
-    firstname = models.CharField(max_length=256)
+    last_name = models.CharField(max_length=256)
+    first_name = models.CharField(max_length=256)
     application = models.TextField()
     avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True)
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='candidates', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'Candidate {self.firstname} {self.lastname}'
+        return f'Candidate {self.first_name} {self.last_name}'
 
 
 class Vote(models.Model):
     election = models.ForeignKey(Election, related_name='votes', on_delete=models.CASCADE)
     candidate = models.ForeignKey(Candidate, related_name='votes', on_delete=models.CASCADE)
-    vote = models.CharField(choices=VOTE_CHOICES)
+    vote = models.CharField(choices=[(x, x) for x in VOTE_CHOICES], max_length=max(len(x) for x in VOTE_CHOICES))

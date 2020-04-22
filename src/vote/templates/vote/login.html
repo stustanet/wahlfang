@@ -1,0 +1,30 @@
+{% extends 'vote/base.html' %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-8 col-md-9">
+      <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body">
+          <div class="p-5">
+            <form class="user" action="{% url "login" %}" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label>Login with your token received by e-mail</label>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-control-user" id="id_token"
+                       name="{{ form.token.name }}"
+                       placeholder="Code">
+                {% if form.token.errors %}
+                  <div class="invalid-feedback">{{ form.token.errors }}</div>
+                {% endif %}
+              </div>
+              <input type="hidden" name="next" value="{{ next }}"/>
+              <button type="submit" class="btn btn-primary btn-user btn-block">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

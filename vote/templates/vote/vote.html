@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="row pt-3 justify-content-center">
+  <div class="row justify-content-center">
     <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
@@ -12,7 +12,37 @@
               <h4>Abstimmen</h4>
             </div>
             <hr>
-            {{ form|crispy }}
+            {% if form.non_field_errors %}
+              <div class="alert alert-block alert-danger">
+                <ul class="m-0">
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% for field in form.visible_fields %}
+              <div class="custom-control custom-checkbox d-flex justify-content-between">
+                <a
+                    class="text-decoration-none"
+                    data-toggle="collapse"
+                    href="#application-collapse-{{ field.auto_id }}"
+                    role="button"
+                    aria-expanded="false"
+                    aria-controls="application-collapse-{{ field.auto_id }}">
+                  {{ field.label }}
+                </a>
+                {{ field }}
+              </div>
+              <div class="collapse" id="application-collapse-{{ field.auto_id }}">
+                <div class="pt-3 pb-3 pl-4">
+                  <div class="card">
+                    {% include 'vote/application.html' with application=field.application %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            <hr>
             <button type="submit" class="btn btn-primary btn-block">Submit</button>
           </form>
         </div>

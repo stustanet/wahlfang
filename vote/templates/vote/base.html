@@ -9,9 +9,9 @@
   <meta http-equiv="content-language" content="de"/>
   <meta http-equiv="Content-Style-Type" content="text/css"/>
   <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/png">
-  <link rel="stylesheet" href="{% static "vote/../../../static/bootstrap-4.4.1-dist/css/bootstrap.min.css" %}"/>
+  <link rel="stylesheet" href="{% static "bootstrap-4.4.1-dist/css/bootstrap.min.css" %}"/>
   <link rel="stylesheet" href="{% static "vote/css/style.css" %}"/>
-  <title>{% block title %}Title{% endblock %}</title>
+  <title>{% block title %}StuStaNet Wahlfang{% endblock %}</title>
 </head>
 <body>
 
@@ -33,9 +33,9 @@
           <span class="navbar-text">StuStaNet Wahlfang</span>
           <ul class="navbar-nav">
             {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              </li>
             {% endif %}
           </ul>
         </div>
@@ -44,6 +44,24 @@
 
       <!-- Begin Page Content -->
       <div class="container">
+        <div class="row pt-3 justify-content-center">
+          <div class="col-8">
+            {% if messages %}
+              <div class="messages">
+                {% for message in messages %}
+                  <div
+                      class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
+                      role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
         {% block content_pre %}{% endblock %}
         {% block content %}
           No content here.
@@ -56,8 +74,8 @@
 
   </div>
 </div>
-<script src="{% static "vote/../../../static/js/jquery-3.5.0.min.js" %}" type="text/javascript"></script>
-<script src="{% static "vote/../../../static/bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js" %}"
+<script src="{% static "js/jquery-3.4.1.min.js" %}" type="text/javascript"></script>
+<script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js" %}"
         type="text/javascript"></script>
 {% block javascript %}
 {% endblock %}

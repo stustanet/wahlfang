@@ -1,27 +1,43 @@
 {% extends 'vote/base.html' %}
 
 {% block content %}
-  <div class="row pt-3 justify-content-center">
+  <div class="row justify-content-center">
     <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
           <h4>Abstimmungen</h4>
           <div class="list-group">
-            <a class="list-group-item list-group-item-action" href="{% url 'vote' %}">{{ voter.election.title }}</a>
+            <a class="list-group-item list-group-item-action" href="{% url 'vote' %}">
+              <span>{{ voter.election.title }}</span>
+              <small class="float-right text-muted">
+                {{ voter.election.application_due_date }} - {{ voter.election.end_date }}
+              </small>
+            </a>
           </div>
           <hr>
-          <h5>Bewerbungen</h5>
+          <h5>Bewerbungen
+            {% if not voter.election.can_apply %}
+              <small class="text-danger">nicht mehr möglich</small>
+            {% endif %}
+          </h5>
           <div class="list-group">
-            {% if voter.application %}
+            {% if voter.election.can_apply %}
+              {% if voter.application %}
+                <a
+                    class="list-group-item list-group-item-action"
+                    href="{% url 'upload-application' %}"
+                >Bewerbung bearbeiten</a>
+              {% else %}
+                <a
+                    class="list-group-item list-group-item-action"
+                    href="{% url 'upload-application' %}"
+                >Als Hausadmin bewerben</a>
+              {% endif %}
+            {% elif voter.application %}
               <a
                   class="list-group-item list-group-item-action"
-                  href="{% url 'upload-application' %}"
-              >Bewerbung bearbeiten</a>
-            {% else %}
-              <a
-                  class="list-group-item list-group-item-action"
-                  href="{% url 'upload-application' %}"
-              >Als Hausadmin bewerben</a>
+                  href="{% url 'view-application' voter.application.pk %}"
+              >Bewerbung ansehen</a>
             {% endif %}
           </div>
         </div>

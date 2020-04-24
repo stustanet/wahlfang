@@ -13,10 +13,9 @@ from vote.models import Application, User, VOTE_CHOICES, Vote, VOTE_ABSTENTION, 
 class TokenAuthenticationForm(forms.Form):
     error_messages = {
         'invalid_login': _(
-            "Please enter a correct %(username)s and password. Note that both "
-            "fields may be case-sensitive."
+            "Please enter a correct access code."
         ),
-        'inactive': _("This account is inactive."),
+        'inactive': _("This access code is inactive."),
     }
 
     token = forms.CharField(label='code', max_length=100)
@@ -37,7 +36,7 @@ class TokenAuthenticationForm(forms.Form):
             self.user_cache = authenticate(token=token)
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.errors_messages['invalid_login']
+                    self.error_messages['invalid_login']
                 )
 
         return self.cleaned_data

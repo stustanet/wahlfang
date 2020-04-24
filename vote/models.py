@@ -21,6 +21,10 @@ class Election(models.Model):
     max_votes_yes = models.IntegerField()
 
     @property
+    def closed(self):
+        return self.end_date > timezone.now()
+
+    @property
     def is_active(self):
         return self.start_date < timezone.now() < self.end_date
 

@@ -7,12 +7,35 @@
         <div class="card-body">
           <h4>Abstimmungen</h4>
           <div class="list-group">
-            <a class="list-group-item list-group-item-action" href="{% url 'vote' %}">
-              <span>{{ voter.election.title }}</span>
-              <small class="float-right text-muted">
-                {{ voter.election.application_due_date }} - {{ voter.election.end_date }}
-              </small>
-            </a>
+            {% if voter.can_vote %}
+              <a class="list-group-item list-group-item-action" href="{% url 'vote' %}">
+                <span>{{ voter.election.title }}</span>
+                <small class="float-right text-muted">
+                  {{ voter.election.application_due_date }} - {{ voter.election.end_date }}
+                </small>
+              </a>
+            {% elif voter.voted %}
+              <a class="list-group-item list-group-item-action" href="#">
+                <span>{{ voter.election.title }}</span>
+                <small class="float-right text-muted">
+                  Stimme abgegeben
+                </small>
+              </a>
+            {% elif voter.election.closed %}
+              <a class="list-group-item list-group-item-action" href="#">
+                <span>{{ voter.election.title }}</span>
+                <small class="float-right text-muted">
+                  Abstimmung geschlossen
+                </small>
+              </a>
+            {% else %}
+              <a class="list-group-item list-group-item-action" href="#">
+                <span>{{ voter.election.title }}</span>
+                <small class="float-right text-muted">
+                  Abstimmung geöffnet ab {{ voter.election.application_due_date }}
+                </small>
+              </a>
+            {% endif %}
           </div>
           <hr>
           <h5>Bewerbungen

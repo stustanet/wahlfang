@@ -36,9 +36,9 @@ def index(request):
 @token_login
 def vote(request):
     voter = User.objects.get(token=request.user.username)
-    # if not voter.can_vote:
-    #     messages.add_message(request, messages.ERROR, 'Voting is not enabled yet')
-    #     return redirect('index')
+    if not voter.can_vote:
+        messages.add_message(request, messages.ERROR, 'Voting is not enabled yet')
+        return redirect('index')
 
     context = {
         'form': VoteForm(request)
@@ -58,9 +58,9 @@ def vote(request):
 @token_login
 def upload_application(request):
     voter = User.objects.get(token=request.user.username)
-    # if not voter.election.can_apply:
-    #     messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
-    #     return redirect('index')
+    if not voter.election.can_apply:
+        messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
+        return redirect('index')
 
     instance = Application.objects.filter(user__token=request.user.username).first()
 

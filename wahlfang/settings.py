@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import logging
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -26,6 +27,13 @@ SECRET_KEY = '$rl7hy0b_$*7py@t0-!^%gdlqdv0f%1+h2s%rza@=2h#1$y1vw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+if DEBUG:
+    # will output to your console
+    logging.basicConfig(
+        level = logging.DEBUG,
+        format = '%(asctime)s %(levelname)s %(message)s',
+    )
 
 ALLOWED_HOSTS = []
 
@@ -72,7 +80,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = {
-    'vote.authentication.TokenBackend',
+    'vote.authentication.AccessCodeBackend',
     'django.contrib.auth.backends.ModelBackend'
 }
 
@@ -88,7 +96,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -115,7 +122,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-LOGIN_URL = '/login'
+LOGIN_URL = reverse_lazy('code_login')
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 
 

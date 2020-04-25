@@ -6,17 +6,20 @@
       <div class="card o-hidden border-0 shadow-lg my-5">
         <div class="card-body">
           <div class="p-5">
-            <form class="user" action="{% url "login" %}" method="post">
+            <form class="user" action="{% url "code_login" %}" method="post">
               {% csrf_token %}
               <div class="form-group">
-                <label>Login with your token received by e-mail</label>
+                <label>Login with your access code received by e-mail</label>
               </div>
               <div class="form-group">
-                <input type="text" class="form-control form-control-user" id="id_token"
-                       name="{{ form.token.name }}"
-                       placeholder="Code">
-                {% if form.token.errors %}
-                  <div class="invalid-feedback">{{ form.token.errors }}</div>
+                <input type="text" class="form-control form-control-user"
+                       id="id_access_code"
+                       name="{{ form.access_code.name }}"
+                       placeholder="Access Code"
+                       autofocus="true"
+                       required="true">
+                {% if form.access_code.errors %}
+                  <div class="invalid-feedback">{{ form.access_code.errors }}</div>
                 {% endif %}
               </div>
               <input type="hidden" name="next" value="{{ next }}"/>

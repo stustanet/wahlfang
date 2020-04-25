@@ -1,7 +1,11 @@
 from django.db import models
+from django.contrib.auth import password_validation
+from django.contrib.auth.hashers import (
+    check_password, is_password_usable, make_password,
+)
+from django.core.mail import send_mail
 from django.utils import timezone
-
-import uuid
+from django.utils.translation import gettext_lazy as _
 
 VOTE_ACCEPT = 'accept'
 VOTE_ABSTENTION = 'abstention'
@@ -38,45 +42,109 @@ class Election(models.Model):
 
     @property
     def applications(self):
-        return Application.objects.filter(user__in=self.participants.all())
+        return Application.objects.filter(voter__in=self.participants.all())
 
     def __str__(self):
         return self.title
 
 
-class User(models.Model):
-    token = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    voted = models.BooleanField(default=False)
-    last_name = models.CharField(max_length=256)
-    first_name = models.CharField(max_length=256)
+class Voter(models.Model):
+    voter_id = models.IntegerField(primary_key=True)
+    password = models.CharField(max_length=128)
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='participants', on_delete=models.CASCADE)
+    voted = models.BooleanField(default=False)
+
+    # last_name = models.CharField(max_length=256)
+    # first_name = models.CharField(max_length=256)
+
+    # Stores the raw password if set_password() is called so that it can
+    # be passed to password_changed() after the model is saved.
+    _password = None
+
+    USERNAME_FIELD = 'voter_id'
+
+    def __str__(self):
+        # return f'{self.first_name} {self.last_name}'
+        return '{:06d}'.format(self.voter_id)
+
+    def save(self, *args, **kwargs):
+        fields = kwargs.pop('update_fields', [])
+        if fields == ['last_login']:
+            return
+        super().save(*args, **kwargs)
+        if self._password is not None:
+            password_validation.password_changed(self._password, self)
+            self._password = None
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+        self._password = raw_password
+
+    def check_password(self, raw_password):
+        """
+        Return a boolean of whether the raw_password was correct. Handles
+        hashing formats behind the scenes.
+        """
+        def setter(raw_password):
+            self.set_password(raw_password)
+            # Password hash upgrades shouldn't be considered password changes.
+            self._password = None
+            self.save(update_fields=["password"])
+        return check_password(raw_password, self.password, setter)
+
+    def set_unusable_password(self):
+        # Set a value that will never be a valid hash
+        self.password = make_password(None)
+
+    def has_usable_password(self):
+        """
+        Return False if set_unusable_password() has been called for this user.
+        """
+        return is_password_usable(self.password)
+
+    def clean(self):
+        setattr(self, self.email, self.normalize_email(self.email))
 
     @classmethod
-    def user_exists(cls, token):
+    def normalize_email(cls, email):
+        """
+        Normalize the email address by lowercasing the domain part of it.
+        """
+        email = email or ''
         try:
-            t = uuid.UUID(token, version=4)
+            email_name, domain_part = email.strip().rsplit('@', 1)
         except ValueError:
-            return False
+            pass
+        else:
+            email = email_name + '@' + domain_part.lower()
+        return email
 
-        return cls.objects.filter(token=token).exists()
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        """Send an email to this user."""
+        send_mail(subject, message, from_email, [self.email], **kwargs)
 
     @property
     def can_vote(self):
         return not self.voted and self.election.can_vote
 
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+    @property
+    def is_authenticated(self):
+        """
+        Always return True. This is a way to tell if the user has been
+        authenticated in templates.
+        """
+        return True
 
 
 class Application(models.Model):
     text = models.TextField()
     avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True, blank=True)
-    user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE)
+    voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE)
     email = models.EmailField()
 
     def __str__(self):
-        return f'Application of {self.user} for {self.user.election}'
+        return f'Application of {self.voter} for {self.voter.election}'
 
 
 class Vote(models.Model):

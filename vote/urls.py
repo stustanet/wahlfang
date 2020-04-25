@@ -13,11 +13,11 @@ urlpatterns = [
 
 # account management stuff
 urlpatterns += [
-    path('code', views.code_authentication),
-    path('login', auth_views.LoginView.as_view(
-        authentication_form=forms.TokenAuthenticationForm,
+    path('code', auth_views.LoginView.as_view(
+        authentication_form=forms.AccessCodeAuthenticationForm,
         template_name='vote/login.html'
-    ), name='login'),
+    ), name='code_login'),
+    path('code/<str:access_code>', views.code_login),
     path('logout', auth_views.LogoutView.as_view(
         next_page='index',
     ), name='logout')

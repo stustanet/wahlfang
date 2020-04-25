@@ -1,24 +1,19 @@
-from crispy_forms.bootstrap import InlineRadios
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
 from django import forms
-from django.contrib.auth import authenticate
 from django.db import transaction
-
+from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Application, User, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
+from vote.models import Application, Voter, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
 
 
-class TokenAuthenticationForm(forms.Form):
+class AccessCodeAuthenticationForm(forms.Form):
     error_messages = {
         'invalid_login': _(
-            "Please enter a correct access code."
-        ),
-        'inactive': _("This access code is inactive."),
+            "Invalid access code."
+        )
     }
 
-    token = forms.CharField(label='code', max_length=100)
+    access_code = forms.CharField(label='access code')
 
     def __init__(self, request=None, *args, **kwargs):
         """
@@ -29,24 +24,19 @@ class TokenAuthenticationForm(forms.Form):
         self.user_cache = None
         super().__init__(*args, **kwargs)
 
-    def clean(self):
-        token = self.cleaned_data.get('token')
+        # self.fields['access_code'].max_length = 128
 
-        if token:
-            self.user_cache = authenticate(token=token)
+    def clean(self):
+        access_code = self.cleaned_data.get('access_code')
+        if access_code:
+            self.user_cache = authenticate(self.request, access_code=access_code)
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.error_messages['invalid_login']
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
                 )
 
         return self.cleaned_data
-
-    def confirm_login_allowed(self, user):
-        if not user.is_active:
-            raise forms.ValidationError(
-                self.error_messages['inactive'],
-                code='inactive',
-            )
 
     def get_user(self):
         return self.user_cache
@@ -60,11 +50,11 @@ class ApplicationUploadForm(forms.ModelForm):
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = User.objects.get(token=request.user.username)
+        self.voter = Voter.objects.get(voter_id=request.user.voter_id)
         self.request = request
 
-        self.fields['first_name'].initial = self.user.first_name
-        self.fields['last_name'].initial = self.user.last_name
+        # self.fields['first_name'].initial = self.user.first_name
+        # self.fields['last_name'].initial = self.user.last_name
 
     class Meta:
         model = Application
@@ -72,12 +62,12 @@ class ApplicationUploadForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        if not self.user.election.can_apply:
+        if not self.voter.election.can_apply:
             raise forms.ValidationError('Applications are currently not allowed')
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.user = self.user
+        instance.voter = self.voter
 
         if commit:
             instance.save()
@@ -94,7 +84,7 @@ class VoteBoundField(forms.BoundField):
 class VoteField(forms.ChoiceField):
     def __init__(self, *, application, **kwargs):
         super().__init__(
-            label=f'{application.user.first_name} {application.user.last_name}',
+            label=f'{application.voter.first_name} {application.voter.last_name}',
             choices=VOTE_CHOICES,
             widget=forms.RadioSelect(attrs={'class': 'vote-list'}),
             initial=VOTE_ABSTENTION,
@@ -109,8 +99,8 @@ class VoteField(forms.ChoiceField):
 class VoteForm(forms.Form):
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = User.objects.get(token=request.user.username)
-        self.election = self.user.election
+        self.voter = Voter.objects.get(voter_id=request.user.voter_id)
+        self.election = self.voter.election
         self.request = request
 
         for application in self.election.applications:
@@ -118,8 +108,8 @@ class VoteForm(forms.Form):
 
     def clean(self):
         super().clean()
-        if not self.user.can_vote:
-            raise forms.ValidationError('User is not allowed to vote')
+        if not self.voter.can_vote:
+            raise forms.ValidationError('You are not allowed to vote')
 
         votes_yes = 0
 
@@ -127,9 +117,9 @@ class VoteForm(forms.Form):
             if vote == VOTE_ACCEPT:
                 votes_yes += 1
 
-        if votes_yes > self.user.election.max_votes_yes:
+        if votes_yes > self.voter.election.max_votes_yes:
             raise forms.ValidationError(
-                f'Too many "yes" votes, only max. {self.user.election.max_votes_yes} allowed.')
+                f'Too many "yes" votes, only max. {self.voter.election.max_votes_yes} allowed.')
 
     def save(self, commit=True):
         votes = [
@@ -143,7 +133,7 @@ class VoteForm(forms.Form):
         if commit:
             with transaction.atomic():
                 Vote.objects.bulk_create(votes)
-                self.user.voted = True
-                self.user.save()
+                self.voter.voted = True
+                self.voter.save()
 
         return votes

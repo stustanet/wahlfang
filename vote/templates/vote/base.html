@@ -49,15 +49,27 @@
             {% if messages %}
               <div class="messages">
                 {% for message in messages %}
-                  <div
-                      class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
+                  <div class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
                       role="alert">
-                    {{ message }}
+                    {{ message|escape }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
                 {% endfor %}
+              </div>
+            {% endif %}
+            {% if form.errors %}
+              <div class="messages">
+                {% for error in form.non_field_errors %}
+                <div class="alert alert-dismissible fade show alert-danger"
+                    role="alert">
+                  {{ error|escape }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
               </div>
             {% endif %}
           </div>

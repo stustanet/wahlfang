@@ -1,41 +1,55 @@
+import string
+
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import User as DjangoUser
 
-from vote.models import User
+from vote.models import Voter
 
 
-def token_login(function=None):
+def voter_login_required(function=None):
     """
-    Decorator for views that checks that the user is with a token,
-    redirecting to the login page if needed.
+    Decorator for views that checks that the voter is logged in, redirecting
+    to the log-in page if necessary.
     """
     actual_decorator = user_passes_test(
-        lambda u: u.is_authenticated and User.user_exists(u.username),
+        lambda u: u.is_authenticated and isinstance(u, Voter)
     )
     if function:
         return actual_decorator(function)
     return actual_decorator
 
 
-class TokenBackend(BaseBackend):
-    def authenticate(self, request, token=None):
-        valid = User.user_exists(token)
-
-        if not valid:
+class AccessCodeBackend(BaseBackend):
+    def authenticate(self, request, access_code=None):
+        if access_code is None:
             return None
 
-        user = DjangoUser.objects.get_or_create(username=token)[0]
-        user.set_unusable_password()
-        user.is_staff = False
-        user.is_superuser = False
-        user.is_active = True
+        voter_id, password = self.split_access_code(access_code)
+        if not voter_id:
+            return None
 
-        # user.first_name = token.first_name
-        # user.last_name = token.last_name
-        user.save()
+        try:
+            voter = Voter.objects.get(voter_id=voter_id)
+        except Voter.DoesNotExist:
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a nonexistent user (#20760).
+            Voter().set_password(password)
+        else:
+            if voter.check_password(password):
+                return voter
 
-        return user
+    @classmethod
+    def split_access_code(cls, access_code=None):
+        if not access_code:
+            return (None, None)
+
+        access_code = access_code.replace('-', '')
+        if len(access_code) < 6 or not all(c in string.hexdigits for c in access_code):
+            return (None, None)
+
+        voter_id = int(access_code[:5], 16)
+        password = access_code[5:].lower()
+        return (voter_id, password)
 
     def get_user(self, user_id):
-        return DjangoUser.objects.filter(pk=user_id).first()
+        return Voter.objects.filter(pk=user_id).first()

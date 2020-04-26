@@ -1,10 +1,15 @@
+import textwrap
+
+from django.conf import settings
 from django.db import models
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
 VOTE_ACCEPT = 'accept'
@@ -54,9 +59,10 @@ class Voter(models.Model):
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='participants', on_delete=models.CASCADE)
     voted = models.BooleanField(default=False)
+    room = models.CharField(max_length=100)
 
-    # last_name = models.CharField(max_length=256)
-    # first_name = models.CharField(max_length=256)
+    last_name = models.CharField(max_length=256)
+    first_name = models.CharField(max_length=256)
 
     # Stores the raw password if set_password() is called so that it can
     # be passed to password_changed() after the model is saved.
@@ -86,11 +92,13 @@ class Voter(models.Model):
         Return a boolean of whether the raw_password was correct. Handles
         hashing formats behind the scenes.
         """
+
         def setter(raw_password):
             self.set_password(raw_password)
             # Password hash upgrades shouldn't be considered password changes.
             self._password = None
             self.save(update_fields=["password"])
+
         return check_password(raw_password, self.password, setter)
 
     def set_unusable_password(self):
@@ -136,11 +144,48 @@ class Voter(models.Model):
         """
         return True
 
+    def send_invitation(self, access_code):
+        subject = 'Election invitaion blub blub'
+        context = {
+            'voter': self,
+            'election': self.election,
+            'access_code': access_code
+        }
+        body = render_to_string('vote/mails/invitation.j2', context=context)
+
+        self.email_user(
+            subject=subject,
+            message=body,
+            from_email=settings.EMAIL_SENDER
+        )
+
+    @staticmethod
+    def get_access_code(voter_id, raw_password):
+        hex_id = f'{voter_id:0{5}x}'
+        code = hex_id + '-' + '-'.join(textwrap.wrap(raw_password, 5))
+        return code
+
+    @classmethod
+    def from_data(cls, voter_id, first_name, last_name, election, email):
+        password = get_random_string(length=30, allowed_chars='abcdef0123456789')
+        voter = Voter(
+            voter_id=voter_id,
+            first_name=first_name,
+            last_name=last_name,
+            election=election,
+            email=email,
+        )
+        voter.set_password(password)
+
+        return voter, cls.get_access_code(voter_id, password)
+
 
 class Application(models.Model):
     text = models.TextField()
     avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True, blank=True)
     voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE)
+    last_name = models.CharField(max_length=256)
+    first_name = models.CharField(max_length=256)
     email = models.EmailField()
 
     def __str__(self):

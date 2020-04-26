@@ -1,20 +1,23 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect, get_object_or_404
+from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
 from vote.forms import ApplicationUploadForm, VoteForm
-from vote.models import Application, Voter
+from vote.models import Application
 
+
+@ratelimit(key='ip', rate='10/h')
 def code_login(request, access_code=None):
     if not access_code:
         messages.add_message(request, messages.ERROR, 'No access code provided.')
-        return redirect('code_login')
+        return redirect('vote:code_login')
 
     user = authenticate(access_code=access_code)
     if not user:
         messages.add_message(request, messages.ERROR, 'Invalid access code.')
-        return redirect('code_login')
+        return redirect('vote:code_login')
 
     login(request, user)
 
@@ -23,7 +26,7 @@ def code_login(request, access_code=None):
 
 @voter_login_required
 def index(request):
-    voter = Voter.objects.get(voter_id=request.user.voter_id)
+    voter = request.user
     context = {
         'voter': voter,
     }
@@ -33,10 +36,10 @@ def index(request):
 
 @voter_login_required
 def vote(request):
-    voter = Voter.objects.get(voter_id=request.user.voter_id)
+    voter = request.user
     if not voter.can_vote:
         messages.add_message(request, messages.ERROR, 'Voting is not enabled yet')
-        return redirect('index')
+        return redirect('vote:index')
 
     context = {
         'form': VoteForm(request)
@@ -46,7 +49,7 @@ def vote(request):
         form = VoteForm(request, request.POST)
         if form.is_valid():
             form.save()
-            return redirect('index')
+            return redirect('vote:index')
         context['form'] = form
 
     return render(request, template_name='vote/vote.html', context=context)
@@ -54,12 +57,12 @@ def vote(request):
 
 @voter_login_required
 def upload_application(request):
-    voter = Voter.objects.get(voter_id=request.user.voter_id)
+    voter = request.user
     if not voter.election.can_apply:
         messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
-        return redirect('index')
+        return redirect('vote:index')
 
-    instance = Application.objects.filter(voter=request.user.voter_id).first()
+    instance = Application.objects.filter(voter=voter.voter_id).first()
 
     context = {
         'form': ApplicationUploadForm(request, instance=instance)
@@ -69,7 +72,7 @@ def upload_application(request):
         form = ApplicationUploadForm(request, request.POST, request.FILES, instance=instance)
         if form.is_valid():
             form.save()
-            return redirect('index')
+            return redirect('vote:index')
         context['form'] = form
 
     return render(request, template_name='vote/upload_application.html', context=context)
@@ -77,7 +80,7 @@ def upload_application(request):
 
 @voter_login_required
 def view_application(request, pk):
-    voter = Voter.objects.get(voter_id=request.user.voter_id)
+    voter = request.user
     application = get_object_or_404(Application, pk=pk, voter__election__pk=voter.election.pk)
     context = {
         'application': application

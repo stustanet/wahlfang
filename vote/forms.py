@@ -43,8 +43,6 @@ class AccessCodeAuthenticationForm(forms.Form):
 
 
 class ApplicationUploadForm(forms.ModelForm):
-    first_name = forms.CharField(disabled=True)
-    last_name = forms.CharField(disabled=True)
 
     field_order = ['first_name', 'last_name', 'email', 'text', 'avatar']
 
@@ -53,12 +51,12 @@ class ApplicationUploadForm(forms.ModelForm):
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
         self.request = request
 
-        # self.fields['first_name'].initial = self.user.first_name
-        # self.fields['last_name'].initial = self.user.last_name
+        # self.fields['first_name'].initial = self.voter.first_name
+        # self.fields['last_name'].initial = self.voter.last_name
 
     class Meta:
         model = Application
-        fields = ('email', 'text', 'avatar')
+        fields = ('first_name', 'last_name', 'email', 'text', 'avatar')
 
     def clean(self):
         super().clean()

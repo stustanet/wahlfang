@@ -1,0 +1,54 @@
+{% extends 'management/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-8 col-md-9">
+      <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body">
+          <div class="p-5">
+            <form class="user" action="{% url "management:login" %}" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label>Admin login</label>
+              </div>
+{#              {% if form.non_field_errors %}#}
+{#                <div class="alert alert-block alert-danger">#}
+{#                  <ul class="m-0">#}
+{#                    {% for error in form.non_field_errors %}#}
+{#                      <li>{{ error }}</li>#}
+{#                    {% endfor %}#}
+{#                  </ul>#}
+{#                </div>#}
+{#              {% endif %}#}
+              <div class="form-group">
+                <input type="text" class="form-control form-control-user"
+                       id="id_username"
+                       name="{{ form.username.name }}"
+                       placeholder="Username"
+                       autofocus="true"
+                       required="true">
+                {% if form.username.errors %}
+                  <div class="invalid-feedback">{{ form.username.errors }}</div>
+                {% endif %}
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control form-control-user"
+                       id="id_password"
+                       name="{{ form.password.name }}"
+                       placeholder="Password"
+                       autofocus="true"
+                       required="true">
+                {% if form.password.errors %}
+                  <div class="invalid-feedback">{{ form.username.errors }}</div>
+                {% endif %}
+              </div>
+              <input type="hidden" name="next" value="{{ next }}"/>
+              <button type="submit" class="btn btn-primary btn-user btn-block">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

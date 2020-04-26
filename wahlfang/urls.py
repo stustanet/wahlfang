@@ -20,7 +20,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('vote.urls'))
+    path('', include('vote.urls', namespace='vote')),
+    path('management/', include('management.urls', namespace='management'))
 ]
 
 if settings.DEBUG:

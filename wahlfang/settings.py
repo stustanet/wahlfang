@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'vote',
+    'management',
 ]
 
 MIDDLEWARE = [
@@ -122,8 +123,8 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-LOGIN_URL = reverse_lazy('code_login')
-LOGIN_REDIRECT_URL = reverse_lazy('index')
+LOGIN_URL = reverse_lazy('vote:code_login')
+LOGIN_REDIRECT_URL = reverse_lazy('vote:index')
 
 
 # Internationalization

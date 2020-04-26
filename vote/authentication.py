@@ -41,15 +41,15 @@ class AccessCodeBackend(BaseBackend):
     @classmethod
     def split_access_code(cls, access_code=None):
         if not access_code:
-            return (None, None)
+            return None, None
 
         access_code = access_code.replace('-', '')
         if len(access_code) < 6 or not all(c in string.hexdigits for c in access_code):
-            return (None, None)
+            return None, None
 
         voter_id = int(access_code[:5], 16)
         password = access_code[5:].lower()
-        return (voter_id, password)
+        return voter_id, password
 
     def get_user(self, user_id):
         return Voter.objects.filter(pk=user_id).first()

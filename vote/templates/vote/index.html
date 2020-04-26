@@ -8,7 +8,7 @@
           <h4>Abstimmungen</h4>
           <div class="list-group">
             {% if voter.can_vote %}
-              <a class="list-group-item list-group-item-action" href="{% url 'vote' %}">
+              <a class="list-group-item list-group-item-action" href="{% url 'vote:vote' %}">
                 <span>{{ voter.election.title }}</span>
                 <small class="float-right text-muted">
                   {{ voter.election.application_due_date }} - {{ voter.election.end_date }}
@@ -48,18 +48,18 @@
               {% if voter.application %}
                 <a
                     class="list-group-item list-group-item-action"
-                    href="{% url 'upload_application' %}"
+                    href="{% url 'vote:upload_application' %}"
                 >Bewerbung bearbeiten</a>
               {% else %}
                 <a
                     class="list-group-item list-group-item-action"
-                    href="{% url 'upload_application' %}"
+                    href="{% url 'vote:upload_application' %}"
                 >Als Hausadmin bewerben</a>
               {% endif %}
             {% elif voter.application %}
               <a
                   class="list-group-item list-group-item-action"
-                  href="{% url 'view_application' voter.application.pk %}"
+                  href="{% url 'vote:view_application' voter.application.pk %}"
               >Bewerbung ansehen</a>
             {% endif %}
           </div>

@@ -37,6 +37,7 @@ class AccessCodeBackend(BaseBackend):
             Voter().set_password(password)
         else:
             if voter.check_password(password):
+                voter.backend = 'vote.authentication.AccessCodeBackend'
                 return voter
 
     @classmethod

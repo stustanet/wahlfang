@@ -1,5 +1,3 @@
-import string
-
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.decorators import user_passes_test
 
@@ -25,7 +23,7 @@ class AccessCodeBackend(BaseBackend):
         if access_code is None:
             return None
 
-        voter_id, password = self.split_access_code(access_code)
+        voter_id, password = Voter.split_access_code(access_code)
         if not voter_id:
             return None
 
@@ -39,19 +37,6 @@ class AccessCodeBackend(BaseBackend):
             if voter.check_password(password):
                 voter.backend = 'vote.authentication.AccessCodeBackend'
                 return voter
-
-    @classmethod
-    def split_access_code(cls, access_code=None):
-        if not access_code:
-            return None, None
-
-        access_code = access_code.replace('-', '')
-        if len(access_code) < 6 or not all(c in string.hexdigits for c in access_code):
-            return None, None
-
-        voter_id = int(access_code[:5], 16)
-        password = access_code[5:].lower()
-        return voter_id, password
 
     def get_user(self, user_id):
         return Voter.objects.filter(pk=user_id).first()

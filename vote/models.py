@@ -1,3 +1,4 @@
+import string
 import textwrap
 
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
+
 VOTE_ACCEPT = 'accept'
 VOTE_ABSTENTION = 'abstention'
 VOTE_REJECT = 'reject'
@@ -21,6 +23,37 @@ VOTE_CHOICES = [
     (VOTE_ABSTENTION, 'Enthaltung'),
 ]
 
+class Enc32:
+    alphabet = "0123456789abcdefghjknpqrstuvwxyz"
+    dec_map = {}
+    for index, c in enumerate(alphabet):
+        dec_map[c] = index
+    dec_map['o'] = dec_map['0']
+    dec_map['l'] = dec_map['1']
+    dec_map['i'] = dec_map['1']
+    dec_map['m'] = dec_map['n']
+
+    @staticmethod
+    def encode(i, length=None):
+        i = int(i)
+        out = ""
+        while i > 0:
+            idx = i & 0x1f
+            out = Enc32.alphabet[idx] + out
+            i >>= 5
+        if length:
+            if len(out) > length:
+                raise ValueError("value too large for given length")
+            out = Enc32.alphabet[0] * (length-len(out)) + out
+        return out
+
+    @staticmethod
+    def decode(s):
+        i = 0
+        for c in s:
+            i <<= 5
+            i += Enc32.dec_map[c]
+        return i
 
 class Election(models.Model):
     title = models.CharField(max_length=512)
@@ -159,14 +192,31 @@ class Voter(models.Model):
         )
 
     @staticmethod
-    def get_access_code(voter_id, raw_password):
-        hex_id = f'{voter_id:0{5}x}'
-        code = hex_id + '-' + '-'.join(textwrap.wrap(raw_password, 5))
-        return code
+    def get_access_code(voter, raw_password):
+        if isinstance(voter, Voter):
+            voter_id = voter.voter_id
+        else:
+            voter_id = int(voter)
+
+        enc_id = Enc32.encode(voter_id, 4)
+        return '-'.join(textwrap.wrap(enc_id+raw_password, 6))
+
+    @staticmethod
+    def split_access_code(access_code=None):
+        if not access_code:
+            return None, None
+
+        access_code = access_code.replace('-', '')
+        if len(access_code) < 5 or not all(c in Enc32.alphabet for c in access_code):
+            return None, None
+
+        voter_id = Enc32.decode(access_code[:4])
+        password = access_code[4:].lower()
+        return voter_id, password
 
     @classmethod
     def from_data(cls, voter_id, first_name, last_name, election, email):
-        password = get_random_string(length=30, allowed_chars='abcdef0123456789')
+        password = get_random_string(length=20, allowed_chars=Enc32.alphabet)
         voter = Voter(
             voter_id=voter_id,
             first_name=first_name,

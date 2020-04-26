@@ -3,19 +3,36 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 
-from vote.models import User, Election
+from vote.models import Enc32, Voter, Election
 
 
-def gen_token():
+class Enc32TestCase(TestCase):
+    def test_encoding(self):
+        for voter_id in (0, 12345, 999999):
+            e = Enc32.encode(voter_id)
+            d = Enc32.decode(e)
+            self.assertEqual(voter_id, d)
+
+class VoterTestCase(TestCase):
+    def test_access_code(self):
+        for voter_id in (0, 12345, 999999):
+            raw_password = Enc32.alphabet
+            code = Voter.get_access_code(voter_id, raw_password)
+            ret_voter_id, ret_password = Voter.split_access_code(code)
+            self.assertEqual(voter_id, ret_voter_id)
+            self.assertEqual(raw_password, ret_password)
+
+def gen_data():
     election = Election.objects.create(
         title='Test election 2020',
         start_date=timezone.now(),
         end_date=timezone.now() + datetime.timedelta(days=10)
     )
-    token = User.objects.create(
-        first_name='Test',
-        last_name='Test',
+    voter, access_code = Voter.from_data(
+        voter_id='012345',
+        first_name='First',
+        last_name='Last',
         email='spam@spam.spam',
         election=election
     )
-    return token
+    return voter, access_code

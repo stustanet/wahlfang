@@ -56,13 +56,12 @@ class Election(models.Model):
 class Voter(models.Model):
     voter_id = models.IntegerField(primary_key=True)
     password = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    room = models.CharField(max_length=64)
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='participants', on_delete=models.CASCADE)
     voted = models.BooleanField(default=False)
-    room = models.CharField(max_length=100)
-
-    last_name = models.CharField(max_length=256)
-    first_name = models.CharField(max_length=256)
 
     # Stores the raw password if set_password() is called so that it can
     # be passed to password_changed() after the model is saved.

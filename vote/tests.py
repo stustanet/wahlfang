@@ -26,7 +26,9 @@ def gen_data():
     election = Election.objects.create(
         title='Test election 2020',
         start_date=timezone.now(),
-        end_date=timezone.now() + datetime.timedelta(days=10)
+        application_due_date=timezone.now() + datetime.timedelta(days=7),
+        end_date=timezone.now() + datetime.timedelta(days=10),
+        max_votes_yes=2,
     )
     voter, access_code = Voter.from_data(
         voter_id='012345',

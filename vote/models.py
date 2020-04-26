@@ -217,7 +217,7 @@ class Voter(models.Model):
     @classmethod
     def from_data(cls, voter_id, first_name, last_name, election, email):
         password = get_random_string(length=20, allowed_chars=Enc32.alphabet)
-        voter = Voter(
+        voter = Voter.objects.create(
             voter_id=voter_id,
             first_name=first_name,
             last_name=last_name,

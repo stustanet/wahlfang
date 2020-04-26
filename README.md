@@ -8,6 +8,21 @@ StuStaNet Online Wahl-Tool
 $ pip3 install -r requirements.txt
 ```
 
+### Generating Test Data
+Create an election:
+```bash
+python3 manage.py createelection --title "Hausadminwahl SS20 im Testhaus"
+```
+
+Create a voter:
+```bash
+python3 manage.py createvoter --election_id 1 --voter_id 1337
+```
+
+You can login with the printed access code.
+
+### Admin Access
+
 Creating a superuser (for testing):
 ```bash
 $ python3 manage.py createsuperuser

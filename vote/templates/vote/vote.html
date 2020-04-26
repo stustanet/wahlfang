@@ -16,7 +16,7 @@
               <div class="alert alert-block alert-danger">
                 <ul class="m-0">
                   {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
+                    <li>{{ error|escape }}</li>
                   {% endfor %}
                 </ul>
               </div>

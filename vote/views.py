@@ -40,7 +40,7 @@ def code_login(request, access_code=None):
 
     login(request, user)
 
-    return redirect('index')
+    return redirect('vote:index')
 
 
 @voter_login_required

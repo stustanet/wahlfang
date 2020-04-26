@@ -1,6 +1,5 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-#from ratelimit.decorators import ratelimit
 from django.views.generic.base import RedirectView
 
 from vote import views

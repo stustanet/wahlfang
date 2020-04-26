@@ -6,13 +6,14 @@ from django.contrib.auth.decorators import user_passes_test
 from vote.models import Voter
 
 
-def voter_login_required(function=None):
+def voter_login_required(function=None, redirect_field_name=None):
     """
     Decorator for views that checks that the voter is logged in, redirecting
     to the log-in page if necessary.
     """
     actual_decorator = user_passes_test(
-        lambda u: u.is_authenticated and isinstance(u, Voter)
+        lambda u: u.is_authenticated and isinstance(u, Voter),
+        redirect_field_name=redirect_field_name
     )
     if function:
         return actual_decorator(function)

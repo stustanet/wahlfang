@@ -48,18 +48,18 @@
               {% if voter.application %}
                 <a
                     class="list-group-item list-group-item-action"
-                    href="{% url 'upload-application' %}"
+                    href="{% url 'upload_application' %}"
                 >Bewerbung bearbeiten</a>
               {% else %}
                 <a
                     class="list-group-item list-group-item-action"
-                    href="{% url 'upload-application' %}"
+                    href="{% url 'upload_application' %}"
                 >Als Hausadmin bewerben</a>
               {% endif %}
             {% elif voter.application %}
               <a
                   class="list-group-item list-group-item-action"
-                  href="{% url 'view-application' voter.application.pk %}"
+                  href="{% url 'view_application' voter.application.pk %}"
               >Bewerbung ansehen</a>
             {% endif %}
           </div>

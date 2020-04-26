@@ -21,7 +21,7 @@ python3 manage.py createvoter --election_id 1 --voter_id 1337
 
 You can login with the printed access code.
 
-### Admin Access
+### Admin Access (optional)
 
 Creating a superuser (for testing):
 ```bash

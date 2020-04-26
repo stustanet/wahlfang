@@ -14,7 +14,7 @@ urlpatterns = [
     path('code/', RedirectView.as_view(pattern_name='code_login')),
     path('code/<str:access_code>', views.code_login),
     path('logout', auth_views.LogoutView.as_view(
-        next_page='index',
+        next_page='vote:index',
     ), name='logout'),
 
     # voting

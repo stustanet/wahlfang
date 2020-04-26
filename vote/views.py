@@ -20,7 +20,7 @@ class LoginView(auth_views.LoginView):
         ratelimited = getattr(request, 'limited', False)
         if ratelimited:
             return render(request, template_name='vote/ratelimited.html', status=429)
-        return super().post(request, args, kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 @ratelimit(key='ip', rate='10/h', block=True)

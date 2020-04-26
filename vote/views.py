@@ -2,29 +2,33 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.shortcuts import render, redirect, get_object_or_404
 from ratelimit.decorators import ratelimit
-from ratelimit.mixins import RatelimitMixin
 
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, ApplicationUploadForm, VoteForm
 from vote.models import Application
 
 
-class LoginView(RatelimitMixin, auth_views.LoginView):
-    # ratelimiting
-    ratelimit_key = 'ip'
-    ratelimit_rate = '2/h'
-    ratelimit_block = True
-    ratelimit_method = 'POST'
-
+class LoginView(auth_views.LoginView):
     # login view settings
     # https://docs.djangoproject.com/en/3.0/topics/auth/default/#django.contrib.auth.views.LoginView
     authentication_form = AccessCodeAuthenticationForm
     template_name = 'vote/login.html'
     redirect_authenticated_user = True
 
+    @ratelimit(key='ip', rate='10/h', method='POST')
+    def post(self, request, *args, **kwargs):
+        ratelimited = getattr(request, 'limited', False)
+        if ratelimited:
+            return render(request, template_name='vote/ratelimited.html', status=429)
+        return super().post(request, args, kwargs)
+
 
 @ratelimit(key='ip', rate='10/h', block=True)
 def code_login(request, access_code=None):
+    ratelimited = getattr(request, 'limited', False)
+    if ratelimited:
+        return render(request, template_name='vote/ratelimited.html', status=429)
+
     if not access_code:
         messages.add_message(request, messages.ERROR, 'No access code provided.')
         return redirect('vote:code_login')

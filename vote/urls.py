@@ -1,9 +1,8 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from ratelimit.decorators import ratelimit
+#from ratelimit.decorators import ratelimit
 from django.views.generic.base import RedirectView
 
-from vote import forms
 from vote import views
 
 app_name = 'vote'
@@ -12,10 +11,7 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     # code login
-    path('code', ratelimit(auth_views.LoginView.as_view(
-        authentication_form=forms.AccessCodeAuthenticationForm,
-        template_name='vote/login.html'
-    ), key='ip', rate='10/h'), name='code_login'),
+    path('code', views.LoginView.as_view(), name='code_login'),
     path('code/', RedirectView.as_view(pattern_name='code_login')),
     path('code/<str:access_code>', views.code_login),
     path('logout', auth_views.LogoutView.as_view(

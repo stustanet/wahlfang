@@ -13,11 +13,11 @@
 <div id="content" style="height: 100%">
 
   <nav class="navbar navbar-expand navbar-dark bg-dark shadow">
-    <div class="container">
+    <div class="container-md">
       <a class="navbar-brand" href="{% url 'vote:index' %}">
         <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
       </a>
-      <span class="navbar-text">Online Voting System</span>
+      <div class="navbar-text">Online Voting System</div>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -33,7 +33,7 @@
     </div>
   </nav>
 
-  <article class="container" role="main">
+  <article class="container-md" role="main">
     <div class="row pt-3 justify-content-center">
       <div class="col-12">
         {% if messages %}

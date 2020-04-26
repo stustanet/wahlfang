@@ -1,90 +1,75 @@
 {% load static %}
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+<html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
-  <meta http-equiv="content-language" content="de"/>
-  <meta http-equiv="Content-Style-Type" content="text/css"/>
   <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/png">
   <link rel="stylesheet" href="{% static "bootstrap-4.4.1-dist/css/bootstrap.min.css" %}"/>
   <link rel="stylesheet" href="{% static "vote/css/style.css" %}"/>
-  <title>{% block title %}StuStaNet Wahlfang{% endblock %}</title>
+  <title>{% block title %}StuStaNet Online Voting System{% endblock %}</title>
 </head>
 <body>
+<div id="content" style="height: 100%">
 
-<!-- Page Wrapper -->
-<div id="wrapper">
-
-  <!-- Content Wrapper -->
-  <div id="content-wrapper" class="d-flex flex-column">
-
-    <!-- Main Content -->
-    <div id="content" style="height: 100%">
-
-      <!-- Topbar -->
-      <nav class="navbar navbar-expand navbar-dark bg-dark shadow justify-content-center">
-        <div class="d-flex">
-          <a class="navbar-brand" href="{% url 'vote:index' %}">
-            <img src="{% static "img/logo_inv.png" %}" width="180px" alt="StuStaNet-Logo">
-          </a>
-          <span class="navbar-text">StuStaNet Wahlfang</span>
-          <ul class="navbar-nav">
-            {% if user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'vote:logout' %}">Logout</a>
-              </li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
-      <!-- End of Topbar -->
-
-      <!-- Begin Page Content -->
-      <div class="container">
-        <div class="row pt-3 justify-content-center">
-          <div class="col-8">
-            {% if messages %}
-              <div class="messages">
-                {% for message in messages %}
-                  <div class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
-                      role="alert">
-                    {{ message|escape }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-            {% if form.errors %}
-              <div class="messages">
-                {% for error in form.non_field_errors %}
-                <div class="alert alert-dismissible fade show alert-danger"
-                    role="alert">
-                  {{ error|escape }}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-              {% endfor %}
-              </div>
-            {% endif %}
-          </div>
-        </div>
-        {% block content_pre %}{% endblock %}
-        {% block content %}
-          No content here.
-        {% endblock %}
+  <nav class="navbar navbar-expand navbar-dark bg-dark shadow">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'vote:index' %}">
+        <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
+      </a>
+      <span class="navbar-text">Online Voting System</span>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'vote:logout' %}">Logout</a>
+            </li>
+          {% endif %}
+        </ul>
       </div>
-      <!-- /.container-fluid -->
-
     </div>
-    <!-- End of Main Content -->
+  </nav>
 
-  </div>
+  <article class="container" role="main">
+    <div class="row pt-3 justify-content-center">
+      <div class="col-12">
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
+                  role="alert">
+                {{ message|escape }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if form.errors %}
+          <div class="messages">
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-dismissible fade show alert-danger"
+                role="alert">
+              {{ error|escape }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% block content_pre %}{% endblock %}
+    {% block content %}
+      No content here.
+    {% endblock %}
+  </article>
+
 </div>
 <script src="{% static "js/jquery-3.4.1.min.js" %}" type="text/javascript"></script>
 <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"

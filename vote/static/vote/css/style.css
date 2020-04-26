@@ -1,3 +1,13 @@
+@media (min-width: 768px) {
+    .container, .container-md, .container-sm {
+        max-width: 720px !important;
+    }
+}
+
+.navbar-brand img {
+    height: 1.6em;
+    margin-top: -0.3em;
+}
 
 .vote-list {
     list-style: none;

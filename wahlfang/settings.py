@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'wahlfang.urls'
@@ -151,6 +152,10 @@ STATICFILES_DIRS = [
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Content Security Policy
+# https://django-csp.readthedocs.io/en/latest/configuration.html#policy-settings
+CSP_DEFAULT_SRC = ("'self'",)
 
 # Mail
 

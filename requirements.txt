@@ -1,5 +1,6 @@
 Django==3.0.*
+argon2-cffi==19.2.*
 pillow==7.1.*
 django-crispy-forms==1.9.*
-argon2-cffi==19.2.*
+django-csp==3.6.*
 django-ratelimit==2.0.*

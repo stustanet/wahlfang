@@ -176,6 +176,16 @@ class Voter(models.Model):
         """
         return True
 
+    @property
+    def is_active(self):
+        return True
+
+    def has_module_perms(self, app_label):
+        return False
+
+    def get_username(self):
+        return str(self)
+
     def send_invitation(self, access_code):
         subject = 'Election invitaion blub blub'
         context = {

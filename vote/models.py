@@ -17,9 +17,9 @@ VOTE_ACCEPT = 'accept'
 VOTE_ABSTENTION = 'abstention'
 VOTE_REJECT = 'reject'
 VOTE_CHOICES = [
-    (VOTE_ACCEPT, 'für'),
-    (VOTE_REJECT, 'gegen'),
-    (VOTE_ABSTENTION, 'Enthaltung'),
+    (VOTE_ABSTENTION, 'Abstention'),
+    (VOTE_ACCEPT, 'Yes'),
+    (VOTE_REJECT, 'No'),
 ]
 
 
@@ -106,7 +106,7 @@ class Election(models.Model):
 
 class Voter(models.Model):
     voter_id = models.IntegerField(primary_key=True)
-    password = models.CharField(max_length=128)
+    password = models.CharField(max_length=256)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     room = models.CharField(max_length=64)
@@ -197,6 +197,10 @@ class Voter(models.Model):
     @property
     def is_active(self):
         return True
+
+    @property
+    def is_staff(self):
+        return False
 
     def has_module_perms(self, app_label):
         return False

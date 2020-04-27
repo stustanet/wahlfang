@@ -20,12 +20,43 @@
     }
 }
 
-.vote-list {
-    list-style: none;
+table.vote-list {
     margin: 0;
-    padding: 0;
 }
 
-.vote-list li {
-    display: inline;
+table.vote-list th.choice {
+    width: 15%;
+}
+
+table.vote-list th:nth-child(2),
+table.vote-list td:nth-child(2) {
+    border-left: 1px solid #dee2e6;
+}
+
+table.vote-list th:nth-child(3),
+table.vote-list td:nth-child(3) {
+    border-right: 1px solid #dee2e6;
+}
+
+table.vote-list td:last-child {
+    background: #e9ecef;
+}
+
+table.vote-list td.applicant .col-3 {
+    min-width: 50px;
+    max-width: 100px;
+}
+
+table.vote-list td.applicant .card-body {
+    padding: 1vw;
+    padding-top: 0;
+}
+
+table.vote-list td.applicant .card-title {
+    font-size: 1.15rem;
+    margin-bottom: .25rem;
+}
+
+table.vote-list td.applicant p {
+    font-size: 0.8em;
 }

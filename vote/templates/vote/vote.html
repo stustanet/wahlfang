@@ -1,5 +1,6 @@
 {% extends 'vote/base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -21,27 +22,44 @@
                 </ul>
               </div>
             {% endif %}
-            {% for field in form.visible_fields %}
-              <div class="custom-control custom-checkbox d-flex justify-content-between">
-                <a
-                    class="text-decoration-none"
-                    data-toggle="collapse"
-                    href="#application-collapse-{{ field.auto_id }}"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="application-collapse-{{ field.auto_id }}">
-                  {{ field.label }}
-                </a>
-                {{ field }}
-              </div>
-              <div class="collapse" id="application-collapse-{{ field.auto_id }}">
-                <div class="pt-3 pb-3 pl-4">
-                  <div class="card">
-                    {% include 'vote/application.html' with application=field.application %}
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
+            <div class="table-responsive">
+              <table class="table table-sm vote-list">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Applicant (Room)</th>
+                    <th class="choice text-center">Abstention</th>
+                    <th class="choice text-center">YES</th>
+                    <th class="choice text-center text-muted" title="NO should only be selected if you want to vote EXPLICITLY AGAINST this applicant">NO*</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for field in form.visible_fields %}
+                  <tr>
+                    <td class="applicant">
+                      <div class="row no-gutters">
+                        <div class="col-3">
+                          {% if field.application.avatar %}
+                            <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
+                          {% else %}
+                            <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
+                          {% endif %}
+                        </div>
+                        <div class="col-9">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ field.label }}</h5>
+                            <p class="card-text">{{ field.application.text }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    {% for radio in field %}
+                    <td class="text-center"><label class="radio" for="{{ radio.id_for_label }}" title="{{ radio.choice_label }}">{{ radio.tag }}</label></td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
             <hr>
             <button type="submit" class="btn btn-primary btn-block">Submit</button>
           </form>

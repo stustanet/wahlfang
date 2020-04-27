@@ -4,7 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon16.png' %}" sizes="16x16" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon32.png' %}" sizes="32x32" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon64.png' %}" sizes="64x64" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon128.png' %}" sizes="128x128" />
   <link rel="stylesheet" href="{% static "bootstrap-4.4.1-dist/css/bootstrap.min.css" %}"/>
   <link rel="stylesheet" href="{% static "vote/css/style.css" %}"/>
   <title>{% block title %}StuStaNet Online Voting System{% endblock %}</title>

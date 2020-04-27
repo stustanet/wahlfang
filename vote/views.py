@@ -23,7 +23,7 @@ class LoginView(auth_views.LoginView):
         return super().post(request, *args, **kwargs)
 
 
-@ratelimit(key='ip', rate='10/h', block=True)
+@ratelimit(key='ip', rate='10/h')
 def code_login(request, access_code=None):
     ratelimited = getattr(request, 'limited', False)
     if ratelimited:

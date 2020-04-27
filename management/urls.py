@@ -6,7 +6,8 @@ from management import views
 app_name = 'management'
 
 urlpatterns = [
-    path('', views.index, name='index')
+    path('', views.index, name='index'),
+    path('election_result/<int:pk>', views.election_result, name='election_result'),
 ]
 
 # account management stuff

@@ -1,4 +1,3 @@
-import string
 import textwrap
 
 from django.conf import settings
@@ -8,11 +7,11 @@ from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
 from django.core.mail import send_mail
+from django.db.models import Count, Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
-
 
 VOTE_ACCEPT = 'accept'
 VOTE_ABSTENTION = 'abstention'
@@ -22,6 +21,7 @@ VOTE_CHOICES = [
     (VOTE_REJECT, 'gegen'),
     (VOTE_ABSTENTION, 'Enthaltung'),
 ]
+
 
 class Enc32:
     alphabet = "0123456789abcdefghjknpqrstuvwxyz"
@@ -44,7 +44,7 @@ class Enc32:
         if length:
             if len(out) > length:
                 raise ValueError("value too large for given length")
-            out = Enc32.alphabet[0] * (length-len(out)) + out
+            out = Enc32.alphabet[0] * (length - len(out)) + out
         return out
 
     @staticmethod
@@ -54,6 +54,7 @@ class Enc32:
             i <<= 5
             i += Enc32.dec_map[c]
         return i
+
 
 class Election(models.Model):
     title = models.CharField(max_length=512)
@@ -81,6 +82,23 @@ class Election(models.Model):
     @property
     def applications(self):
         return Application.objects.filter(voter__in=self.participants.all())
+
+    @property
+    def election_summary(self):
+        if not self.closed:
+            return self.objects.none()
+
+        votes_accept = Count('votes', filter=Q(votes__vote=VOTE_ACCEPT))
+        votes_reject = Count('votes', filter=Q(votes__vote=VOTE_REJECT))
+        votes_abstention = Count('votes', filter=Q(votes__vote=VOTE_ABSTENTION))
+
+        applications = Application.objects.filter(voter__election=self).annotate(
+            votes_accept=votes_accept,
+            votes_reject=votes_reject,
+            votes_abstention=votes_abstention
+        ).order_by('votes_accept')
+
+        return applications
 
     def __str__(self):
         return self.title
@@ -186,6 +204,10 @@ class Voter(models.Model):
     def get_username(self):
         return str(self)
 
+    @property
+    def is_staff(self):
+        return False
+
     def send_invitation(self, access_code):
         subject = 'Election invitaion blub blub'
         context = {
@@ -209,7 +231,7 @@ class Voter(models.Model):
             voter_id = int(voter)
 
         enc_id = Enc32.encode(voter_id, 4)
-        return '-'.join(textwrap.wrap(enc_id+raw_password, 6))
+        return '-'.join(textwrap.wrap(enc_id + raw_password, 6))
 
     @staticmethod
     def split_access_code(access_code=None):
@@ -227,7 +249,7 @@ class Voter(models.Model):
     @classmethod
     def from_data(cls, voter_id, first_name, last_name, election, email):
         password = get_random_string(length=20, allowed_chars=Enc32.alphabet)
-        voter = Voter.objects.create(
+        voter = Voter(
             voter_id=voter_id,
             first_name=first_name,
             last_name=last_name,
@@ -235,6 +257,7 @@ class Voter(models.Model):
             email=email,
         )
         voter.set_password(password)
+        voter.save()
 
         return voter, cls.get_access_code(voter_id, password)
 

@@ -43,9 +43,9 @@
       <!-- End of Topbar -->
 
       <!-- Begin Page Content -->
-      <div class="container">
+      <div class="container-fluid">
         <div class="row pt-3 justify-content-center">
-          <div class="col-8">
+          <div class="col-12">
             {% if messages %}
               <div class="messages">
                 {% for message in messages %}
@@ -86,8 +86,8 @@
 
   </div>
 </div>
-<script src="{% static "js/jquery-3.4.1.min.js" %}" type="text/javascript"></script>
-<script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js" %}"
+<script src="{% static "js/jquery-3.4.1.slim.min.js" %}" type="text/javascript"></script>
+<script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
         type="text/javascript"></script>
 {% block javascript %}
 {% endblock %}

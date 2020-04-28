@@ -24,6 +24,12 @@ table.vote-list {
     margin: 0;
 }
 
+table.vote-list th {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 table.vote-list th.choice {
     width: 15%;
 }
@@ -40,6 +46,14 @@ table.vote-list td:nth-child(3) {
 
 table.vote-list td:last-child {
     background: #e9ecef;
+}
+
+table.vote-list tfoot td {
+    border-left: none !important;
+    border-right: none !important;
+    background: none !important;
+    color: #495057;
+    font-size: 0.8em;
 }
 
 table.vote-list td.applicant .col-3 {
@@ -59,4 +73,10 @@ table.vote-list td.applicant .card-title {
 
 table.vote-list td.applicant p {
     font-size: 0.8em;
+}
+
+table.vote-list label {
+    width: 100%;
+    height: 100%;
+    min-height: 50px;
 }

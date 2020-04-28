@@ -61,7 +61,9 @@ def vote(request):
         return redirect('vote:index')
 
     context = {
-        'form': VoteForm(request)
+        'form': VoteForm(request),
+        'title': voter.election.title,
+        'max_votes_yes': voter.election.max_votes_yes,
     }
 
     if request.POST:

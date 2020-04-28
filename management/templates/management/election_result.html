@@ -6,7 +6,10 @@
       <div class="card shadow">
         <div class="card-body">
           <h4>{{ election.title }}</h4>
-          <div class="list-group">
+          {% if not election.closed %}
+            <div>Abstimmung noch offen</div>
+            <div>Wahlzeitraum: {{ election.application_due_date }} - {{ election.end_date }}</div>
+          {% else %}
             <table class="table table-striped">
               <thead class="thead-dark">
               <tr>
@@ -34,8 +37,8 @@
               {% endfor %}
               </tbody>
             </table>
-          </div>
-        </div>
+            </div>
+          {% endif %}
       </div>
     </div>
 {% endblock %}

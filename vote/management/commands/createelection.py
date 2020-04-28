@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from vote.models import Election
 
+
 class Command(BaseCommand):
     help = 'Creates a new election'
 

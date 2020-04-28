@@ -1,9 +1,7 @@
-import datetime
-
-from django.core.management.base import BaseCommand, CommandError
-from django.utils import timezone
+from django.core.management.base import BaseCommand
 
 from vote.models import Election, Voter
+
 
 class Command(BaseCommand):
     help = 'Creates a new Voter'

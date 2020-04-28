@@ -1,8 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
 
-from vote.models import Election, Application
+from vote.models import Election
 
 
 @staff_member_required(login_url='/management/login')

@@ -1,7 +1,7 @@
 import textwrap
 
 from django.conf import settings
-from django.db import models
+from django.db import models, IntegrityError
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
@@ -9,6 +9,7 @@ from django.contrib.auth.hashers import (
 from django.core.mail import send_mail
 from django.db.models import Count, Q
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
@@ -65,7 +66,7 @@ class Election(models.Model):
 
     @property
     def closed(self):
-        return self.end_date > timezone.now()
+        return self.end_date < timezone.now()
 
     @property
     def is_active(self):
@@ -121,8 +122,7 @@ class Voter(models.Model):
     USERNAME_FIELD = 'voter_id'
 
     def __str__(self):
-        # return f'{self.first_name} {self.last_name}'
-        return '{:06d}'.format(self.voter_id)
+        return f'{self.first_name} {self.last_name}'
 
     def save(self, *args, **kwargs):
         fields = kwargs.pop('update_fields', [])
@@ -213,10 +213,11 @@ class Voter(models.Model):
         return False
 
     def send_invitation(self, access_code):
-        subject = 'Election invitaion blub blub'
+        subject = 'Einladung Online Hausadminwahl'
         context = {
             'voter': self,
             'election': self.election,
+            'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}),
             'access_code': access_code
         }
         body = render_to_string('vote/mails/invitation.j2', context=context)
@@ -251,12 +252,16 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, voter_id, first_name, last_name, election, email):
+    def from_data(cls, voter_id, first_name, last_name, room, election, email):
+        if Voter.objects.filter(voter_id=voter_id).exists():
+            raise IntegrityError('voter id not unique')
+
         password = get_random_string(length=20, allowed_chars=Enc32.alphabet)
         voter = Voter(
             voter_id=voter_id,
             first_name=first_name,
             last_name=last_name,
+            room=room,
             election=election,
             email=email,
         )

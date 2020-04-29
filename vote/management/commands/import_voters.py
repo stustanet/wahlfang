@@ -16,6 +16,7 @@ class Command(BaseCommand):
         parser.add_argument('--end-date', type=str, required=True)
         parser.add_argument('--max-votes-yes', type=int, required=True)
         parser.add_argument('--csv', type=str, required=True)
+        parser.add_argument('--jitsi-link', type=str, required=True)
 
     def handle(self, *args, **options):
         f = Path(options['csv'])
@@ -46,6 +47,6 @@ class Command(BaseCommand):
                     email=row[4],
                     election=election,
                 )
-                voter.send_invitation(access_code)
+                voter.send_invitation(access_code, conference_link=options['jitsi_link'])
 
         self.stdout.write(self.style.SUCCESS(f'Successfully created {len(election.participants.all())} voters'))

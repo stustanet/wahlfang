@@ -212,13 +212,14 @@ class Voter(models.Model):
     def is_staff(self):
         return False
 
-    def send_invitation(self, access_code):
+    def send_invitation(self, access_code, conference_link):
         subject = 'Einladung Online Hausadminwahl'
         context = {
             'voter': self,
             'election': self.election,
             'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}),
-            'access_code': access_code
+            'access_code': access_code,
+            'conference_link': conference_link
         }
         body = render_to_string('vote/mails/invitation.j2', context=context)
 

@@ -91,14 +91,3 @@ def upload_application(request):
         context['form'] = form
 
     return render(request, template_name='vote/upload_application.html', context=context)
-
-
-@voter_login_required
-def view_application(request, pk):
-    voter = request.user
-    application = get_object_or_404(Application, pk=pk, voter__election__pk=voter.election.pk)
-    context = {
-        'application': application
-    }
-
-    return render(request, template_name='vote/view_application.html', context=context)

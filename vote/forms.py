@@ -82,7 +82,7 @@ class VoteBoundField(forms.BoundField):
 class VoteField(forms.ChoiceField):
     def __init__(self, *, application, **kwargs):
         super().__init__(
-            label=f'{application.first_name} {application.last_name} ({application.voter.room})',
+            label=application.get_display_name(),
             choices=VOTE_CHOICES,
             widget=forms.RadioSelect(),
             initial=VOTE_ABSTENTION,

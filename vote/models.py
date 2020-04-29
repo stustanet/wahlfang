@@ -281,7 +281,10 @@ class Application(models.Model):
     email = models.EmailField()
 
     def __str__(self):
-        return f'Application of {self.voter} for {self.voter.election}'
+        return f'Application of {self.get_display_name()} for {self.voter.election}'
+
+    def get_display_name(self):
+        return f'{self.first_name} {self.last_name} ({self.voter.room})'
 
 
 class Vote(models.Model):

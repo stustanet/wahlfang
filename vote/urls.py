@@ -19,6 +19,4 @@ urlpatterns = [
 
     # applications
     path('application', views.upload_application, name='upload_application'),
-    path('application/', RedirectView.as_view(pattern_name='upload_application')),
-    path('application/<pk>', views.view_application, name='view_application')
 ]

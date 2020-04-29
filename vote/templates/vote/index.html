@@ -1,5 +1,6 @@
 {% extends 'vote/base.html' %}
 {% load static %}
+{% load vote_extras %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -53,7 +54,7 @@
                     </div>
                     <div class="col-9">
                       <div class="card-body">
-                        <h5 class="card-title">TODO: Name (0123)</h5>
+                        <h5 class="card-title">{% applicant_name application %}</h5>
                         <p class="card-text">{{ application.text|escape }}</p>
                       </div>
                     </div>

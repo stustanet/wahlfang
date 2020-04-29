@@ -74,22 +74,22 @@ table.vote-list td.applicant {
     padding-left: 0;
 }
 
-table.vote-list td.applicant .col-3 {
+.vote-list .applicant .col-3 {
     min-width: 50px;
     max-width: 100px;
 }
 
-table.vote-list td.applicant .card-body {
+.vote-list .applicant .card-body {
     padding: 1vw;
     padding-top: 0;
 }
 
-table.vote-list td.applicant .card-title {
+.vote-list .applicant .card-title {
     font-size: 1.15rem;
     margin-bottom: .25rem;
 }
 
-table.vote-list td.applicant p {
+.vote-list .applicant p {
     font-size: 0.8em;
 }
 

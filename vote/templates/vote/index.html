@@ -1,11 +1,12 @@
 {% extends 'vote/base.html' %}
+{% load static %}
 
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <h4 class="mb-0">{{ voter.election.title }}</h4>
+          <h4 class="mb-0">{{ title }}</h4>
           <small class="text-muted">Voting Period: {{ voter.election.application_due_date }} - {{ voter.election.end_date }}</small>
           <hr>
           <div class="list-group mt-3">
@@ -28,18 +29,38 @@
           <hr>
           <h5 class="mb-0">Your Application</h5>
           <small class="text-muted">Application Period: {{ voter.election.start_date }} - {{ voter.election.application_due_date }}</small>
-          <div class="list-group">
+          <div class="list-group mt-3">
             {% if voter.application %}
-              <a
-                  class="list-group-item list-group-item-action"
-                  href="{% url 'vote:upload_application' %}"
-              >Bewerbung bearbeiten</a>
+              <a class="btn btn-success" role="button" href="{% url 'vote:upload_application' %}">Edit Application</a>
             {% else %}
-              <a
-                  class="list-group-item list-group-item-action"
-                  href="{% url 'vote:upload_application' %}"
-              >Als Hausadmin bewerben</a>
+              <a class="btn btn-primary" role="button" href="{% url 'vote:upload_application' %}">Apply as Network Admin</a>
             {% endif %}
+          </div>
+          <h5 class="mb-0 mt-4">Current Applications</h5>
+          <small class="text-muted">Up to {{ max_votes_yes }} network admins (Hausadmins) will be elected. Apply now!</small>
+          <div class="mt-3">
+            <div class="row row-cols-1 row-cols-md-2 vote-list">
+            {% for application in voter.election.applications %}
+              <div class="col mb-4">
+                <div class="card applicant">
+                  <div class="row no-gutters">
+                    <div class="col-3">
+                      {% if application.avatar %}
+                        <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
+                      {% else %}
+                        <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
+                      {% endif %}
+                    </div>
+                    <div class="col-9">
+                      <div class="card-body">
+                        <h5 class="card-title">TODO: Name (0123)</h5>
+                        <p class="card-text">{{ application.text|escape }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
           </div>
           {% endif %}
         </div>

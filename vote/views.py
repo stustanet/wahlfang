@@ -67,9 +67,6 @@ def index(request):
         return render(request, template_name='vote/vote.html', context=context)
 
     # overview
-    context = {
-        'voter': voter,
-    }
     return render(request, template_name='vote/index.html', context=context)
 
 

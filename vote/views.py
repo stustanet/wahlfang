@@ -46,34 +46,31 @@ def code_login(request, access_code=None):
 @voter_login_required
 def index(request):
     voter = request.user
+
     context = {
+        'title': voter.election.title,
+        'max_votes_yes': voter.election.max_votes_yes,
         'voter': voter,
     }
 
-    return render(request, template_name='vote/index.html', context=context)
+    # vote
+    if voter.can_vote:
+        if request.POST:
+            form = VoteForm(request, request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('vote:index')
+            context['form'] = form
+        else:
+            context['form'] = VoteForm(request)
 
+        return render(request, template_name='vote/vote.html', context=context)
 
-@voter_login_required
-def vote(request):
-    voter = request.user
-    if not voter.can_vote:
-        messages.add_message(request, messages.ERROR, 'Voting is not enabled yet')
-        return redirect('vote:index')
-
+    # overview
     context = {
-        'form': VoteForm(request),
-        'title': voter.election.title,
-        'max_votes_yes': voter.election.max_votes_yes,
+        'voter': voter,
     }
-
-    if request.POST:
-        form = VoteForm(request, request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('vote:index')
-        context['form'] = form
-
-    return render(request, template_name='vote/vote.html', context=context)
+    return render(request, template_name='vote/index.html', context=context)
 
 
 @voter_login_required

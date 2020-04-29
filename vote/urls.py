@@ -17,9 +17,6 @@ urlpatterns = [
         next_page='vote:index',
     ), name='logout'),
 
-    # voting
-    path('vote', views.vote, name='vote'),
-
     # applications
     path('application', views.upload_application, name='upload_application'),
     path('application/', RedirectView.as_view(pattern_name='upload_application')),

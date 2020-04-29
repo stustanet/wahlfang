@@ -7,10 +7,11 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <form action="{% url 'vote:vote' %}" method="post">
+          <form action="{% url 'vote:index' %}" method="post">
             {% csrf_token %}
             <div class="form-group">
-              <h4>{{ title }}</h4>
+              <h4 class="mb-0">{{ title }}</h4>
+              <small class="text-muted">Voting Period: {{ voter.election.application_due_date }} - {{ voter.election.end_date }}</small>
             </div>
             <hr>
             {% if form.non_field_errors %}

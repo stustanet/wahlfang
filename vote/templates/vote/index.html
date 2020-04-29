@@ -5,64 +5,43 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Abstimmungen</h4>
-          <div class="list-group">
+          <h4 class="mb-0">{{ voter.election.title }}</h4>
+          <small class="text-muted">Voting Period: {{ voter.election.application_due_date }} - {{ voter.election.end_date }}</small>
+          <hr>
+          <div class="list-group mt-3">
             {% if voter.can_vote %}
-              <a class="list-group-item list-group-item-action" href="{% url 'vote:vote' %}">
-                <span>{{ voter.election.title }}</span>
-                <small class="float-right text-muted">
-                  {{ voter.election.application_due_date }} - {{ voter.election.end_date }}
-                </small>
-              </a>
+              <a class="btn btn-primary" role="button" href="{% url 'vote:vote' %}">Vote Now!</a>
             {% elif voter.voted %}
-              <a class="list-group-item list-group-item-action" href="#">
-                <span>{{ voter.election.title }}</span>
-                <small class="float-right text-muted">
-                  Stimme abgegeben
-                </small>
-              </a>
+              <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Thank You For Your Vote!</h4>
+                <hr>
+                <p class="mb-0">This election will end {{ voter.election.end_date }}</p>
+              </div>
             {% elif voter.election.closed %}
-              <a class="list-group-item list-group-item-action" href="#">
-                <span>{{ voter.election.title }}</span>
-                <small class="float-right text-muted">
-                  Abstimmung geschlossen
-                </small>
-              </a>
+              <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting ended</a>
             {% else %}
-              <a class="list-group-item list-group-item-action" href="#">
-                <span>{{ voter.election.title }}</span>
-                <small class="float-right text-muted">
-                  Abstimmung geöffnet ab {{ voter.election.application_due_date }}
-                </small>
-              </a>
+              <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting starts {{voter.election.application_due_date }}</a>
+              <p class="mt-3">TODO: remind me via email</p>
             {% endif %}
           </div>
+          {% if voter.election.can_apply %}
           <hr>
-          <h5>Bewerbungen
-            {% if not voter.election.can_apply %}
-              <small class="text-danger">nicht mehr möglich</small>
-            {% endif %}
-          </h5>
+          <h5 class="mb-0">Your Application</h5>
+          <small class="text-muted">Application Period: {{ voter.election.start_date }} - {{ voter.election.application_due_date }}</small>
           <div class="list-group">
-            {% if voter.election.can_apply %}
-              {% if voter.application %}
-                <a
-                    class="list-group-item list-group-item-action"
-                    href="{% url 'vote:upload_application' %}"
-                >Bewerbung bearbeiten</a>
-              {% else %}
-                <a
-                    class="list-group-item list-group-item-action"
-                    href="{% url 'vote:upload_application' %}"
-                >Als Hausadmin bewerben</a>
-              {% endif %}
-            {% elif voter.application %}
+            {% if voter.application %}
               <a
                   class="list-group-item list-group-item-action"
-                  href="{% url 'vote:view_application' voter.application.pk %}"
-              >Bewerbung ansehen</a>
+                  href="{% url 'vote:upload_application' %}"
+              >Bewerbung bearbeiten</a>
+            {% else %}
+              <a
+                  class="list-group-item list-group-item-action"
+                  href="{% url 'vote:upload_application' %}"
+              >Als Hausadmin bewerben</a>
             {% endif %}
           </div>
+          {% endif %}
         </div>
       </div>
     </div>

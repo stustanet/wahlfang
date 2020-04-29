@@ -20,8 +20,22 @@
     }
 }
 
+.card-body :last-child {
+    margin-bottom: 0;
+}
+
+.card-dual .card-body:first-of-type {
+    padding-bottom: 0.75rem;
+}
+
+.card-dual .card-body:last-of-type {
+    border-top: 1px solid rgba(0,0,0,.125);
+    padding-top: 0.75rem;
+}
+
 table.vote-list {
     margin: 0;
+    margin-top: 1.75rem;
 }
 
 table.vote-list th {
@@ -54,6 +68,10 @@ table.vote-list tfoot td {
     background: none !important;
     color: #495057;
     font-size: 0.8em;
+}
+
+table.vote-list td.applicant {
+    padding-left: 0;
 }
 
 table.vote-list td.applicant .col-3 {

@@ -22,12 +22,20 @@
                 </ul>
               </div>
             {% endif %}
-            <p>Elected are those candidates who:</p>
-            <ol>
-              <li>received more YES than NO votes and</li>
-              <li>are among the {{ max_votes_yes }} remaining candidates with the most votes.</li>
-            </ol>
-            <p>You may give up to {{ max_votes_yes }} YES votes.</p>
+            <div class="card card-dual">
+              <h5 class="card-header">Voting Procedure</h5>
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2">Elected are those candidates who:</h6>
+                <ol>
+                  <li>received more YES than NO votes and</li>
+                  <li>are among the {{ max_votes_yes }} remaining candidates with the most votes.</li>
+                </ol>
+              </div>
+              <div class="card-body">
+                You may give up to {{ max_votes_yes }} YES votes.<br>
+                NO votes should only be used if you are explicitly against a candidate.
+              </div>
+            </div>
             <table class="table table-sm vote-list" data-max-votes-yes="{{ max_votes_yes }}">
               <thead class="thead-light">
                 <tr>
@@ -51,8 +59,8 @@
                       </div>
                       <div class="col-9">
                         <div class="card-body">
-                          <h5 class="card-title">{{ field.label }}</h5>
-                          <p class="card-text">{{ field.application.text }}</p>
+                          <h5 class="card-title">{{ field.label|escape }}</h5>
+                          <p class="card-text">{{ field.application.text|escape }}</p>
                         </div>
                       </div>
                     </div>
@@ -67,7 +75,7 @@
                 <tr>
                   <td></td>
                   <td></td>
-                  <td class="yes text-center">Up to {{ max_votes_yes }}</td>
+                  <td class="text-center"><span class="yes badge badge-pill badge-secondary">Up to {{ max_votes_yes }}</span></td>
                   <td></td>
                 </tr>
               </tfoot>

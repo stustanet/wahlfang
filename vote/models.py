@@ -19,6 +19,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 
 VOTE_ACCEPT = 'accept'
@@ -230,12 +231,13 @@ class Voter(models.Model):
             'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}),
             'access_code': access_code,
         }
-        body = render_to_string('vote/mails/invitation.j2', context=context)
+        body_html = render_to_string('vote/mails/invitation.j2', context=context)
 
         self.email_user(
             subject=subject,
-            message=body,
-            from_email=settings.EMAIL_SENDER
+            message=strip_tags(body_html),
+            from_email=settings.EMAIL_SENDER,
+            html_message=body_html.replace('\n', '<br/>')
         )
 
     @staticmethod

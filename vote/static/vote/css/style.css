@@ -75,6 +75,7 @@ table.vote-list td.applicant {
     max-width: 430px;
 }
 
+.applicant-picture,
 .vote-list .applicant .col-3 {
     min-width: 50px;
     max-width: 100px;

@@ -42,8 +42,11 @@ class AccessCodeAuthenticationForm(forms.Form):
         return self.user_cache
 
 
-class ApplicationUploadForm(forms.ModelForm):
+class CustomClearableFileInput(forms.ClearableFileInput):
+    template_name = 'vote/image_input.html'
 
+
+class ApplicationUploadForm(forms.ModelForm):
     field_order = ['first_name', 'last_name', 'email', 'text', 'avatar']
 
     def __init__(self, request, *args, **kwargs):
@@ -51,6 +54,7 @@ class ApplicationUploadForm(forms.ModelForm):
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
         self.request = request
 
+        self.fields['avatar'].widget = CustomClearableFileInput()
         self.fields['first_name'].initial = self.voter.first_name
         self.fields['last_name'].initial = self.voter.last_name
         self.fields['email'].initial = self.voter.email

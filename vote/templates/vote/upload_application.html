@@ -33,7 +33,7 @@
             <div class="card mb-3">
               <div class="card-body p-3">
                 <h5 class="card-title">Contact E-Mail Address</h5>
-                <span class="form-text text-muted mb-2">You will receive announcements from StuStaNet and support requests here. Your address will not be public.</span>
+                <span class="form-text text-muted mb-2">You will receive announcements from StuStaNet and support requests here. Your e-mail address will not be public.</span>
                 <div class="form-row">
                   <div class="form-group col-md-6 mb-0">
                     {{ form.email|as_crispy_field:"bootstrap4" }}
@@ -55,7 +55,7 @@
                 </div>
 
                 <span class="form-text text-muted mt-4 mb-2">Be recognizable and add a photo of yourself :)</span>
-                {{ form.avatar|as_crispy_field:"bootstrap4" }}
+                {{ form.avatar }}
               </div>
             </div>
 

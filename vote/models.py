@@ -62,7 +62,8 @@ class Election(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     application_due_date = models.DateTimeField()
-    description = models.TextField(max_length=512, blank=True, null=True)
+    meeting_start_time = models.DateTimeField()
+    meeting_link = models.CharField(max_length=128)
     max_votes_yes = models.IntegerField()
 
     @property

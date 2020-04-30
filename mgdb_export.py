@@ -49,6 +49,7 @@ def main():
         ).filter(stusta_address__isnull=False).filter(
             stusta_address__house=house,
             external_address__isnull=True,
+            isexternal=False,
             membership_status__status_name__in=('mitglied',), # 'ehrenmitglied'),
         ).filter(
             Q(Q(ismissinginaction__isnull=True) | Q(ismissinginaction__gt=timezone.now()))

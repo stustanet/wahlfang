@@ -25,4 +25,5 @@ class Command(BaseCommand):
             email=options['email'],
             election=election,
         )
+        voter.send_invitation(access_code)
         self.stdout.write(self.style.SUCCESS('Successfully created voter "%s"\nAccess Code: %s' % (voter, access_code)))

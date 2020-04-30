@@ -12,7 +12,8 @@ class Command(BaseCommand):
         parser.add_argument('-a', '--application-due-date', type=str, required=True)
         parser.add_argument('-e', '--end-date', type=str, required=True)
         parser.add_argument('-m', '--max-votes-yes', type=int, required=True)
-        parser.add_argument('-d', '--description', type=str, required=True)
+        parser.add_argument('-l', '--meeting-link', type=str, required=True)
+        parser.add_argument('--meeting-time', type=str, required=True)
 
     def handle(self, *args, **options):
         election = Election.objects.create(
@@ -21,6 +22,7 @@ class Command(BaseCommand):
             application_due_date=options['application_due_date'],
             end_date=options['end_date'],
             max_votes_yes=options['max_votes_yes'],
-            description=options['description']
+            meeting_link=options['meeting-link'],
+            meeting_start_time=options['meeting-time']
         )
         self.stdout.write(self.style.SUCCESS('Successfully created election "%s" with ID %i' % (election, election.id)))

@@ -82,6 +82,15 @@ table.vote-list td.applicant {
     max-height: 100px;
 }
 
+.image-input .img-wrapper {
+    height: 100px;
+    float: left;
+}
+
+.image-input .applicant-picture {
+    margin-right: 1rem;
+}
+
 .vote-list .applicant .card-body {
     padding: 1vw;
     padding-top: 0.4rem;

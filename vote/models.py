@@ -273,7 +273,7 @@ class Voter(models.Model):
 
 
 class Application(models.Model):
-    text = models.TextField()
+    text = models.TextField(max_length=250, blank=True)
     avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True, blank=True)
     voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE)
     last_name = models.CharField(max_length=256)

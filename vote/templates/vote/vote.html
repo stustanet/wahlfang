@@ -23,66 +23,75 @@
                 </ul>
               </div>
             {% endif %}
-            <div class="card card-dual">
-              <h5 class="card-header">Voting Procedure</h5>
-              <div class="card-body">
-                <h6 class="card-subtitle mb-2">Elected are those candidates who:</h6>
-                <ol>
-                  <li>received more YES than NO votes and</li>
-                  <li>are among the {{ max_votes_yes }} remaining candidates with the most votes.</li>
-                </ol>
+            {% if form.visible_fields %}
+              <div class="card card-dual">
+                <h5 class="card-header">Voting Procedure</h5>
+                <div class="card-body">
+                  <h6 class="card-subtitle mb-2">Elected are those candidates who:</h6>
+                  <ol>
+                    <li>received more YES than NO votes and</li>
+                    <li>are among the {{ max_votes_yes }} remaining candidates with the most votes.</li>
+                  </ol>
+                </div>
+                <div class="card-body">
+                  You may give up to {{ max_votes_yes }} YES votes.<br>
+                  NO votes should only be used if you are explicitly against a candidate.
+                </div>
               </div>
-              <div class="card-body">
-                You may give up to {{ max_votes_yes }} YES votes.<br>
-                NO votes should only be used if you are explicitly against a candidate.
-              </div>
-            </div>
-            <table class="table table-sm vote-list" data-max-votes-yes="{{ max_votes_yes }}">
-              <thead class="thead-light">
-                <tr>
-                  <th>Applicant (Room)</th>
-                  <th class="choice text-center">Abstention</th>
-                  <th class="choice text-center">YES</th>
-                  <th class="choice text-center text-muted" title="NO should only be selected if you want to vote EXPLICITLY AGAINST this applicant">NO*</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for field in form.visible_fields %}
-                <tr>
-                  <td class="applicant">
-                    <div class="row no-gutters">
-                      <div class="col-3">
-                        {% if field.application.avatar %}
-                          <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
-                        {% else %}
-                          <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
-                        {% endif %}
-                      </div>
-                      <div class="col-9">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ field.label|escape }}</h5>
-                          <p class="card-text">{{ field.application.text|escape }}</p>
+              <table class="table table-sm vote-list" data-max-votes-yes="{{ max_votes_yes }}">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Applicant (Room)</th>
+                    <th class="choice text-center">Abstention</th>
+                    <th class="choice text-center">YES</th>
+                    <th class="choice text-center text-muted" title="NO should only be selected if you want to vote EXPLICITLY AGAINST this applicant">NO*</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for field in form.visible_fields %}
+                  <tr>
+                    <td class="applicant">
+                      <div class="row no-gutters">
+                        <div class="col-3">
+                          {% if field.application.avatar %}
+                            <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
+                          {% else %}
+                            <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
+                          {% endif %}
+                        </div>
+                        <div class="col-9">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ field.label|escape }}</h5>
+                            <p class="card-text">{{ field.application.text|escape }}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  {% for radio in field %}
-                  <td class="text-center"><label class="radio" for="{{ radio.id_for_label }}" title="{{ radio.choice_label }}">{{ radio.tag }}</label></td>
+                    </td>
+                    {% for radio in field %}
+                    <td class="text-center"><label class="radio" for="{{ radio.id_for_label }}" title="{{ radio.choice_label }}">{{ radio.tag }}</label></td>
+                    {% endfor %}
+                  </tr>
                   {% endfor %}
-                </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td class="text-center"><span class="yes badge badge-pill badge-secondary">Up to {{ max_votes_yes }}</span></td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
-            <hr>
-            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="text-center"><span class="yes badge badge-pill badge-secondary">Up to {{ max_votes_yes }}</span></td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+              <hr>
+              <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            {% else %}
+              <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                  <span class="display-1 d-block">:(</span>
+                  <div class="mt-4 mb-4 lead">Unfortunately there were no applicants for your house.<br>Contact vorstand@stustanet.de if you're interested.</div>
+                </div>
+              </div>
+            {% endif %}
           </form>
         </div>
       </div>

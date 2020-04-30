@@ -237,7 +237,8 @@ class Voter(models.Model):
             subject=subject,
             message=strip_tags(body_html),
             from_email=settings.EMAIL_SENDER,
-            html_message=body_html.replace('\n', '<br/>')
+            html_message=body_html.replace('\n', '<br/>'),
+            fail_silently=True
         )
 
     @staticmethod

@@ -297,6 +297,12 @@ class Application(models.Model):
     first_name = models.CharField(max_length=256)
     email = models.EmailField()
 
+    _old_avatar = None
+
+    def __init__(self, *args, **kwargs):
+        super(Application, self).__init__(*args, **kwargs)
+        self._old_avatar = self.avatar
+
     def __str__(self):
         return f'Application of {self.get_display_name()} for {self.voter.election}'
 
@@ -304,7 +310,10 @@ class Application(models.Model):
         return f'{self.first_name} {self.last_name} ({self.voter.room})'
 
     def save(self, *args, **kwargs):
-        if self.avatar:
+        if self.avatar and self._old_avatar != self.avatar:
+            if self._old_avatar and os.path.isfile(self._old_avatar.path):
+                os.remove(self._old_avatar.path)
+
             max_width = 100
             max_height = 100
             img = Image.open(self.avatar)
@@ -329,6 +338,7 @@ class Application(models.Model):
             img.save(output, format='JPEG', quality=95)
             output.seek(0)
             self.avatar = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.avatar.name.split('.')[0], 'image/jpeg', sys.getsizeof(output), None)
+            self._old_avatar = self.avatar
 
         super(Application, self).save(*args, **kwargs)
 

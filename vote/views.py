@@ -15,19 +15,19 @@ class LoginView(auth_views.LoginView):
     template_name = 'vote/login.html'
     redirect_authenticated_user = True
 
-    @ratelimit(key='ip', rate='10/h', method='POST')
+    # @ratelimit(key='ip', rate='10/h', method='POST')
     def post(self, request, *args, **kwargs):
-        ratelimited = getattr(request, 'limited', False)
-        if ratelimited:
-            return render(request, template_name='vote/ratelimited.html', status=429)
+        # ratelimited = getattr(request, 'limited', False)
+        # if ratelimited:
+        #     return render(request, template_name='vote/ratelimited.html', status=429)
         return super().post(request, *args, **kwargs)
 
 
-@ratelimit(key='ip', rate='10/h')
+# @ratelimit(key='ip', rate='10/h')
 def code_login(request, access_code=None):
-    ratelimited = getattr(request, 'limited', False)
-    if ratelimited:
-        return render(request, template_name='vote/ratelimited.html', status=429)
+    # ratelimited = getattr(request, 'limited', False)
+    # if ratelimited:
+    #     return render(request, template_name='vote/ratelimited.html', status=429)
 
     if not access_code:
         messages.add_message(request, messages.ERROR, 'No access code provided.')

@@ -22,7 +22,7 @@
             {% elif voter.election.closed %}
               <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting ended</a>
             {% else %}
-              <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting starts {{ voter.election.start_date|date:"D Y-m-d H:i:s" }} (UTC{{ voter.election.start_date|date:"O" }})</a>
+              <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting starts {{ voter.election.application_due_date|date:"l Y-m-d H:i:s" }}</a>
               <p class="mt-3">TODO: remind me via email</p>
             {% endif %}
           </div>

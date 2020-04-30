@@ -22,7 +22,7 @@ class Command(BaseCommand):
             application_due_date=options['application_due_date'],
             end_date=options['end_date'],
             max_votes_yes=options['max_votes_yes'],
-            meeting_link=options['meeting-link'],
-            meeting_start_time=options['meeting-time']
+            meeting_link=options['meeting_link'],
+            meeting_start_time=options['meeting_time']
         )
         self.stdout.write(self.style.SUCCESS('Successfully created election "%s" with ID %i' % (election, election.id)))

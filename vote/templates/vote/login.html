@@ -12,12 +12,15 @@
                 <label>Login with your access code received by e-mail</label>
               </div>
               <div class="form-group">
-                <input type="text" class="form-control form-control-user"
+                <input type="text" class="form-control form-control-user text-center"
                        id="id_access_code"
                        name="{{ form.access_code.name }}"
                        placeholder="Access Code"
                        autofocus="true"
-                       required="true">
+                       required="true"
+                       minlength="24"
+                       maxlength="27"
+                       spellcheck="false">
                 {% if form.access_code.errors %}
                   <div class="invalid-feedback">{{ form.access_code.errors }}</div>
                 {% endif %}

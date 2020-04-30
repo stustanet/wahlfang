@@ -218,7 +218,7 @@ class Voter(models.Model):
         return False
 
     def send_invitation(self, access_code):
-        subject = 'Einladung Online Hausadminwahl'
+        subject = 'Einladung Hausadmin Wahlen | Invitation house admin elections'
         context = {
             'voter': self,
             'election': self.election,

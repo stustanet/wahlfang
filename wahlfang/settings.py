@@ -160,7 +160,7 @@ CSP_DEFAULT_SRC = ("'self'",)
 # Mail
 
 EMAIL_HOST = 'mail.stusta.de'
-EMAIL_SENDER = 'noreply@stustanet.de'
+EMAIL_SENDER = 'vorstand@stustanet.de'
 EMAIL_PORT = 25
 
 

@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
-from vote.forms import AccessCodeAuthenticationForm, ApplicationUploadForm, VoteForm
+from vote.forms import AccessCodeAuthenticationForm, ApplicationUploadForm, VoteForm, EmptyForm
 from vote.models import Application
 
 
@@ -53,9 +53,16 @@ def index(request):
         'voter': voter,
     }
 
+    # remind me
+    if request.POST and request.GET.get('action') in ('remind_me', 'dont_remind_me'):
+        f = EmptyForm(request.POST)
+        if f.is_valid():
+            voter.remind_me = request.GET['action'] == 'remind_me'
+            voter.save()
+
     # vote
     if voter.can_vote:
-        if request.POST:
+        if request.POST and request.GET.get('action') == 'vote':
             form = VoteForm(request, request.POST)
             if form.is_valid():
                 form.save()

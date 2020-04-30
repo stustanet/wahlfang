@@ -8,7 +8,7 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <form action="{% url 'vote:index' %}" method="post">
+          <form action="{% url 'vote:index' %}?action=vote" method="post">
             {% csrf_token %}
             <div class="form-group">
               <h4 class="mb-0">{{ title }}</h4>

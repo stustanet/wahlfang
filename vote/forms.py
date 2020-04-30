@@ -74,6 +74,10 @@ class ApplicationUploadForm(forms.ModelForm):
         return instance
 
 
+class EmptyForm(forms.Form):
+    pass
+
+
 class VoteBoundField(forms.BoundField):
     def __init__(self, form, field, name, application):
         super().__init__(form, field, name)

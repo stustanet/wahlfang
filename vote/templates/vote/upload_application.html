@@ -6,10 +6,10 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <form action="{% url 'vote:upload_application' %}" method="post">
+          <form action="{% url 'vote:upload_application' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
-              <h4>Bewerbung als Hausadmin</h4>
+              <h4>Hausadmin (Network Admin) Application</h4>
             </div>
             <hr>
             {{ form|crispy }}

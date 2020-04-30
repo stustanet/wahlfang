@@ -47,7 +47,7 @@
                   <div class="row no-gutters">
                     <div class="col-3">
                       {% if application.avatar %}
-                        <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
+                        <img src="{{ application.avatar.url }}" class="card-img" alt="applicant-picture">
                       {% else %}
                         <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
                       {% endif %}

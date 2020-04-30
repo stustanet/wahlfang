@@ -1,4 +1,6 @@
 import textwrap
+import uuid
+import os
 
 from django.conf import settings
 from django.db import models, IntegrityError
@@ -273,9 +275,13 @@ class Voter(models.Model):
         return voter, cls.get_access_code(voter_id, password)
 
 
+def avatar_file_name(instance, filename):
+        ext = filename.split('.')[-1]
+        return os.path.join('avatars', str(uuid.uuid4())+"."+ext)
+
 class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)
-    avatar = models.ImageField(upload_to='avatars/%Y/%m/%d', null=True, blank=True)
+    avatar = models.ImageField(upload_to=avatar_file_name, null=True, blank=True)
     voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE)
     last_name = models.CharField(max_length=256)
     first_name = models.CharField(max_length=256)

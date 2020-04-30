@@ -79,15 +79,15 @@ def upload_application(request):
 
     instance = Application.objects.filter(voter=voter.voter_id).first()
 
-    context = {
-        'form': ApplicationUploadForm(request, instance=instance)
-    }
-
     if request.POST:
         form = ApplicationUploadForm(request, request.POST, request.FILES, instance=instance)
         if form.is_valid():
             form.save()
             return redirect('vote:index')
-        context['form'] = form
+    else:
+        form = ApplicationUploadForm(request, instance=instance)
 
+    context = {
+        'form': form
+    }
     return render(request, template_name='vote/upload_application.html', context=context)

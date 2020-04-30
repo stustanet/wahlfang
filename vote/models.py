@@ -1,13 +1,18 @@
 import textwrap
 import uuid
 import os
+import sys
+import PIL
 
+from io import BytesIO
+from PIL import Image
 from django.conf import settings
 from django.db import models, IntegrityError
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.db.models import Count, Q
 from django.template.loader import render_to_string
@@ -294,6 +299,35 @@ class Application(models.Model):
 
     def get_display_name(self):
         return f'{self.first_name} {self.last_name} ({self.voter.room})'
+
+    def save(self, *args, **kwargs):
+        if self.avatar:
+            max_width = 100
+            max_height = 100
+            img = Image.open(self.avatar)
+
+            # remove alpha channel
+            if img.mode in ('RGBA', 'LA'):
+                background = Image.new(img.mode[:-1], img.size, '#FFF')
+                background.paste(img, img.split()[-1])
+                img = background
+
+            # resize
+            width = max_width
+            width_percent = (width/float(img.size[0]))
+            height = int((float(img.size[1])*float(width_percent)))
+            if height > max_height:
+                height = max_height
+                height_percent = (height/float(img.size[1]))
+                width = int((float(img.size[0])*float(height_percent)))
+            img = img.resize((width, height), PIL.Image.ANTIALIAS)
+
+            output = BytesIO()
+            img.save(output, format='JPEG', quality=95)
+            output.seek(0)
+            self.avatar = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.avatar.name.split('.')[0], 'image/jpeg', sys.getsizeof(output), None)
+
+        super(Application, self).save(*args, **kwargs)
 
 
 class Vote(models.Model):

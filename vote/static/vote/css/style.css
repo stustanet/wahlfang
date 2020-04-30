@@ -72,6 +72,7 @@ table.vote-list tfoot td {
 
 table.vote-list td.applicant {
     padding-left: 0;
+    max-width: 430px;
 }
 
 .vote-list .applicant .col-3 {

@@ -62,6 +62,7 @@ class Election(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     application_due_date = models.DateTimeField()
+    description = models.TextField(max_length=512, blank=True, null=True)
     max_votes_yes = models.IntegerField()
 
     @property
@@ -212,14 +213,13 @@ class Voter(models.Model):
     def is_staff(self):
         return False
 
-    def send_invitation(self, access_code, conference_link):
+    def send_invitation(self, access_code):
         subject = 'Einladung Online Hausadminwahl'
         context = {
             'voter': self,
             'election': self.election,
             'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}),
             'access_code': access_code,
-            'conference_link': conference_link
         }
         body = render_to_string('vote/mails/invitation.j2', context=context)
 

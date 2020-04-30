@@ -51,8 +51,9 @@ class ApplicationUploadForm(forms.ModelForm):
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
         self.request = request
 
-        # self.fields['first_name'].initial = self.voter.first_name
-        # self.fields['last_name'].initial = self.voter.last_name
+        self.fields['first_name'].initial = self.voter.first_name
+        self.fields['last_name'].initial = self.voter.last_name
+        self.fields['email'].initial = self.voter.email
 
     class Meta:
         model = Application

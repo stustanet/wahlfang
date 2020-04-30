@@ -79,6 +79,7 @@ table.vote-list td.applicant {
 .vote-list .applicant .col-3 {
     min-width: 50px;
     max-width: 100px;
+    max-height: 100px;
 }
 
 .vote-list .applicant .card-body {

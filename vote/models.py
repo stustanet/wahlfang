@@ -118,6 +118,7 @@ class Voter(models.Model):
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='participants', on_delete=models.CASCADE)
     voted = models.BooleanField(default=False)
+    remind_me = models.BooleanField(default=False)
 
     # Stores the raw password if set_password() is called so that it can
     # be passed to password_changed() after the model is saved.
@@ -276,8 +277,9 @@ class Voter(models.Model):
 
 
 def avatar_file_name(instance, filename):
-        ext = filename.split('.')[-1]
-        return os.path.join('avatars', str(uuid.uuid4())+"."+ext)
+    ext = filename.split('.')[-1]
+    return os.path.join('avatars', str(uuid.uuid4()) + "." + ext)
+
 
 class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)

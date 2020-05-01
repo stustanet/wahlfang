@@ -127,6 +127,8 @@ PASSWORD_HASHERS = [
 LOGIN_URL = reverse_lazy('vote:code_login')
 LOGIN_REDIRECT_URL = reverse_lazy('vote:index')
 
+RATELIMIT_KEY = 'ip'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

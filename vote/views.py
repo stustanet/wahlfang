@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.shortcuts import render, redirect
@@ -15,7 +16,7 @@ class LoginView(auth_views.LoginView):
     template_name = 'vote/login.html'
     redirect_authenticated_user = True
 
-    @ratelimit(key='header:x-real-ip', rate='10/h', method='POST')
+    @ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST')
     def post(self, request, *args, **kwargs):
         ratelimited = getattr(request, 'limited', False)
         if ratelimited:
@@ -23,7 +24,7 @@ class LoginView(auth_views.LoginView):
         return super().post(request, *args, **kwargs)
 
 
-@ratelimit(key='header:x-real-ip', rate='10/h')
+@ratelimit(key=settings.RATELIMIT_KEY, rate='10/h')
 def code_login(request, access_code=None):
     ratelimited = getattr(request, 'limited', False)
     if ratelimited:

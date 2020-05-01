@@ -1,5 +1,6 @@
 {% extends 'vote/base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -66,4 +67,9 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block footer_scripts %}
+    {{ block.super }}
+    <script src="{% static "vote/js/application.js" %}"></script>
 {% endblock %}

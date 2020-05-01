@@ -97,4 +97,4 @@ def upload_application(request):
     context = {
         'form': form
     }
-    return render(request, template_name='vote/upload_application.html', context=context)
+    return render(request, template_name='vote/application.html', context=context)

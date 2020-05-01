@@ -156,6 +156,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Content Security Policy
 # https://django-csp.readthedocs.io/en/latest/configuration.html#policy-settings
 CSP_DEFAULT_SRC = ("'self'",)
+CSP_IMG_SRC = ("'self'", "data:", )
 
 # Mail
 

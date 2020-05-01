@@ -83,8 +83,8 @@ table.vote-list td.applicant {
 
 table.vote-list .applicant .card-body {
     padding: 1vw;
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .applicant-picture,

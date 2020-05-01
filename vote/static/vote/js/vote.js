@@ -1,13 +1,20 @@
-$(".vote-list input[type='radio']").change(function() {
-    const max = $(".vote-list").data("max-votes-yes");
-    var count = $(".vote-list input[type='radio'][value='accept']:checked").length;
-    if(count >= max) {
-        $(".vote-list input[type='radio'][value='accept']:not(:checked)").prop('disabled', true);
-        if(count > max){
-            $(this).prop('checked', false);
+document.querySelectorAll(".vote-list input[type='radio']").forEach(function(input) {
+    input.onchange = function() {
+        var voteList = document.querySelector('.vote-list');
+        var max = voteList.dataset.maxVotesYes;
+        var count = voteList.querySelectorAll("input[type='radio'][value='accept']:checked").length;
+        if(count >= max) {
+            voteList.querySelectorAll("input[type='radio'][value='accept']:not(:checked)").forEach(function(input) {
+                input.disabled = true;
+            });
+            if(count > max){
+                this.checked = false;
+            }
+        } else {
+            voteList.querySelectorAll("input[type='radio'][value='accept']").forEach(function(input) {
+                input.disabled = (count >= max);
+            });
         }
-    } else {
-        $(".vote-list input[type='radio'][value='accept']").prop('disabled', (count >= max));
+        voteList.querySelector("tfoot .yes").innerText = (max-count) + " remaining";
     }
-    $(".vote-list tfoot .yes").text((max-count) + " remaining");
 });

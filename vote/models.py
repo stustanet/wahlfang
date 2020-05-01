@@ -311,8 +311,12 @@ class Application(models.Model):
 
     def save(self, *args, **kwargs):
         if self.avatar and self._old_avatar != self.avatar:
+            # remove old file
             if self._old_avatar and os.path.isfile(self._old_avatar.path):
-                os.remove(self._old_avatar.path)
+                # let's not play russian roulette
+                path = os.path.normpath(self._old_avatar.path)
+                if path.startswith(os.path.join(settings.MEDIA_ROOT, 'avatars')):
+                    os.remove(path)
 
             max_width = 100
             max_height = 100

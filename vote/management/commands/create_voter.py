@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from vote.models import Election, Voter
@@ -9,10 +10,19 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--election_id', type=int, required=True)
         parser.add_argument('--voter_id', type=int, required=True)
-        parser.add_argument('--first_name', type=str, default="First")
-        parser.add_argument('--last_name', type=str, default="Last")
-        parser.add_argument('--room', type=str, default="123")
-        parser.add_argument('--email', type=str, default="spam@spam.spam")
+
+        # Make things a little bit easier for dev and debugging convenience
+        if settings.DEBUG:
+            parser.add_argument('--first_name', type=str, default="First")
+            parser.add_argument('--last_name', type=str, default="Last")
+            parser.add_argument('--room', type=str, default="123")
+            parser.add_argument('--email', type=str, default="spam@spam.spam")
+        else:
+            parser.add_argument('--first_name', type=str, required=True)
+            parser.add_argument('--last_name', type=str, required=True)
+            parser.add_argument('--room', type=str, required=True)
+            parser.add_argument('--email', type=str, required=True)
+
 
     def handle(self, *args, **options):
         election = Election.objects.get(pk=options['election_id'])

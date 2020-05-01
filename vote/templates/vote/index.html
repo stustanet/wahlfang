@@ -61,22 +61,14 @@
           <div class="row row-cols-1 row-cols-md-2 vote-list">
             {% for application in voter.election.applications|shuffle %}
               <div class="col mb-4">
-                <div class="card applicant">
-                  <div class="row no-gutters">
-                    <div class="col-3">
-                      {% if application.avatar %}
-                        <img src="{{ application.avatar.url }}" class="card-img" alt="applicant-picture">
-                      {% else %}
-                        <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
-                      {% endif %}
-                    </div>
-                    <div class="col-9">
-                      <div class="card-body">
-                        <h5 class="card-title">{% applicant_name application %}</h5>
-                        <p class="card-text">{{ application.text|escape }}</p>
-                      </div>
-                    </div>
-                  </div>
+                <div class="applicant">
+                  {% if application.avatar %}
+                    <img src="{{ application.avatar.url }}" class="applicant-picture" alt="applicant-picture">
+                  {% else %}
+                    <img src="{% static 'img/blank_avatar.png' %}" class="applicant-picture" alt="applicant-picture">
+                  {% endif %}
+                  <h6>{% applicant_name application %}</h6>
+                  <p class="description">{{ application.text|escape }}</p>
                 </div>
               </div>
             {% empty %}

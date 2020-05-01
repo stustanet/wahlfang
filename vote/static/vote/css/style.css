@@ -77,9 +77,15 @@ table.vote-list td.applicant {
 
 .applicant-picture,
 .vote-list .applicant .col-3 {
+    width: auto;
+    height: auto;
     min-width: 50px;
     max-width: 100px;
     max-height: 100px;
+}
+
+.vote-list .applicant-picture {
+    float: right;
 }
 
 .image-input .img-wrapper {
@@ -97,7 +103,7 @@ table.vote-list td.applicant {
     padding-bottom: 0.4rem;
 }
 
-.vote-list .applicant .card-title {
+.vote-list .applicant h6 {
     font-size: 1.15rem;
     margin-bottom: .25rem;
 }

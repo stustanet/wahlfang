@@ -70,9 +70,21 @@ table.vote-list tfoot td {
     font-size: 0.8em;
 }
 
+table.vote-list label {
+    width: 100%;
+    height: 100%;
+    min-height: 50px;
+}
+
 table.vote-list td.applicant {
     padding-left: 0;
     max-width: 430px;
+}
+
+table.vote-list .applicant .card-body {
+    padding: 1vw;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
 }
 
 .applicant-picture,
@@ -86,6 +98,18 @@ table.vote-list td.applicant {
 
 .vote-list .applicant-picture {
     float: right;
+    margin-left: 7px;
+    margin-bottom: 7px;
+    border-radius: 4px;
+}
+
+.vote-list .applicant h6 {
+    font-size: 1.1rem;
+    margin-bottom: .4rem;
+}
+
+.vote-list .applicant p {
+    font-size: 0.8em;
 }
 
 .image-input .img-wrapper {
@@ -95,25 +119,4 @@ table.vote-list td.applicant {
 
 .image-input .applicant-picture {
     margin-right: 1rem;
-}
-
-.vote-list .applicant .card-body {
-    padding: 1vw;
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
-}
-
-.vote-list .applicant h6 {
-    font-size: 1.15rem;
-    margin-bottom: .25rem;
-}
-
-.vote-list .applicant p {
-    font-size: 0.8em;
-}
-
-table.vote-list label {
-    width: 100%;
-    height: 100%;
-    min-height: 50px;
 }

@@ -19,7 +19,7 @@
             <div class="card mb-3">
               <div class="card-body p-3">
                 <h5 class="card-title">Display Name</h5>
-                <span class="form-text text-muted mb-2">Will be displayed as: <strong>Firstname Lastname (Room)</strong></span>
+                <span class="form-text text-muted mb-2">Current display name: <strong class="text-nowrap">{{ form.first_name.value|escape }} {{ form.last_name.value|escape }} ({{ voter.room }})</strong></span>
                 <div class="form-row">
                   <div class="form-group col-md-6 mb-0">
                     {{ form.first_name|as_crispy_field:"bootstrap4" }}

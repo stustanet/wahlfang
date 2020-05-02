@@ -96,6 +96,7 @@ def upload_application(request):
         form = ApplicationUploadForm(request, instance=instance)
 
     context = {
-        'form': form
+        'form': form,
+        'voter': voter,
     }
     return render(request, template_name='vote/application.html', context=context)

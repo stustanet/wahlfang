@@ -162,8 +162,8 @@ CSP_IMG_SRC = ("'self'", "data:", )
 
 # Mail
 
-EMAIL_HOST = 'mail.stusta.de'
-EMAIL_SENDER = 'vorstand@stustanet.de'
+EMAIL_HOST = 'localhost'
+EMAIL_SENDER = 'wahlfang@localhost'
 EMAIL_PORT = 25
 
 

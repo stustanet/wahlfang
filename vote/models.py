@@ -144,9 +144,12 @@ class Voter(models.Model):
             password_validation.password_changed(self._password, self)
             self._password = None
 
-    def set_password(self, raw_password):
+    def set_password(self, raw_password=None):
+        if not raw_password:
+            raw_password = get_random_string(length=20, allowed_chars=Enc32.alphabet)
         self.password = make_password(raw_password)
         self._password = raw_password
+        return raw_password
 
     def check_password(self, raw_password):
         """
@@ -269,7 +272,6 @@ class Voter(models.Model):
         if Voter.objects.filter(voter_id=voter_id).exists():
             raise IntegrityError('voter id not unique')
 
-        password = get_random_string(length=20, allowed_chars=Enc32.alphabet)
         voter = Voter(
             voter_id=voter_id,
             first_name=first_name,
@@ -278,7 +280,7 @@ class Voter(models.Model):
             election=election,
             email=email,
         )
-        voter.set_password(password)
+        password = voter.set_password()
         voter.save()
 
         return voter, cls.get_access_code(voter_id, password)

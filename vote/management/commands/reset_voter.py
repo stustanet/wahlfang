@@ -9,13 +9,21 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--voter_id', type=int, required=True)
+        parser.add_argument('--email', type=str)
         parser.add_argument('--send_invitation', type=int, default=True)
 
     def handle(self, *args, **options):
         voter_id = options['voter_id']
         voter = Voter.objects.get(pk=voter_id)
         password = voter.set_password()
+
+        email = options['email']
+        if email:
+            voter.email = email
+            self.stdout.write(self.style.SUCCESS('New email: "%s"' % email))
+
         voter.save()
+
         access_code = Voter.get_access_code(voter_id, password)
         if options['send_invitation']:
             voter.send_invitation(access_code)

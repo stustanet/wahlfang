@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--voter_id', type=int, required=True)
         parser.add_argument('--email', type=str)
-        parser.add_argument('--send_invitation', type=int, default=True)
+        parser.add_argument('--send_invitation', type=bool, default=True)
 
     def handle(self, *args, **options):
         voter_id = options['voter_id']

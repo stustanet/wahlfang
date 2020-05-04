@@ -10,6 +10,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--election_id', type=int, required=True)
         parser.add_argument('--voter_id', type=int, required=True)
+        parser.add_argument('--no_vote', type=bool, default=False)
+        parser.add_argument('--send_invitation', type=bool, default=True)
 
         # Make things a little bit easier for dev and debugging convenience
         if settings.DEBUG:
@@ -34,6 +36,8 @@ class Command(BaseCommand):
             room=options['room'],
             email=options['email'],
             election=election,
+            voted=options['no_vote'],
         )
-        voter.send_invitation(access_code)
+        if options['send_invitation']:
+            voter.send_invitation(access_code)
         self.stdout.write(self.style.SUCCESS('Successfully created voter "%s"\nAccess Code: %s' % (voter, access_code)))

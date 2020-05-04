@@ -29,7 +29,7 @@
               {% if voter.remind_me %}
                 <form action="{% url 'vote:index' %}?action=dont_remind_me" method="post">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-danger btn-sm">Don't remind me</button>
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Don't remind me</button>
                 </form>
               {% else %}
                 <form action="{% url 'vote:index' %}?action=remind_me" method="post">

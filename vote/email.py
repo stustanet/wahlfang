@@ -8,7 +8,7 @@ from vote.models import Voter
 
 
 def email_voters(voters, subject, template):
-    with mail.get_connection(fail_silently=True) as connection:
+    with mail.get_connection(fail_silently=False) as connection:
         for voter in voters:
             context = {
                 'voter': voter,
@@ -26,8 +26,8 @@ def email_voters(voters, subject, template):
                 [voter.email],
                 connection=connection)
             message.attach_alternative(body_html, 'text/html')
-
             message.send(fail_silently=True)
+    print(f'Successfully sent emails to {voters.count()} voters')
 
 
 def remind_voters():

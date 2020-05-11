@@ -10,8 +10,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--election_id', type=int, required=True)
         parser.add_argument('--voter_id', type=int, required=True)
-        parser.add_argument('--no_vote', type=bool, default=False)
-        parser.add_argument('--send_invitation', type=bool, default=True)
+        parser.add_argument('--no_vote', default=False, action='store_true')
+        parser.add_argument('--no_invitation', default=True, action='store_false')
 
         # Make things a little bit easier for dev and debugging convenience
         if settings.DEBUG:
@@ -25,7 +25,6 @@ class Command(BaseCommand):
             parser.add_argument('--room', type=str, required=True)
             parser.add_argument('--email', type=str, required=True)
 
-
     def handle(self, *args, **options):
         election = Election.objects.get(pk=options['election_id'])
 
@@ -38,6 +37,6 @@ class Command(BaseCommand):
             election=election,
             voted=options['no_vote'],
         )
-        if options['send_invitation']:
+        if not options['no_invitation']:
             voter.send_invitation(access_code)
         self.stdout.write(self.style.SUCCESS('Successfully created voter "%s"\nAccess Code: %s' % (voter, access_code)))

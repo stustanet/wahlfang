@@ -268,7 +268,7 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, voter_id, first_name, last_name, room, election, email):
+    def from_data(cls, voter_id, first_name, last_name, room, election, email, voted=False):
         if Voter.objects.filter(voter_id=voter_id).exists():
             raise IntegrityError('voter id not unique')
 
@@ -279,6 +279,7 @@ class Voter(models.Model):
             room=room,
             election=election,
             email=email,
+            voted=voted
         )
         password = voter.set_password()
         voter.save()

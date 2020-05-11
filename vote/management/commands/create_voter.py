@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('--election_id', type=int, required=True)
         parser.add_argument('--voter_id', type=int, required=True)
         parser.add_argument('--no_vote', default=False, action='store_true')
-        parser.add_argument('--no_invitation', default=True, action='store_false')
+        parser.add_argument('--no_invitation', default=False, action='store_true')
 
         # Make things a little bit easier for dev and debugging convenience
         if settings.DEBUG:

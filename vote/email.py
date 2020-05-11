@@ -8,7 +8,7 @@ from vote.models import Voter
 
 
 def email_voters(voters, subject, template):
-    with mail.get_connection(fail_silently=False) as connection:
+    with mail.get_connection(fail_silently=True) as connection:
         for voter in voters:
             context = {
                 'voter': voter,

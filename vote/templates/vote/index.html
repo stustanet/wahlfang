@@ -68,7 +68,7 @@
                     <img src="{% static 'img/blank_avatar.png' %}" class="applicant-picture" alt="applicant-picture">
                   {% endif %}
                   <h6>{% applicant_name application %}</h6>
-                  <p class="description">{{ application.text|escape }}</p>
+                  <p class="description">{{ application.text|urlize }}</p>
                 </div>
               </div>
             {% empty %}

@@ -34,7 +34,7 @@ def remind_voters():
     voters = Voter.objects.filter(remind_me=True)
     email_voters(
         voters=voters,
-        subject='Erinnerung Hausadmin Wahlen | Reminder house admin elections',
+        subject='Hausadminwahlen: Abstimmung gestartet | House Admin Elections: Voting has started',
         template='vote/mails/reminder.j2'
     )
 

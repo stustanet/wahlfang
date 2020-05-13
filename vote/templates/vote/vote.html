@@ -41,6 +41,11 @@
                   Your vote is anonymous.
                 </div>
               </div>
+              {% if max_votes_yes > 1 and max_votes_yes >= form.num_applications %}
+                <div class="mt-4 text-right">
+                  <button type="button" class="btn btn-success" id="all-yes">Select YES for all {{ form.num_applications }} applicants</button>
+                </div>
+              {% endif %}
               <table class="table table-sm vote-list" data-max-votes-yes="{{ max_votes_yes }}">
                 <thead class="thead-light">
                   <tr>

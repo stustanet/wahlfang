@@ -18,3 +18,13 @@ document.querySelectorAll(".vote-list input[type='radio']").forEach(function(inp
         voteList.querySelector("tfoot .yes").innerText = (max-count) + " remaining";
     }
 });
+
+document.querySelectorAll("#all-yes").forEach(function(btn) {
+    btn.onclick = function() {
+        var voteList = document.querySelector('.vote-list');
+        voteList.querySelectorAll("input[type='radio'][value='accept']").forEach(function(input) {
+            input.checked = true;
+            input.onchange();
+        });
+    }
+});

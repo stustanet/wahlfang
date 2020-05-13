@@ -113,6 +113,8 @@ class VoteForm(forms.Form):
         for application in self.election.applications:
             self.fields[f'{application.pk}'] = VoteField(application=application)
 
+        self.num_applications = len(self.election.applications)
+
     def clean(self):
         super().clean()
         if not self.voter.can_vote:

@@ -47,10 +47,11 @@ def code_login(request, access_code=None):
 @voter_login_required
 def index(request):
     voter = request.user
+    max_votes_yes = voter.election.max_votes_yes
 
     context = {
         'title': voter.election.title,
-        'max_votes_yes': voter.election.max_votes_yes,
+        'max_votes_yes': max_votes_yes,
         'voter': voter,
     }
 
@@ -68,10 +69,11 @@ def index(request):
             if form.is_valid():
                 form.save()
                 return redirect('vote:index')
-            context['form'] = form
         else:
-            context['form'] = VoteForm(request)
+            form = VoteForm(request)
 
+        context['form'] = form
+        context['max_votes_yes'] = min(max_votes_yes, form.num_applications)
         return render(request, template_name='vote/vote.html', context=context)
 
     # overview

@@ -20,6 +20,7 @@ document.querySelectorAll(".vote-list input[type='radio']").forEach(function(inp
 });
 
 document.querySelectorAll("#all-yes").forEach(function(btn) {
+    btn.parentNode.classList.remove('d-none');
     btn.onclick = function() {
         var voteList = document.querySelector('.vote-list');
         voteList.querySelectorAll("input[type='radio'][value='accept']").forEach(function(input) {

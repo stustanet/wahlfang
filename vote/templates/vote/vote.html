@@ -42,7 +42,7 @@
                 </div>
               </div>
               {% if max_votes_yes > 1 and max_votes_yes >= form.num_applications %}
-                <div class="mt-4 text-right">
+                <div class="mt-4 text-right d-none">
                   <button type="button" class="btn btn-success" id="all-yes">Select YES for all {{ form.num_applications }} applicants</button>
                 </div>
               {% endif %}

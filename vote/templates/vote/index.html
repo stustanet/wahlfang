@@ -21,9 +21,14 @@
               <p class="mb-0">This election will end {{ voter.election.end_date|date:"l Y-m-d H:i:s" }}</p>
             </div>
           {% elif voter.election.closed %}
-            <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting ended</a>
+            <a class="btn btn-outline-dark disabled" role="button" href="#">Voting ended</a>
+            <div class="alert alert-primary mt-3" role="alert">
+              The results will be announced during the online meeting at
+              <a href="{{ voter.election.meeting_link }}">{{ voter.election.meeting_link }}</a>,
+              starting on {{ voter.election.meeting_start_time|date:"l Y-m-d H:i" }}.
+            </div>
           {% else %}
-            <a class="btn btn-outline-secondary disabled" role="button" href="#">Voting
+            <a class="btn btn-outline-dark disabled" role="button" href="#">Voting
               starts {{ voter.election.application_due_date|date:"l Y-m-d H:i:s" }}</a>
             <div class="mt-3">
               {% if voter.remind_me %}

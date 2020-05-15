@@ -21,8 +21,9 @@
               <p class="mb-0">This election will end {{ voter.election.end_date|date:"l Y-m-d H:i:s" }}</p>
             </div>
           {% elif voter.election.closed %}
-            <a class="btn btn-outline-dark disabled" role="button" href="#">Voting ended</a>
-            <div class="alert alert-primary mt-3" role="alert">
+            <div class="alert alert-info" role="alert">
+              <h4 class="alert-heading">Voting Ended</h4>
+              <hr>
               The results will be announced during the online meeting at
               <a href="{{ voter.election.meeting_link }}">{{ voter.election.meeting_link }}</a>,
               starting on {{ voter.election.meeting_start_time|date:"l Y-m-d H:i" }}.

@@ -6,7 +6,26 @@
       <div class="card shadow">
         <div class="card-body">
           <h4>{{ election.title }}</h4>
-          {% if not election.closed %}
+          {% if not election.end_date %}
+            <div>Abstimmung noch nicht gestarted.</div>
+            <hr>
+            <form class="user" action="{% url 'management:election' election.pk %}" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="id_run_time">Dauer der Abstimmung:</label>
+                <div class="container row">
+                <input type="number" class="form-control form-control-user col-6"
+                       id="id_run_time"
+                       name="{{ form.run_time.name }}"
+                       min="1"
+                       value="5"
+                       required="true">
+                <div class="col-6 my-auto">Minuten</div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-user btn-block">Starte Abstimmung</button>
+            </form>
+          {% elif not election.closed %}
             <div>Abstimmung noch offen</div>
             <div>Wahlzeitraum: {{ election.application_due_date }} - {{ election.end_date }}</div>
           {% else %}

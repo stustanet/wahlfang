@@ -67,8 +67,8 @@ class Enc32:
 
 class Election(models.Model):
     title = models.CharField(max_length=512)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     application_due_date = models.DateTimeField()
     meeting_start_time = models.DateTimeField()
     meeting_link = models.CharField(max_length=128)
@@ -76,15 +76,24 @@ class Election(models.Model):
 
     @property
     def closed(self):
-        return self.end_date < timezone.now()
+        if self.end_date:
+            return self.end_date < timezone.now()
+        else:
+            return False
 
     @property
     def is_active(self):
-        return self.start_date < timezone.now() < self.end_date
+        if self.start_date and self.end_date:
+            return self.start_date < timezone.now() < self.end_date
+        else:
+            return True
 
     @property
     def can_vote(self):
-        return self.application_due_date < timezone.now() < self.end_date
+        if self.end_date:
+            return self.application_due_date < timezone.now() < self.end_date
+        else:
+            return False
 
     @property
     def can_apply(self):

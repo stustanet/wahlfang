@@ -48,8 +48,8 @@ def election(request, pk, action=None):
         pass
 
     if not election.closed:
-        return render(request, template_name='management/election.html', context=context)
-
-    context['applications'] = election.election_summary
+        context['applications'] = election.applications
+    else:
+        context['applications'] = election.election_summary
 
     return render(request, template_name='management/election.html', context=context)

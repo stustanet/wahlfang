@@ -33,36 +33,49 @@
               {% csrf_token %}
               <button type="submit" id="id_btn_close" class="btn btn-danger btn-user btn-block">Abstimmung jetzt schließen</button>
             </form>
+          {% endif %}
+          {% if not election.closed %}
+            <hr>
+            <h5> Bewerber
+              {% if election.can_apply %}
+                (Bewerbungen möglich bis {{ election.application_due_date }}):
+              {% else %}
+                (Bewerbungsphase abgeschlossen):
+              {% endif %}
+            </h5>
           {% else %}
-            <table class="table table-striped">
-              <thead class="thead-dark">
+            <h5>Ergebnis</h5>
+          {% endif %}
+          <table class="table table-striped">
+            <thead class="thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Bewerber</th>
+              <th scope="col">Für</th>
+              <th scope="col">Gegen</th>
+              <th scope="col">Enthaltung</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for application in applications %}
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Bewerber</th>
-                <th scope="col">Für</th>
-                <th scope="col">Gegen</th>
-                <th scope="col">Enthaltung</th>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ application.first_name }} {{ application.last_name }}</td>
+                <td>{{ application.votes_accept }}</td>
+                <td>{{ application.votes_reject }}</td>
+                <td>{{ application.votes_abstention }}</td>
               </tr>
-              </thead>
-              <tbody>
-              {% for application in applications %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{ application.first_name }} {{ application.last_name }}</td>
-                  <td>{{ application.votes_accept }}</td>
-                  <td>{{ application.votes_reject }}</td>
-                  <td>{{ application.votes_abstention }}</td>
-                </tr>
-                {% if forloop.counter == election.max_votes_yes %}
+              {% if forloop.counter == election.max_votes_yes %}
+                {% if election.closed %}
                   <tr class="table-danger">
                     <td colspan="5">Maximale Anzahl von {{ election.max_votes_yes }} Bewerbern gewählt</td>
                   </tr>
                 {% endif %}
-              {% endfor %}
-              </tbody>
-            </table>
-            </div>
-          {% endif %}
+              {% endif %}
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 {% endblock %}

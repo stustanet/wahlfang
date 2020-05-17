@@ -14,7 +14,7 @@
               <div class="form-group">
                 <label for="id_run_time">Dauer der Abstimmung:</label>
                 <div class="container row">
-                <input type="number" class="form-control form-control-user col-6"
+                <input dir="rtl" type="number" class="form-control form-control-user col-6 text-right"
                        id="id_run_time"
                        name="{{ form.run_time.name }}"
                        min="1"
@@ -23,7 +23,7 @@
                 <div class="col-6 my-auto">Minuten</div>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn-user btn-block">Starte Abstimmung</button>
+              <button type="submit" class="btn btn-success btn-user btn-block">Starte Abstimmung</button>
             </form>
           {% elif not election.closed %}
             <div>Abstimmung noch offen</div>

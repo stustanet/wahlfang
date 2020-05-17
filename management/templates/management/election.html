@@ -9,7 +9,7 @@
           {% if not election.end_date %}
             <div>Abstimmung noch nicht gestarted.</div>
             <hr>
-            <form class="user" action="{% url 'management:election' election.pk %}" method="post">
+            <form class="user" action="{% url 'management:election_action' election.pk 'open'%}" method="post">
               {% csrf_token %}
               <div class="form-group">
                 <label for="id_run_time">Dauer der Abstimmung:</label>
@@ -23,11 +23,16 @@
                 <div class="col-6 my-auto">Minuten</div>
                 </div>
               </div>
-              <button type="submit" class="btn btn-success btn-user btn-block">Starte Abstimmung</button>
+              <button type="submit" id="id_btn_start" class="btn btn-success btn-user btn-block">Starte Abstimmung</button>
             </form>
           {% elif not election.closed %}
             <div>Abstimmung noch offen</div>
             <div>Wahlzeitraum: {{ election.application_due_date }} - {{ election.end_date }}</div>
+            <hr>
+            <form class="user" action="{% url 'management:election_action' election.pk 'close'%}" method="post">
+              {% csrf_token %}
+              <button type="submit" id="id_btn_close" class="btn btn-danger btn-user btn-block">Abstimmung jetzt schließen</button>
+            </form>
           {% else %}
             <table class="table table-striped">
               <thead class="thead-dark">

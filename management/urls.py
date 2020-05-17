@@ -8,6 +8,7 @@ app_name = 'management'
 urlpatterns = [
     path('', views.index, name='index'),
     path('election/<int:pk>', views.election, name='election'),
+    path('election/<int:pk>/<str:action>', views.election, name='election_action')
 ]
 
 # account management stuff

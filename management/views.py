@@ -17,26 +17,39 @@ def index(request):
 
 
 @staff_member_required(login_url='/management/login')
-def election(request, pk):
+def election(request, pk, action=None):
     election = get_object_or_404(Election, pk=pk)
 
+    context = {'election': election}
+
     if request.POST:
-        form = StartElectionForm(request.POST)
-        if form.is_valid():
-            run_time = form.cleaned_data['run_time']
-            election.start_date = timezone.now()
-            election.end_date = timezone.now() + timedelta(minutes=run_time)
-            election.save()
-    else:
+        if action == "close":
+            if election.is_active:
+                election.end_date = timezone.now()
+                election.save()
+            else:
+                pass
+        elif action == "open":
+            form = StartElectionForm(request.POST)
+            context['form'] = form
+            if form.is_valid():
+                run_time = form.cleaned_data['run_time']
+                election.start_date = timezone.now()
+                election.end_date = timezone.now() + timedelta(minutes=run_time)
+                election.save()
+            else:
+                pass
+        else:
+            pass
+    elif not election.end_date:
         form = StartElectionForm()
+        context['form'] = form
+    else:
+        pass
 
-    context = {
-        'election': election,
-        'form': form
-    }
     if not election.closed:
-        return render(request, template_name='management/election.html', context=context)
-
-    context['applications'] = election.election_summary
+        context['applications'] = election.applications
+    else:
+        context['applications'] = election.election_summary
 
     return render(request, template_name='management/election.html', context=context)

@@ -9,12 +9,12 @@
           {% if not election.end_date %}
             <div>Abstimmung noch nicht gestarted.</div>
             <hr>
-            <form class="user" action="{% url 'management:election' election.pk %}" method="post">
+            <form class="user" action="{% url 'management:election_action' election.pk 'open'%}" method="post">
               {% csrf_token %}
               <div class="form-group">
                 <label for="id_run_time">Dauer der Abstimmung:</label>
                 <div class="container row">
-                <input type="number" class="form-control form-control-user col-6"
+                <input dir="rtl" type="number" class="form-control form-control-user col-6 text-right"
                        id="id_run_time"
                        name="{{ form.run_time.name }}"
                        min="1"
@@ -23,41 +23,59 @@
                 <div class="col-6 my-auto">Minuten</div>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn-user btn-block">Starte Abstimmung</button>
+              <button type="submit" id="id_btn_start" class="btn btn-success btn-user btn-block">Starte Abstimmung</button>
             </form>
           {% elif not election.closed %}
             <div>Abstimmung noch offen</div>
             <div>Wahlzeitraum: {{ election.application_due_date }} - {{ election.end_date }}</div>
+            <hr>
+            <form class="user" action="{% url 'management:election_action' election.pk 'close'%}" method="post">
+              {% csrf_token %}
+              <button type="submit" id="id_btn_close" class="btn btn-danger btn-user btn-block">Abstimmung jetzt schließen</button>
+            </form>
+          {% endif %}
+          {% if not election.closed %}
+            <hr>
+            <h5> Bewerber
+              {% if election.can_apply %}
+                (Bewerbungen möglich bis {{ election.application_due_date }}):
+              {% else %}
+                (Bewerbungsphase abgeschlossen):
+              {% endif %}
+            </h5>
           {% else %}
-            <table class="table table-striped">
-              <thead class="thead-dark">
+            <h5>Ergebnis</h5>
+          {% endif %}
+          <table class="table table-striped">
+            <thead class="thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Bewerber</th>
+              <th scope="col">Für</th>
+              <th scope="col">Gegen</th>
+              <th scope="col">Enthaltung</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for application in applications %}
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Bewerber</th>
-                <th scope="col">Für</th>
-                <th scope="col">Gegen</th>
-                <th scope="col">Enthaltung</th>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ application.first_name }} {{ application.last_name }}</td>
+                <td>{{ application.votes_accept }}</td>
+                <td>{{ application.votes_reject }}</td>
+                <td>{{ application.votes_abstention }}</td>
               </tr>
-              </thead>
-              <tbody>
-              {% for application in applications %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{ application.first_name }} {{ application.last_name }}</td>
-                  <td>{{ application.votes_accept }}</td>
-                  <td>{{ application.votes_reject }}</td>
-                  <td>{{ application.votes_abstention }}</td>
-                </tr>
-                {% if forloop.counter == election.max_votes_yes %}
+              {% if forloop.counter == election.max_votes_yes %}
+                {% if election.closed %}
                   <tr class="table-danger">
                     <td colspan="5">Maximale Anzahl von {{ election.max_votes_yes }} Bewerbern gewählt</td>
                   </tr>
                 {% endif %}
-              {% endfor %}
-              </tbody>
-            </table>
-            </div>
-          {% endif %}
+              {% endif %}
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 {% endblock %}

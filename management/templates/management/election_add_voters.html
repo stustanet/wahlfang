@@ -1,0 +1,23 @@
+{% extends 'management/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <h4>Wahlberechtigte hinzufügen</h4>
+          <span><b>Eine e-mail Adresse pro Zeile</b> in das Feld eintragen.<br>
+            An diese Adressen wird nach abschicken dieses Formulars ein Zugangscode für diese Wahl geschickt.
+          </span>
+          <hr>
+          <form class="user" action="{% url 'management:election_add_voters' election.pk %}" method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" id="id_btn_start" class="btn btn-success">Hinzufügen</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

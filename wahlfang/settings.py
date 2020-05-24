@@ -83,6 +83,7 @@ TEMPLATES = [
 
 AUTHENTICATION_BACKENDS = {
     'vote.authentication.AccessCodeBackend',
+    'management.authentication.ManagementBackend',
     'django.contrib.auth.backends.ModelBackend'
 }
 
@@ -162,8 +163,8 @@ CSP_IMG_SRC = ("'self'", "data:", )
 
 # Mail
 
-EMAIL_HOST = 'localhost'
-EMAIL_SENDER = 'wahlfang@localhost'
+EMAIL_HOST = 'mail.stusta.de'
+EMAIL_SENDER = 'vorstand@stustanet.de'
 EMAIL_PORT = 25
 
 

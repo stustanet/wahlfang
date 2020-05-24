@@ -52,7 +52,6 @@ class ApplicationUploadForm(forms.ModelForm):
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
-        self.request = request
 
         self.fields['avatar'].widget = AvatarFileInput()
         self.fields['first_name'].initial = self.voter.first_name

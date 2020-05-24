@@ -20,7 +20,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.html import strip_tags
-from django.utils.translation import gettext_lazy as _
 
 VOTE_ACCEPT = 'accept'
 VOTE_ABSTENTION = 'abstention'
@@ -69,10 +68,15 @@ class Election(models.Model):
     title = models.CharField(max_length=512)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    application_due_date = models.DateTimeField()
-    meeting_start_time = models.DateTimeField()
-    meeting_link = models.CharField(max_length=128)
+    application_due_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField()
+
+    @property
+    def started(self):
+        if self.start_date is not None and self.end_date is not None:
+            return timezone.now() < self.start_date
+        else:
+            return False
 
     @property
     def closed(self):
@@ -97,11 +101,7 @@ class Election(models.Model):
 
     @property
     def can_apply(self):
-        return self.is_active and timezone.now() < self.application_due_date
-
-    @property
-    def applications(self):
-        return Application.objects.filter(voter__in=self.participants.all())
+        return self.is_active and self.application_due_date is not None and timezone.now() < self.application_due_date
 
     @property
     def election_summary(self):
@@ -120,6 +120,12 @@ class Election(models.Model):
 
         return applications
 
+    def number_voters(self):
+        return self.participants.count()
+
+    def number_votes_cast(self):
+        return self.votes.count()
+
     def __str__(self):
         return self.title
 
@@ -129,7 +135,6 @@ class Voter(models.Model):
     password = models.CharField(max_length=256)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    room = models.CharField(max_length=64)
     email = models.EmailField()
     election = models.ForeignKey(Election, related_name='participants', on_delete=models.CASCADE)
     voted = models.BooleanField(default=False)
@@ -231,12 +236,8 @@ class Voter(models.Model):
     def get_username(self):
         return str(self)
 
-    @property
-    def is_staff(self):
-        return False
-
     def send_invitation(self, access_code):
-        subject = 'Einladung Hausadmin Wahlen | Invitation house admin elections'
+        subject = f'Einladung {self.election.title}'
         context = {
             'voter': self,
             'election': self.election,
@@ -304,7 +305,9 @@ def avatar_file_name(instance, filename):
 class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)
     avatar = models.ImageField(upload_to=avatar_file_name, null=True, blank=True)
-    voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE)
+    # allow empty voter field to enable manually added applications
+    voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE, null=True, blank=True)
+    election = models.ForeignKey(Election, related_name='applications', on_delete=models.CASCADE)
     last_name = models.CharField(max_length=256)
     first_name = models.CharField(max_length=256)
     email = models.EmailField()

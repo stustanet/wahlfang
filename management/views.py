@@ -26,6 +26,7 @@ def election(request, pk, action=None):
     context = {'election': election}
 
     if request.POST:
+        action = request.POST.get("action", None)
         if action == "close":
             if election.is_active:
                 election.end_date = timezone.now()

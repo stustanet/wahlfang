@@ -74,7 +74,7 @@ class Election(models.Model):
     @property
     def started(self):
         if self.start_date is not None and self.end_date is not None:
-            return timezone.now() < self.start_date
+            return timezone.now() > self.start_date
         else:
             return False
 

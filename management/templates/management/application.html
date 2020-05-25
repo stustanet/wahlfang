@@ -1,16 +1,24 @@
-{% extends 'vote/base.html' %}
+{% extends 'management/base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12">
+<div class="row justify-content-center">
+    <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
-          <form action="{% url 'vote:upload_application' %}" method="post" enctype="multipart/form-data">
+          {% if application_id %}
+            <form action="{% url 'management:election_edit_application' election.pk application_id %}" method="post" enctype="multipart/form-data">
+          {% else %}
+            <form action="{% url 'management:election_upload_application' election.pk %}" method="post" enctype="multipart/form-data">
+          {% endif %}
             {% csrf_token %}
             <div class="form-group">
-              <h4>Hausadmin (Network Admin) Application</h4>
+              {% if application_id %}
+                <h4>Edit Application</h4>
+              {% else %}
+                <h4>New Application</h4>
+              {% endif %}
             </div>
             <hr>
 
@@ -19,13 +27,18 @@
             <div class="card mb-3">
               <div class="card-body p-3">
                 <h5 class="card-title">Display Name</h5>
-                <span class="form-text text-muted mb-2">Current display name: <strong class="text-nowrap">{{ form.first_name.value|escape }} {{ form.last_name.value|escape }} ({{ voter.room }})</strong></span>
                 <div class="form-row">
-                  <div class="form-group col-md-6 mb-0">
+                  <div class="form-group col-md-3 mb-0">
+                    {{ form.election|as_crispy_field:"bootstrap4" }}
+                  </div>
+                  <div class="form-group col-md-3 mb-0">
                     {{ form.first_name|as_crispy_field:"bootstrap4" }}
                   </div>
-                  <div class="form-group col-md-6 mb-0">
+                  <div class="form-group col-md-3 mb-0">
                     {{ form.last_name|as_crispy_field:"bootstrap4" }}
+                  </div>
+                  <div class="form-group col-md-3 mb-0">
+                    {{ form.room|as_crispy_field:"bootstrap4" }}
                   </div>
                 </div>
               </div>
@@ -33,8 +46,8 @@
 
             <div class="card mb-3">
               <div class="card-body p-3">
-                <h5 class="card-title">Contact E-Mail Address</h5>
-                <span class="form-text text-muted mb-2">You will receive announcements from StuStaNet and support requests here.<br>Your e-mail address will not be public.</span>
+                <h5 class="card-title">Contact E-Mail Address<span class="ml-2 badge badge-secondary">Optional</span></h5>
+                <span class="form-text text-muted mb-2">The e-mail address will not be visible to voters.</span>
                 <div class="form-row">
                   <div class="form-group col-md-6 mb-0">
                     {{ form.email|as_crispy_field:"bootstrap4" }}
@@ -46,9 +59,9 @@
             <div class="card mb-3">
               <div class="card-body p-3">
                 <h5 class="card-title">Application Info<span class="ml-2 badge badge-secondary">Optional</span></h5>
-                <span><strong>This information is visible to your house mates!</strong></span>
+                <span><strong>This information is visible to voters!</strong></span>
 
-                <span class="form-text text-muted mb-2">What makes you a good candidate? You've been a network admin before? You study something technical? You speak Chinese or Arabic? Your mom thinks you have super powers because you fixed the printer once? Let us know!</span>
+                <span class="form-text text-muted mb-2">Add a short description of the applicant.</span>
                 <div id="div_id_text" class="form-group">
                   <label for="id_text" class="">Description <small class="text-muted">(max. 250 characters)</small></label>
                   <div class="">
@@ -56,11 +69,10 @@
                   </div>
                 </div>
 
-                <span class="form-text text-muted mt-4 mb-2">Be recognizable and add a photo of yourself :)</span>
+                <span class="form-text text-muted mt-4 mb-2">Add a photo of the applicant.</span>
                 {{ form.avatar }}
               </div>
             </div>
-
             <button type="submit" class="btn btn-primary btn-block">Submit</button>
           </form>
         </div>
@@ -71,5 +83,5 @@
 
 {% block footer_scripts %}
     {{ block.super }}
-    <script src="{% static "vote/js/application.js" %}"></script>
+    <script src="{% static 'management/js/application.js' %}"></script>
 {% endblock %}

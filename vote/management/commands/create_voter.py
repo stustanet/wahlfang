@@ -17,12 +17,10 @@ class Command(BaseCommand):
         if settings.DEBUG:
             parser.add_argument('--first_name', type=str, default="First")
             parser.add_argument('--last_name', type=str, default="Last")
-            parser.add_argument('--room', type=str, default="123")
             parser.add_argument('--email', type=str, default="spam@spam.spam")
         else:
             parser.add_argument('--first_name', type=str, required=True)
             parser.add_argument('--last_name', type=str, required=True)
-            parser.add_argument('--room', type=str, required=True)
             parser.add_argument('--email', type=str, required=True)
 
     def handle(self, *args, **options):
@@ -32,7 +30,6 @@ class Command(BaseCommand):
             voter_id=options['voter_id'],
             first_name=options['first_name'],
             last_name=options['last_name'],
-            room=options['room'],
             email=options['email'],
             election=election,
             voted=options['no_vote'],

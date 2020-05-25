@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
-from vote.forms import AccessCodeAuthenticationForm, ApplicationUploadForm, VoteForm, EmptyForm
+from vote.forms import AccessCodeAuthenticationForm, VoteForm, EmptyForm
 from vote.models import Application
 
 
@@ -78,27 +78,3 @@ def index(request):
 
     # overview
     return render(request, template_name='vote/index.html', context=context)
-
-
-@voter_login_required
-def upload_application(request):
-    voter = request.user
-    if not voter.election.can_apply:
-        messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
-        return redirect('vote:index')
-
-    instance = Application.objects.filter(voter=voter.voter_id).first()
-
-    if request.POST:
-        form = ApplicationUploadForm(request, request.POST, request.FILES, instance=instance)
-        if form.is_valid():
-            form.save()
-            return redirect('vote:index')
-    else:
-        form = ApplicationUploadForm(request, instance=instance)
-
-    context = {
-        'form': form,
-        'voter': voter,
-    }
-    return render(request, template_name='vote/application.html', context=context)

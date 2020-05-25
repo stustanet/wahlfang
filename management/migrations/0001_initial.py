@@ -5,8 +5,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('management', '0001_initial'), ('management', '0002_auto_20200524_1531'), ('management', '0003_auto_20200524_1531'), ('management', '0004_auto_20200524_1609')]
-
     dependencies = [
         ('vote', '0007_auto_20200516_1814'),
     ]

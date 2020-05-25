@@ -3,9 +3,12 @@ from datetime import timedelta
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.contrib import messages
 
 from management.authentication import management_login_required
-from management.forms import StartElectionForm, AddElectionForm, AddVotersForm, AddApplicationForm
+from management.forms import StartElectionForm, AddElectionForm, AddVotersForm, ApplicationUploadForm
+
+from vote.models import Election, Application
 
 
 @management_login_required(login_url='/management/login')
@@ -21,13 +24,14 @@ def index(request):
 def election(request, pk, action=None):
     election = request.user.get_election(pk=pk)
     if election is None:
-        return Http404('Election does not exist')
+        raise Http404('Election does not exist')
 
     context = {'election': election}
 
     if request.POST:
+        action = request.POST.get("action", None)
         if action == "close":
-            if election.is_active:
+            if election.can_vote:
                 election.end_date = timezone.now()
                 election.save()
             else:
@@ -76,32 +80,10 @@ def add_election(request):
 
 
 @management_login_required(login_url='/management/login')
-def election_add_application(request, pk):
-    election = request.user.get_election(pk=pk)
-    if election is None:
-        return Http404('Election does not exist')
-
-    context = {
-        'form': AddApplicationForm(election=election),
-        'election': election
-    }
-
-    if request.POST:
-        form = AddApplicationForm(election=election, data=request.POST, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('management:index')
-
-        context['form'] = form
-
-    return render(request, template_name='management/add_application.html', context=context)
-
-
-@management_login_required(login_url='/management/login')
 def election_add_voters(request, pk):
     election = request.user.get_election(pk=pk)
     if election is None:
-        return Http404('Election does not exist')
+        raise Http404('Election does not exist')
 
     context = {
         'form': AddVotersForm(election=election),
@@ -117,3 +99,39 @@ def election_add_voters(request, pk):
         context['form'] = form
 
     return render(request, template_name='management/election_add_voters.html', context=context)
+
+
+@management_login_required(login_url='/management/login')
+def election_upload_application(request, pk, application_id=None):
+    election = request.user.get_election(pk=pk)
+    if election is None:
+        raise Http404('Election does not exist')
+
+    if not election.can_apply:
+        messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
+        return redirect('management:index')
+
+    if application_id:
+        try:
+            instance = Application.objects.get(pk=application_id)
+            if instance.election_id != election.pk:
+                raise Http404("Application does not exist")
+        except Application.DoesNotExist:
+            raise Http404("Application does not exist")
+    else:
+        instance = None
+
+    if request.POST:
+        form = ApplicationUploadForm(election, request, request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('management:election', election.pk)
+    else:
+        form = ApplicationUploadForm(election, request, instance=instance)
+
+    context = {
+        'form': form,
+        'election': election,
+        'application_id': application_id
+    }
+    return render(request, template_name='management/application.html', context=context)

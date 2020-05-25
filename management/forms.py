@@ -15,13 +15,12 @@ class AddElectionForm(forms.ModelForm):
 
     class Meta:
         model = Election
-        fields = ('title', 'max_votes_yes', 'start_date', 'end_date', 'application_due_date')
+        fields = ('title', 'max_votes_yes', 'start_date', 'end_date')
         labels = {
             'title': 'Name',
             'max_votes_yes': 'Maximale Anzahl an JA Stimmen',
             'start_date': 'Wahlbeginn (optional)',
             'end_date': 'Wahlende (optional)',
-            'application_due_date': 'Deadline für Bewerbungen (optional)'
         }
 
     def save(self, commit=True):
@@ -34,18 +33,32 @@ class AddElectionForm(forms.ModelForm):
         return instance
 
 
-class AddApplicationForm(forms.ModelForm):
-    def __init__(self, election, *args, **kwargs):
+class AvatarFileInput(forms.ClearableFileInput):
+    template_name = 'vote/image_input.html'
+
+
+class ApplicationUploadForm(forms.ModelForm):
+    field_order = ['election', 'first_name', 'last_name', 'room', 'email', 'text', 'avatar']
+
+    def __init__(self, election, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.election = election
+        self.fields['election'].initial = self.election
+        self.fields['election'].disabled = True
+
+        self.request = request
 
     class Meta:
         model = Application
-        fields = ('first_name', 'last_name', 'email', 'text', 'avatar')
+        fields = ('election', 'first_name', 'last_name', 'room', 'email', 'text', 'avatar')
+
+    def clean(self):
+        super().clean()
+        if not self.election.can_apply:
+            raise forms.ValidationError('Applications are currently not allowed')
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.election = self.election
 
         if commit:
             instance.save()

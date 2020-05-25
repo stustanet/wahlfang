@@ -1,0 +1,45 @@
+{% extends 'management/base.html' %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="card shadow ">
+                <div class="card-header  bg-dark text-light">
+                    <h4 class="d-inline">{{ session.title }}</h4>
+                    <a class="btn btn-success d-inline float-right ml-2"
+                       href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
+                    <a class="btn btn-success d-inline float-right ml-2"
+                       href="{% url 'management:add_election' pk=session.id %}">Add Election</a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for election in elections %}
+                            <a class="list-group-item list-group-item-action" href="{% url 'management:election' pk=election.id %}">
+                                <h4>{{ election.title }}</h4>
+                                {% if not election.closed and not election.open %}
+                                    {% comment %}
+                    <form class="d-inline float-right" action="{% url 'management:election' pk=election.id %}?action=open">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success, btn-sm">Open</button>
+                    </form>
+                    {% endcomment %}
+                                {% elif election.closed %}
+                                    <hr>
+                                    {% include 'management/results.html' %}
+                                {% elif election.open %}
+                                    {% comment %}
+                    <form class="d-inline float-right" action="{% url 'management:election' pk=election.id %}?action=close">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger, btn-sm">Close</button>
+                    </form>
+                    {% endcomment %}
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

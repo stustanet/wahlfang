@@ -1,5 +1,5 @@
 {% extends 'management/base.html' %}
-{% load static%}
+{% load static %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 
@@ -8,10 +8,10 @@
     <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Create election</h4>
-          <form class="user" action="{% url 'management:add_election' pk=session.id %}" method="post">
+          <h4>Create Meeting</h4>
+          <form class="user" action="{% url 'management:index' %}?action=add_session" method="post">
             {% csrf_token %}
-            {{ form| crispy }}
+            {{ form|crispy }}
             <button type="submit" id="id_btn_start" class="btn btn-success">Submit</button>
           </form>
         </div>

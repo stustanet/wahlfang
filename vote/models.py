@@ -2,6 +2,8 @@ import textwrap
 import uuid
 import os
 import sys
+from builtins import map
+
 import PIL
 
 from io import BytesIO
@@ -14,7 +16,7 @@ from django.contrib.auth.hashers import (
 )
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
-from django.db.models import Count, Q
+from django.db.models import Count, Q, CASCADE
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
@@ -64,11 +66,18 @@ class Enc32:
         return i
 
 
+class Session(models.Model):
+    title = models.CharField(max_length=256)
+    meeting_link = models.CharField(max_length=512, blank=True, null=True)
+    start_date = models.DateTimeField(blank=True, null=True, default=timezone.now)
+
+
 class Election(models.Model):
     title = models.CharField(max_length=512)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField()
+    session = models.ForeignKey(Session, related_name='elections', default=None, on_delete=CASCADE)
 
     @property
     def started(self):
@@ -85,7 +94,7 @@ class Election(models.Model):
             return False
 
     @property
-    def can_vote(self):
+    def is_open(self):
         if self.end_date:
             return self.start_date < timezone.now() < self.end_date
         else:
@@ -120,9 +129,14 @@ class Election(models.Model):
         return applications
 
     def number_voters(self):
-        return self.participants.count()
+        return self.session.participants.count()
+
+    def number_votes_open(self):
+        return self.open_votes.count()
 
     def number_votes_cast(self):
+        if self.applications.count() == 0:
+            return 0;
         return int(self.votes.count() / self.applications.count())
 
     def __str__(self):
@@ -135,8 +149,7 @@ class Voter(models.Model):
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     email = models.EmailField()
-    election = models.ForeignKey(Election, related_name='participants', on_delete=models.CASCADE)
-    voted = models.BooleanField(default=False)
+    session = models.ForeignKey(Session, related_name='participants', default=None, on_delete=models.CASCADE)
     remind_me = models.BooleanField(default=False)
 
     # Stores the raw password if set_password() is called so that it can
@@ -210,10 +223,6 @@ class Voter(models.Model):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     @property
-    def can_vote(self):
-        return not self.voted and self.election.can_vote
-
-    @property
     def is_authenticated(self):
         """
         Always return True. This is a way to tell if the user has been
@@ -224,6 +233,9 @@ class Voter(models.Model):
     @property
     def is_active(self):
         return True
+
+    def can_vote(self, election):
+        return election.is_open and OpenVote.objects.filter(voter_id=self.voter_id, election_id=election.id).exists()
 
     @property
     def is_staff(self):
@@ -236,10 +248,10 @@ class Voter(models.Model):
         return str(self)
 
     def send_invitation(self, access_code):
-        subject = f'Einladung {self.election.title}'
+        subject = f'Einladung {self.session.title}'
         context = {
             'voter': self,
-            'election': self.election,
+            'session': self.session,
             'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}),
             'access_code': access_code,
         }
@@ -277,7 +289,7 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, voter_id, first_name, last_name, election, email, voted=False):
+    def from_data(cls, voter_id, first_name, last_name, session, email):
         if Voter.objects.filter(voter_id=voter_id).exists():
             raise IntegrityError('voter id not unique')
 
@@ -285,9 +297,8 @@ class Voter(models.Model):
             voter_id=voter_id,
             first_name=first_name,
             last_name=last_name,
-            election=election,
+            session=session,
             email=email,
-            voted=voted
         )
         password = voter.set_password()
         voter.save()
@@ -360,6 +371,14 @@ class Application(models.Model):
             self._old_avatar = self.avatar
 
         super(Application, self).save(*args, **kwargs)
+
+
+class OpenVote(models.Model):
+    election = models.ForeignKey(Election, related_name='open_votes', on_delete=models.CASCADE)
+    voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
+
+    def can_vote(self,voter_id, election_id):
+        return self.objects.filter(voter_id=voter_id, election_id=election_id).exists()
 
 
 class Vote(models.Model):

@@ -29,55 +29,88 @@
             </form>
           {% elif not election.closed %}
             <div>Abstimmung noch offen</div>
-            <div>Wahlzeitraum: {{ election.application_due_date }} - {{ election.end_date }}</div>
+            <div>
+              Wahlzeitraum: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
+              {{ election.end_date|date:"l Y-m-d H:i:s" }}
+            </div>
             <hr>
             <form class="user" action="{% url 'management:election' election.pk%}" method="post">
               {% csrf_token %}
               <input type="hidden" name="action" value="close">
-              <button type="submit" id="id_btn_close" class="btn btn-danger btn-user btn-block">Abstimmung jetzt schließen</button>
+              <button type="submit" id="id_btn_close" class="btn btn-danger">Abstimmung jetzt schließen</button>
             </form>
           {% endif %}
+        </div>
+      </div>
+      <div class="card shadow mt-4">
+        <div class="card-body">
           {% if not election.closed %}
+            <h4>Bewerber</h4>
             <hr>
-            <h5> Bewerber
-              {% if election.can_apply %}
-                (Bewerbungen möglich bis {{ election.application_due_date }}):
-              {% else %}
-                (Bewerbungsphase abgeschlossen):
-              {% endif %}
-            </h5>
-          {% else %}
-            <h5>Ergebnis</h5>
-          {% endif %}
-          <table class="table table-striped">
-            <thead class="thead-dark">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Bewerber</th>
-              <th scope="col">Für</th>
-              <th scope="col">Gegen</th>
-              <th scope="col">Enthaltung</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for application in applications %}
+            <table class="table table-striped">
+              <thead class="thead-dark">
               <tr>
-                <th scope="row">{{ forloop.counter }}</th>
-                <td>{{ application.first_name }} {{ application.last_name }}</td>
-                <td>{{ application.votes_accept }}</td>
-                <td>{{ application.votes_reject }}</td>
-                <td>{{ application.votes_abstention }}</td>
+                <th scope="col">#</th>
+                <th scope="col">Bewerber</th>
+                <th scope="col"></th>
               </tr>
-              {% if forloop.counter == election.max_votes_yes %}
-                {% if election.closed %}
-                  <tr class="table-danger">
-                    <td colspan="5">Maximale Anzahl von {{ election.max_votes_yes }} Bewerbern gewählt</td>
-                  </tr>
+              </thead>
+              <tbody>
+              {% for application in applications %}
+                <tr>
+                  <th scope="row">{{ forloop.counter }}</th>
+                  <td>{{ application.get_display_name }}</td>
+                  <td class="text-right">
+                    {% if election.can_apply %}
+                      <a class="btn btn-warning" role="button"
+                         href="{% url 'management:election_edit_application' election.pk application.pk%}">
+                        Bearbeiten
+                      </a>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+            {% if election.can_apply %}
+              <a class="btn btn-primary" role="button"
+                 href="{% url 'management:election_upload_application' election.pk%}">
+                Bewerber hinzufügen
+              </a>
+            {% endif %}
+          {% else %}
+            <h4>Ergebnis</h4>
+            <hr>
+            <table class="table table-striped">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Bewerber</th>
+                <th scope="col">Für</th>
+                <th scope="col">Gegen</th>
+                <th scope="col">Enthaltung</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for application in applications %}
+                <tr>
+                  <th scope="row">{{ forloop.counter }}</th>
+                  <td>{{ application.get_display_name }}</td>
+                  <td>{{ application.votes_accept }}</td>
+                  <td>{{ application.votes_reject }}</td>
+                  <td>{{ application.votes_abstention }}</td>
+                </tr>
+                {% if forloop.counter == election.max_votes_yes %}
+                  {% if election.closed %}
+                    <tr class="table-danger">
+                      <td colspan="5">Maximale Anzahl von {{ election.max_votes_yes }} Bewerbern gewählt</td>
+                    </tr>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
-            {% endfor %}
-            </tbody>
-          </table>
+              {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
         </div>
       </div>
       <div class="card shadow mt-4">

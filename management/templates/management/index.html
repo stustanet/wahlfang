@@ -12,7 +12,7 @@
                 <span>{{ election.title }}</span>
                 <small class="float-right text-muted">
                   {% if election.end_date %}
-                    {{ election.application_due_date }} - {{ election.end_date }}
+                    {{ election.start_date|date:"l Y-m-d H:i:s" }} - {{ election.end_date|date:"H:i:s" }}
                   {% else %}
                     Not started yet
                   {% endif %}

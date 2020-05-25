@@ -16,7 +16,4 @@ urlpatterns = [
     path('logout', auth_views.LogoutView.as_view(
         next_page='vote:index',
     ), name='logout'),
-
-    # applications
-    path('application', views.upload_application, name='upload_application'),
 ]

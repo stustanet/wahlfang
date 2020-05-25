@@ -68,7 +68,6 @@ class Election(models.Model):
     title = models.CharField(max_length=512)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    application_due_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField()
 
     @property
@@ -86,22 +85,22 @@ class Election(models.Model):
             return False
 
     @property
-    def is_active(self):
-        if self.start_date and self.end_date:
-            return self.start_date < timezone.now() < self.end_date
-        else:
-            return True
-
-    @property
     def can_vote(self):
         if self.end_date:
-            return self.application_due_date < timezone.now() < self.end_date
+            return self.start_date < timezone.now() < self.end_date
         else:
             return False
 
     @property
     def can_apply(self):
-        return self.is_active and self.application_due_date is not None and timezone.now() < self.application_due_date
+        if self.start_date:
+            return timezone.now() < self.start_date
+        else:
+            return True
+
+    @property
+    def applications(self):
+        return Application.objects.filter(election=self)
 
     @property
     def election_summary(self):
@@ -112,11 +111,11 @@ class Election(models.Model):
         votes_reject = Count('votes', filter=Q(votes__vote=VOTE_REJECT))
         votes_abstention = Count('votes', filter=Q(votes__vote=VOTE_ABSTENTION))
 
-        applications = Application.objects.filter(voter__election=self).annotate(
+        applications = Application.objects.filter(election_id=self.pk).annotate(
             votes_accept=votes_accept,
             votes_reject=votes_reject,
             votes_abstention=votes_abstention
-        ).order_by('votes_accept')
+        ).order_by('-votes_accept')
 
         return applications
 
@@ -124,7 +123,7 @@ class Election(models.Model):
         return self.participants.count()
 
     def number_votes_cast(self):
-        return self.votes.count()
+        return int(self.votes.count() / self.applications.count())
 
     def __str__(self):
         return self.title
@@ -278,7 +277,7 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, voter_id, first_name, last_name, room, election, email, voted=False):
+    def from_data(cls, voter_id, first_name, last_name, election, email, voted=False):
         if Voter.objects.filter(voter_id=voter_id).exists():
             raise IntegrityError('voter id not unique')
 
@@ -286,7 +285,6 @@ class Voter(models.Model):
             voter_id=voter_id,
             first_name=first_name,
             last_name=last_name,
-            room=room,
             election=election,
             email=email,
             voted=voted
@@ -305,12 +303,11 @@ def avatar_file_name(instance, filename):
 class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)
     avatar = models.ImageField(upload_to=avatar_file_name, null=True, blank=True)
-    # allow empty voter field to enable manually added applications
-    voter = models.OneToOneField(Voter, related_name='application', on_delete=models.CASCADE, null=True, blank=True)
-    election = models.ForeignKey(Election, related_name='applications', on_delete=models.CASCADE)
+    election = models.ForeignKey(Election, related_name='application', on_delete=models.CASCADE)
     last_name = models.CharField(max_length=256)
     first_name = models.CharField(max_length=256)
-    email = models.EmailField()
+    room = models.CharField(max_length=64, blank=True)
+    email = models.EmailField(blank=True)
 
     _old_avatar = None
 
@@ -319,10 +316,13 @@ class Application(models.Model):
         self._old_avatar = self.avatar
 
     def __str__(self):
-        return f'Application of {self.get_display_name()} for {self.voter.election}'
+        return f'Application of {self.get_display_name()} for {self.election}'
 
     def get_display_name(self):
-        return f'{self.first_name} {self.last_name} ({self.voter.room})'
+        if self.room:
+            return f'{self.first_name} {self.last_name} ({self.room})'
+        else:
+            return f'{self.first_name} {self.last_name}'
 
     def save(self, *args, **kwargs):
         if self.avatar and self._old_avatar != self.avatar:

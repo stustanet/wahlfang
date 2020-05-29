@@ -369,7 +369,7 @@ class Application(models.Model):
 
 class OpenVote(models.Model):
     election = models.ForeignKey(Election, related_name='open_votes', on_delete=models.CASCADE)
-    voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
+    voter = models.ForeignKey(Voter, related_name='open_votes', on_delete=models.CASCADE)
 
     def can_vote(self, voter_id, election_id):
         return self.objects.filter(voter_id=voter_id, election_id=election_id).exists()

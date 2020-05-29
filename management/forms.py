@@ -98,8 +98,8 @@ class AddElectionForm(forms.ModelForm):
         if commit:
             self.session.save()
             open_votes = [
-                OpenVote(voter=v, session=self.session)
-                for v in self.session.participants
+                OpenVote(voter=v, election=instance)
+                for v in self.session.participants.all()
             ]
             OpenVote.objects.bulk_create(open_votes)
 

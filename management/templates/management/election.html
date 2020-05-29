@@ -1,134 +1,116 @@
 {% extends 'management/base.html' %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-8">
-      <div class="card shadow">
-        <div class="card-body">
-          <h4>{{ election.title }}</h4>
-          {% if not election.started %}
-            <div>Abstimmung noch nicht gestarted.</div>
-            <hr>
-            <form class="user" action="{% url 'management:election' election.pk%}" method="post">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="id_run_time">Dauer der Abstimmung:</label>
-                <div class="container row">
-                <input dir="rtl" type="number" class="form-control form-control-user col-6 text-right"
-                       id="id_run_time"
-                       name="{{ form.run_time.name }}"
-                       min="1"
-                       value="5"
-                       required="true">
-                  <input type="hidden" name="action" value="open">
-                <div class="col-6 my-auto">Minuten</div>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-light">
+                    <h4 class="d-inline">{{ election.title }}</h4>
+                    <a class="btn btn-light d-inline float-right" href="{% url "management:session"  pk=session.id%}">Back</a>
                 </div>
-              </div>
-              <button type="submit" id="id_btn_start" class="btn btn-success">Abstimmung starten
-              </button>
-            </form>
-          {% elif not election.closed %}
-            <div>Abstimmung noch offen</div>
-            <div>
-              Wahlzeitraum: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
-              {{ election.end_date|date:"l Y-m-d H:i:s" }}
-            </div>
-            <hr>
-            <form class="user" action="{% url 'management:election' election.pk%}" method="post">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="close">
-              <button type="submit" id="id_btn_close" class="btn btn-danger">Abstimmung jetzt schließen</button>
-            </form>
-          {% endif %}
-        </div>
-      </div>
-      <div class="card shadow mt-4">
-        <div class="card-body">
-          {% if not election.closed %}
-            <h4>Bewerber</h4>
-            <hr>
-            <table class="table table-striped">
-              <thead class="thead-dark">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Bewerber</th>
-                <th scope="col"></th>
-              </tr>
-              </thead>
-              <tbody>
-              {% for application in applications %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{ application.get_display_name }}</td>
-                  <td class="text-right">
-                    {% if election.can_apply %}
-                      <a class="btn btn-warning" role="button"
-                         href="{% url 'management:election_edit_application' election.pk application.pk%}">
-                        Bearbeiten
-                      </a>
+                <div class="card-body">
+                    {% if not election.started %}
+                        <div>Abstimmung noch nicht gestarted.</div>
+                        <hr>
+                        <form class="user" action="{% url 'management:election' election.pk %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="id_run_time">Dauer der Abstimmung:</label>
+                                <div class="container row">
+                                    <input dir="rtl" type="number"
+                                           class="form-control form-control-user col-6 text-right"
+                                           id="id_run_time"
+                                           name="{{ form.run_time.name }}"
+                                           min="1"
+                                           value="5"
+                                           required="true">
+                                    <input type="hidden" name="action" value="open">
+                                    <div class="col-6 my-auto">Minuten</div>
+                                </div>
+                            </div>
+                            <button type="submit" id="id_btn_start" class="btn btn-success">Abstimmung starten
+                            </button>
+                        </form>
+                    {% elif not election.closed %}
+                        <div>Abstimmung noch offen</div>
+                        <div>
+                            Wahlzeitraum: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
+                            {{ election.end_date|date:"l Y-m-d H:i:s" }}
+                        </div>
+                        <hr>
+                        <form class="user" action="{% url 'management:election' election.pk %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="close">
+                            <button type="submit" id="id_btn_close" class="btn btn-danger">Abstimmung jetzt schließen
+                            </button>
+                        </form>
                     {% endif %}
-                  </td>
-                </tr>
-              {% endfor %}
-              </tbody>
-            </table>
-            {% if election.can_apply %}
-              <a class="btn btn-primary" role="button"
-                 href="{% url 'management:election_upload_application' election.pk%}">
-                Bewerber hinzufügen
-              </a>
-            {% endif %}
-          {% else %}
-            <h4>Ergebnis</h4>
-            <hr>
-            <table class="table table-striped">
-              <thead class="thead-dark">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Bewerber</th>
-                <th scope="col">Für</th>
-                <th scope="col">Gegen</th>
-                <th scope="col">Enthaltung</th>
-              </tr>
-              </thead>
-              <tbody>
-              {% for application in applications %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{ application.get_display_name }}</td>
-                  <td>{{ application.votes_accept }}</td>
-                  <td>{{ application.votes_reject }}</td>
-                  <td>{{ application.votes_abstention }}</td>
-                </tr>
-                {% if forloop.counter == election.max_votes_yes %}
-                  {% if election.closed %}
-                    <tr class="table-danger">
-                      <td colspan="5">Maximale Anzahl von {{ election.max_votes_yes }} Bewerbern gewählt</td>
-                    </tr>
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-              </tbody>
-            </table>
-          {% endif %}
-        </div>
-      </div>
-      <div class="card shadow mt-4">
-        <div class="card-body">
-          <h4>Wahlberechtigte</h4>
-          <hr>
-          {% if election.started %}
-            <div>
-              Aus {{ election.number_voters }} Wahlberechtigten haben {{ election.number_votes_cast }} abgestimmt.
+                </div>
             </div>
-          {% else %}
-            <div>
-              <a class="btn btn-primary" href="{% url 'management:election_add_voters' election.pk %}">Wahlberechtigte
-                hinzufügen</a>
+            <div class="card shadow mt-4">
+                <div class="card-body">
+                    {% if not election.closed %}
+                        <h4>Bewerber</h4>
+                        <hr>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Bewerber</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for application in applications %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ application.get_display_name }}</td>
+                                    <td class="text-right">
+                                        {% if election.can_apply %}
+                                            <a class="btn btn-warning" role="button"
+                                               href="{% url 'management:edit_application' pk=election.pk application_id=application.pk %}">
+                                                Bearbeiten
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if election.can_apply %}
+                            <a class="btn btn-primary" role="button"
+                               href="{% url 'management:add_application' election.pk %}">
+                                Bewerber hinzufügen
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <h4>Ergebnis</h4>
+                        {% include 'management/results.html' %}
+                    {% endif %}
+                </div>
             </div>
-          {% endif %}
+            <div class="card shadow mt-4">
+                <div class="card-body">
+                    <h4>Wahlberechtigte</h4>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                          <tr>
+                              <th scope="row">Voters</th>
+                              <th scope="row">Cast</th>
+                              <th scope="row">Open</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{ election.number_voters }}</td>
+                            <td>{{ election.number_votes_cast }}</td>
+                            <td>{{ election.number_votes_open }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 {% endblock %}

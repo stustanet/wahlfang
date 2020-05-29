@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import user_passes_test
 from management.models import ElectionManager
 
 
-def management_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='admin:login'):
+def management_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='management:login'):
     """
     Decorator for views that checks that the voter is logged in, redirecting
     to the log-in page if necessary.

@@ -27,7 +27,7 @@ class VoterAdmin(UserAdmin):
     form = VoterChangeForm
     model = Voter
     fieldsets = (
-        (None, {'fields': ('voter_id', 'password', 'election',)}),
+        (None, {'fields': ('voter_id', 'password', 'session',)}),
         # (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Personal info'), {'fields': ('email',)}),
         (_('Status'), {'fields': ('voted',)}),
@@ -35,13 +35,13 @@ class VoterAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('voter_id', 'password1', 'password2', 'election')}
+            'fields': ('voter_id', 'password1', 'password2', 'session')}
         ),
         (_('Personal info'), {'fields': ('email',)}),
     )
-    list_display = ('voter_id', 'election', 'voted',)
-    list_filter = ('voted',)
-    search_fields = ('voter_id', 'election', 'email',)
+    list_display = ('voter_id', 'session',)
+    list_filter = ()
+    search_fields = ('voter_id', 'session', 'email',)
     ordering = ('voter_id',)
     filter_horizontal = tuple()
 

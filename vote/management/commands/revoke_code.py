@@ -1,7 +1,6 @@
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from vote.models import Election, Voter
+from vote.models import Voter
 
 
 class Command(BaseCommand):
@@ -27,4 +26,5 @@ class Command(BaseCommand):
         if voter.has_usable_password():
             raise CommandError("unsetting password failed")
 
-        self.stdout.write(self.style.SUCCESS('Successfully revoked access for "%s"\nAccess Code: %s' % (voter, access_code)))
+        self.stdout.write(
+            self.style.SUCCESS('Successfully revoked access for "%s"\nAccess Code: %s' % (voter, access_code)))

@@ -1,14 +1,18 @@
-from django import forms
+from typing import Tuple, List
 
-from vote.models import Election, Application,Session
+from django import forms
+from django.core.validators import validate_email
 from django.utils import timezone
+
+from vote.models import Election, Application, Session, Voter
+
 
 class StartElectionForm(forms.Form):
     run_time = forms.IntegerField(label="run time")
 
 
 class AddSessionForm(forms.ModelForm):
-    def __init__(self, request,user, *args, **kwargs):
+    def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
         self.request = request
@@ -40,7 +44,7 @@ class AddElectionForm(forms.ModelForm):
         self.fields['session'].disabled = True
         self.fields['session'].initial = session
         self.fields['session'].widget = forms.HiddenInput()
-        self.fields['start_date'].initial =timezone.now()
+        # self.fields['start_date'].initial = timezone.now()
 
     class Meta:
         model = Election
@@ -68,11 +72,11 @@ class AddElectionForm(forms.ModelForm):
 
 
 class AvatarFileInput(forms.ClearableFileInput):
-    template_name = 'vote/image_input.html'
+    template_name = 'management/image_input.html'
 
 
 class ApplicationUploadForm(forms.ModelForm):
-    field_order = ['election', 'first_name', 'last_name', 'room', 'email', 'text', 'avatar']
+    field_order = ['election', 'first_name', 'last_name', 'email', 'text', 'avatar']
 
     def __init__(self, election, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -84,7 +88,7 @@ class ApplicationUploadForm(forms.ModelForm):
 
     class Meta:
         model = Application
-        fields = ('election', 'first_name', 'last_name', 'room', 'email', 'text', 'avatar')
+        fields = ('election', 'first_name', 'last_name', 'email', 'text', 'avatar')
 
     def clean(self):
         super().clean()
@@ -107,8 +111,22 @@ class AddVotersForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.session = session
 
-    def save(self, commit=True):
-        pass
+    def save(self) -> List[Tuple[Voter, str]]:
+        voters = [
+            Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['email_list']
+        ]
+
+        for voter, code in voters:
+            voter.send_invitation(code)
+
+        return voters
 
     def clean(self):
-        pass
+        emails = self.cleaned_data['voters_list'].splitlines()
+        for email in emails:
+            validate_email(email)
+
+        if not len(emails) == len(set(emails)):
+            raise forms.ValidationError("duplicate email address")
+
+        self.cleaned_data['email_list'] = emails

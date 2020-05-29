@@ -3,14 +3,14 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand
 
-from vote.models import Election, Voter
+from vote.models import Voter, Session
 
 
 class Command(BaseCommand):
     help = 'Imports voters from a csv'
 
     def add_arguments(self, parser):
-        parser.add_argument('-e', '--election-id', type=int, required=True)
+        parser.add_argument('-e', '--session-id', type=int, required=True)
         parser.add_argument('-c', '--csv', type=str, required=True)
 
     def handle(self, *args, **options):
@@ -19,7 +19,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f'Input file {f} does not exist.'))
             return
 
-        election = Election.objects.get(pk=options['election_id'])
+        session = Session.objects.get(pk=options['session_id'])
 
         with f.open('r') as csv_file:
             reader = csv.reader(csv_file, delimiter=',')
@@ -32,10 +32,9 @@ class Command(BaseCommand):
                     voter_id=row[0],
                     first_name=row[1],
                     last_name=row[2],
-                    room=room,
                     email=row[4],
-                    election=election,
+                    session=session,
                 )
                 voter.send_invitation(access_code)
 
-        self.stdout.write(self.style.SUCCESS(f'Successfully created {len(election.participants.all())} voters'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully created {session.participants.all().count()} voters'))

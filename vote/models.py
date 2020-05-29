@@ -1,21 +1,19 @@
-import textwrap
-import uuid
 import os
 import sys
-from builtins import map
+import textwrap
+import uuid
+from io import BytesIO
 
 import PIL
-
-from io import BytesIO
 from PIL import Image
 from django.conf import settings
-from django.db import models, IntegrityError
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
 )
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
+from django.db import models
 from django.db.models import Count, Q, CASCADE
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -136,7 +134,7 @@ class Election(models.Model):
 
     def number_votes_cast(self):
         if self.applications.count() == 0:
-            return 0;
+            return 0
         return int(self.votes.count() / self.applications.count())
 
     def __str__(self):
@@ -144,12 +142,12 @@ class Election(models.Model):
 
 
 class Voter(models.Model):
-    voter_id = models.IntegerField(primary_key=True)
+    voter_id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=256)
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=128, null=True, blank=True)
+    last_name = models.CharField(max_length=128, null=True, blank=True)
     email = models.EmailField()
-    session = models.ForeignKey(Session, related_name='participants', default=None, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
     remind_me = models.BooleanField(default=False)
 
     # Stores the raw password if set_password() is called so that it can
@@ -157,6 +155,9 @@ class Voter(models.Model):
     _password = None
 
     USERNAME_FIELD = 'voter_id'
+
+    class Meta:
+        unique_together = ('session', 'email')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -289,12 +290,8 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, voter_id, first_name, last_name, session, email):
-        if Voter.objects.filter(voter_id=voter_id).exists():
-            raise IntegrityError('voter id not unique')
-
+    def from_data(cls, session, email, first_name=None, last_name=None):
         voter = Voter(
-            voter_id=voter_id,
             first_name=first_name,
             last_name=last_name,
             session=session,
@@ -303,7 +300,7 @@ class Voter(models.Model):
         password = voter.set_password()
         voter.save()
 
-        return voter, cls.get_access_code(voter_id, password)
+        return voter, cls.get_access_code(voter.voter_id, password)
 
 
 def avatar_file_name(instance, filename):
@@ -317,8 +314,7 @@ class Application(models.Model):
     election = models.ForeignKey(Election, related_name='application', on_delete=models.CASCADE)
     last_name = models.CharField(max_length=256)
     first_name = models.CharField(max_length=256)
-    room = models.CharField(max_length=64, blank=True)
-    email = models.EmailField(blank=True)
+    email = models.EmailField(null=True, blank=True)
 
     _old_avatar = None
 
@@ -330,10 +326,7 @@ class Application(models.Model):
         return f'Application of {self.get_display_name()} for {self.election}'
 
     def get_display_name(self):
-        if self.room:
-            return f'{self.first_name} {self.last_name} ({self.room})'
-        else:
-            return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name}'
 
     def save(self, *args, **kwargs):
         if self.avatar and self._old_avatar != self.avatar:
@@ -356,18 +349,19 @@ class Application(models.Model):
 
             # resize
             width = max_width
-            width_percent = (width/float(img.size[0]))
-            height = int((float(img.size[1])*float(width_percent)))
+            width_percent = (width / float(img.size[0]))
+            height = int((float(img.size[1]) * float(width_percent)))
             if height > max_height:
                 height = max_height
-                height_percent = (height/float(img.size[1]))
-                width = int((float(img.size[0])*float(height_percent)))
+                height_percent = (height / float(img.size[1]))
+                width = int((float(img.size[0]) * float(height_percent)))
             img = img.resize((width, height), PIL.Image.ANTIALIAS)
 
             output = BytesIO()
             img.save(output, format='JPEG', quality=95)
             output.seek(0)
-            self.avatar = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.avatar.name.split('.')[0], 'image/jpeg', sys.getsizeof(output), None)
+            self.avatar = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.avatar.name.split('.')[0],
+                                               'image/jpeg', sys.getsizeof(output), None)
             self._old_avatar = self.avatar
 
         super(Application, self).save(*args, **kwargs)
@@ -377,7 +371,7 @@ class OpenVote(models.Model):
     election = models.ForeignKey(Election, related_name='open_votes', on_delete=models.CASCADE)
     voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
 
-    def can_vote(self,voter_id, election_id):
+    def can_vote(self, voter_id, election_id):
         return self.objects.filter(voter_id=voter_id, election_id=election_id).exists()
 
 

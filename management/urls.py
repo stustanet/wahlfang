@@ -7,12 +7,12 @@ app_name = 'management'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    re_path(r'meeting/(?P<pk>\d+)/add_voters', views.add_voters, name='add_voters'),
-    re_path(r'meeting/(?P<pk>\d+)/add_election', views.add_election, name='add_election'),
-    re_path(r'meeting/(?P<pk>\d+)', views.session, name='session'),
-    re_path(r'election/(?P<pk>\d+)/add_application', views.election_upload_application, name='add_application'),
-    re_path(r'election/(?P<pk>\d+)/edit/(?P<application_id>\d+)', views.election_upload_application, name='edit_application'),
-    re_path(r'election/(?P<pk>\d+)', views.election, name='election'),
+    path('meeting/<int:pk>/add_voters', views.add_voters, name='add_voters'),
+    path('meeting/<int:pk>/add_election', views.add_election, name='add_election'),
+    path('meeting/<int:pk>', views.session_detail, name='session'),
+    path('election/<int:pk>/add_application', views.election_upload_application, name='add_application'),
+    path('election/<int:pk>/edit/<int:application_id>', views.election_upload_application, name='edit_application'),
+    path('election/<int:pk>', views.election_detail, name='election'),
 
     # account management stuff
     path('login', auth_views.LoginView.as_view(

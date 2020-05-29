@@ -1,6 +1,5 @@
 {% extends 'management/base.html' %}
 {% load static%}
-{% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 
 {% block content %}
@@ -11,7 +10,7 @@
           <h4>Create election</h4>
           <form class="user" action="{% url 'management:add_election' pk=session.id %}" method="post">
             {% csrf_token %}
-            {{ form| crispy }}
+            {{ form|crispy }}
             <button type="submit" id="id_btn_start" class="btn btn-success">Submit</button>
           </form>
         </div>

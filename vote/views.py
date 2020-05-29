@@ -6,7 +6,7 @@ from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, VoteForm, EmptyForm
-from vote.models import Application, Election, OpenVote, Voter
+from vote.models import OpenVote, Voter
 
 
 class LoginView(auth_views.LoginView):
@@ -31,12 +31,12 @@ def code_login(request, access_code=None):
         return render(request, template_name='vote/ratelimited.html', status=429)
 
     if not access_code:
-        messages.add_message(request, messages.ERROR, 'No access code provided.')
+        messages.error(request, 'No access code provided.')
         return redirect('vote:code_login')
 
     user = authenticate(access_code=access_code)
     if not user:
-        messages.add_message(request, messages.ERROR, 'Invalid access code.')
+        messages.error(request, 'Invalid access code.')
         return redirect('vote:code_login')
 
     login(request, user)
@@ -46,7 +46,7 @@ def code_login(request, access_code=None):
 
 @voter_login_required
 def index(request):
-    voter = Voter.objects.get(voter_id=request.user.pk)
+    voter = request.user
     election_id = getattr(request, 'election', False)
     context = {
         'title': voter.session.title,
@@ -54,29 +54,48 @@ def index(request):
         'voter': voter,
     }
     # vote
-    try:
-      election = OpenVote.objects.get(election_id=election_id, voter_id=voter.pk)
-      if request.POST and request.GET.get('action') == 'vote':
+    if OpenVote.objects.filter(election_id=election_id, voter_id=voter.pk).exists():
+        if request.POST and request.GET.get('action') == 'vote':
+            form = VoteForm(request, request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('vote:index')
+            else:
+                form = VoteForm(request)
+            context['form'] = form
+            context['election'] = election
+            context['max_votes_yes'] = min(election.max_votes_yes, form.num_applications)
+            return render(request, template_name='vote/vote.html', context=context)
+
+    # remind me
+    if request.POST and request.GET.get('action') in ('remind_me', 'dont_remind_me'):
+        f = EmptyForm(request.POST)
+        if f.is_valid():
+            voter.remind_me = request.GET['action'] == 'remind_me'
+            voter.save()
+
+    context['elections'] = map(lambda e: (e, voter.can_vote(e)), voter.session.elections.all())
+    # overview
+    return render(request, template_name='vote/index.html', context=context)
+
+
+@voter_login_required
+def vote(request, election_id):
+    voter = request.user
+    election = voter.get_election(election_id)
+    can_vote = voter.can_vote(election)
+    context = {
+        'title': election.title,
+        'election': election,
+        'voter': voter,
+        'can_vote': can_vote,
+        'form': VoteForm(request)
+    }
+
+    if request.POST and can_vote:
         form = VoteForm(request, request.POST)
         if form.is_valid():
             form.save()
             return redirect('vote:index')
-        else:
-            form = VoteForm(request)
-        context['form'] = form
-        context['election'] = election
-        context['max_votes_yes'] = min(election.max_votes_yes, form.num_applications)
-        return render(request, template_name='vote/vote.html', context=context)
-    except OpenVote.DoesNotExist:
-            pass;
 
-    # remind me
-    if request.POST and request.GET.get('action') in ('remind_me', 'dont_remind_me'):
-            f = EmptyForm(request.POST)
-            if f.is_valid():
-                voter.remind_me = request.GET['action'] == 'remind_me'
-                voter.save()
-
-    context['elections'] = map(lambda e: (e, voter.can_vote(e)),voter.session.elections.all())
-    # overview
-    return render(request, template_name='vote/index.html', context=context)
+    return render(request, template_name='vote/vote.html', context=context)

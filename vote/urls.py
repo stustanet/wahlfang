@@ -8,7 +8,7 @@ app_name = 'vote'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<int:election>', views.index, name='index'),
+    path('vote/<int:election_id>', views.vote, name='vote'),
 
     # code login
     path('code', views.LoginView.as_view(), name='code_login'),

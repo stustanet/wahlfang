@@ -1,6 +1,5 @@
 {% extends 'management/base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 
 {% block content %}
@@ -15,7 +14,7 @@
           <hr>
           <form class="user" action="{% url 'management:add_voters' session.pk %}" method="post">
             {% csrf_token %}
-            {{ form|crispy}}
+            {{ form|crispy }}
             <button type="submit" id="id_btn_start" class="btn btn-success">Submit</button>
           </form>
         </div>

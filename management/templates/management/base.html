@@ -1,14 +1,14 @@
 {% load static %}
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
-  <meta http-equiv="content-language" content="de"/>
-  <meta http-equiv="Content-Style-Type" content="text/css"/>
-  <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon16.png' %}" sizes="16x16" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon32.png' %}" sizes="32x32" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon64.png' %}" sizes="64x64" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon128.png' %}" sizes="128x128" />
   <link rel="stylesheet" href="{% static "bootstrap-4.4.1-dist/css/bootstrap.min.css" %}"/>
   <link rel="stylesheet" href="{% static "vote/css/style.css" %}"/>
   <title>{% block title %}StuStaNet Wahlfang{% endblock %}</title>
@@ -49,7 +49,8 @@
             {% if messages %}
               <div class="messages">
                 {% for message in messages %}
-                  <div class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
+                  <div
+                      class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
                       role="alert">
                     {{ message|escape }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -62,14 +63,14 @@
             {% if form and form.errors %}
               <div class="messages">
                 {% for error in form.non_field_errors %}
-                <div class="alert alert-dismissible fade show alert-danger"
-                    role="alert">
-                  {{ error|escape }}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-              {% endfor %}
+                  <div class="alert alert-dismissible fade show alert-danger"
+                       role="alert">
+                    {{ error|escape }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                {% endfor %}
               </div>
             {% endif %}
           </div>

@@ -19,7 +19,7 @@ Der aktuellen Situation geschuldet muss die Wahl dieses Semester online stattfin
 ähnliche Universitäts-VPNs.)
 
 Die Ergebnisse der Online-Abstimmung werden dann in einer kurzen Hausversammlung per Videokonferenz gesammelt angenommen oder abgelehnt.
-Unter <a href="{{ election.meeting_link }}">{{ election.meeting_link }}</a> kannst du am {{ election.meeting_start_time|date:"d.m.Y" }} um {{ election.meeting_start_time|date:"H:i" }} Uhr teilnehmen.
+Unter <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a> kannst du am {{ session.meeting_start_time|date:"d.m.Y" }} um {{ session.meeting_start_time|date:"H:i" }} Uhr teilnehmen.
 
 
 Was macht ein Hausadmin?
@@ -64,8 +64,8 @@ Due do the current situation we are unable to hold the election in person, which
 via lrz VPN or similar university VPNs)
 
 The results of this online-election will afterwards be either accepted or rejected by a short house assembly via video conference.
-This conference will take part on {{ election.meeting_start_time|date:"Y/m/d" }} at {{ election.meeting_start_time|date:"h:i A" }}.
-You can join at that time via <a href="{{ election.meeting_link }}">{{ election.meeting_link }}</a>.
+This conference will take part on {{ session.meeting_start_time|date:"Y/m/d" }} at {{ session.meeting_start_time|date:"h:i A" }}.
+You can join at that time via <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a>.
 
 What does a network admin do?
 - Helps coresidents with general internet problems

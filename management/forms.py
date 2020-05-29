@@ -1,21 +1,51 @@
 from django import forms
 
-from vote.models import Election, Application
-
+from vote.models import Election, Application,Session
+from django.utils import timezone
 
 class StartElectionForm(forms.Form):
     run_time = forms.IntegerField(label="run time")
 
 
-class AddElectionForm(forms.ModelForm):
-
-    def __init__(self, user, *args, **kwargs):
+class AddSessionForm(forms.ModelForm):
+    def __init__(self, request,user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.request = request
+
+    class Meta:
+        model = Session
+        fields = ('title', 'start_date', 'meeting_link')
+        labels = {
+            'title': 'Meeting name',
+            'start_date': 'Meeting start (optional)',
+            'meeting_link': 'Link to meeting call platform (optional)',
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        self.user.sessions.add(instance)
+        if commit:
+            self.user.save()
+
+        return instance
+
+
+class AddElectionForm(forms.ModelForm):
+
+    def __init__(self, user, session, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.session = session
+        self.fields['session'].disabled = True
+        self.fields['session'].initial = session
+        self.fields['session'].widget = forms.HiddenInput()
+        self.fields['start_date'].initial =timezone.now()
 
     class Meta:
         model = Election
-        fields = ('title', 'max_votes_yes', 'start_date', 'end_date')
+        fields = ('title', 'max_votes_yes', 'start_date', 'end_date', 'session')
+
         labels = {
             'title': 'Name',
             'max_votes_yes': 'Maximale Anzahl an JA Stimmen',
@@ -23,12 +53,16 @@ class AddElectionForm(forms.ModelForm):
             'end_date': 'Wahlende (optional)',
         }
 
+    def clean(self):
+        super().clean()
+        if self.session not in self.user.sessions.all():
+            raise forms.ValidationError("You don't have the permission to add an election here.")
+
     def save(self, commit=True):
         instance = super().save(commit=commit)
-
-        self.user.elections.add(instance)
+        self.session.elections.add(instance)
         if commit:
-            self.user.save()
+            self.session.save()
 
         return instance
 
@@ -42,11 +76,11 @@ class ApplicationUploadForm(forms.ModelForm):
 
     def __init__(self, election, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.request = request
         self.election = election
         self.fields['election'].initial = self.election
         self.fields['election'].disabled = True
-
-        self.request = request
+        self.fields['election'].widget = forms.HiddenInput()
 
     class Meta:
         model = Application
@@ -69,9 +103,9 @@ class ApplicationUploadForm(forms.ModelForm):
 class AddVotersForm(forms.Form):
     voters_list = forms.CharField(widget=forms.Textarea, label='E-Mail Adressen')  # explicitly no max_length here
 
-    def __init__(self, election, *args, **kwargs):
+    def __init__(self, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.election = election
+        self.session = session
 
     def save(self, commit=True):
         pass

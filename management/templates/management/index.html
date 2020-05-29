@@ -5,23 +5,29 @@
     <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Meine Abstimmungen</h4>
+          <h4>My Meetings</h4>
           <div class="list-group">
-            {% for election in elections %}
-              <a class="list-group-item list-group-item-action" href="{% url 'management:election' election.pk %}">
-                <span>{{ election.title }}</span>
+            {% for session in sessions %}
+              <a class="list-group-item list-group-item-action" href="{% url 'management:session' session.id %}">
+                <span>{{ session.title }}</span>
                 <small class="float-right text-muted">
-                  {% if election.end_date %}
-                    {{ election.start_date|date:"l Y-m-d H:i:s" }} - {{ election.end_date|date:"H:i:s" }}
+                  {% if session.start_date %}
+                    {{ session.start_date|date:"l Y-m-d H:i:s" }}
                   {% else %}
                     Not started yet
                   {% endif %}
                 </small>
+                {% if session.meeting_link %}
+                    <small>Meeting on <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
+                {% endif %}
               </a>
             {% endfor %}
           </div>
           <hr>
-          <a class="btn btn-success" href="{% url 'management:add_election' %}">Abstimmung erstellen</a>
+          <form class="d-inline" action="{% url 'management:index' %}?action=add_session" method="post">
+              {% csrf_token %}
+              <button class="btn btn-success" type="submit">Create Meeting</button>
+          </form>
         </div>
       </div>
     </div>

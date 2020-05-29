@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from vote.models import Election
+from vote.models import Election, Session
 
 
 class Command(BaseCommand):
@@ -13,6 +13,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-t', '--title', type=str, required=True)
         parser.add_argument('-m', '--max-votes-yes', type=int, required=True)
+        parser.add_argument('-i','--session-id', type=int,required=True)
 
         # Make things a little bit easier for dev and debugging convenience
         if settings.DEBUG:
@@ -29,13 +30,12 @@ class Command(BaseCommand):
             parser.add_argument('-d', '--meeting-time', type=str, required=True)
 
     def handle(self, *args, **options):
+        session = Session.objects.get(id=options['session_id'])
         election = Election.objects.create(
             title=options['title'],
             start_date=options['start_date'],
-            application_due_date=options['application_due_date'],
             end_date=options['end_date'],
             max_votes_yes=options['max_votes_yes'],
-            meeting_link=options['meeting_link'],
-            meeting_start_time=options['meeting_time']
+            session=session,
         )
         self.stdout.write(self.style.SUCCESS('Successfully created election "%s" with ID %i' % (election, election.id)))

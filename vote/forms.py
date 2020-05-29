@@ -3,7 +3,7 @@ from django.db import transaction
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Application, Voter, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
+from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT, Election
 
 
 class AccessCodeAuthenticationForm(forms.Form):
@@ -106,7 +106,8 @@ class VoteForm(forms.Form):
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
-        self.election = self.voter.election
+        election_id = getattr(request, 'election',False)
+        self.election = Election.objects.get(election_id=election_id)
         self.request = request
 
         for application in self.election.applications:
@@ -116,7 +117,7 @@ class VoteForm(forms.Form):
 
     def clean(self):
         super().clean()
-        if not self.voter.can_vote:
+        if not OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.id):
             raise forms.ValidationError('You are not allowed to vote')
 
         votes_yes = 0
@@ -140,8 +141,9 @@ class VoteForm(forms.Form):
 
         if commit:
             with transaction.atomic():
+                can_vote = OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.id)
+                if not can_vote:
+                    raise forms.ValidationError('You are not allowed to vote')
                 Vote.objects.bulk_create(votes)
-                self.voter.voted = True
-                self.voter.save()
-
+                can_vote.delete()
         return votes

@@ -1,13 +1,16 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.sessions.models import Session as DjangoSession
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_protect
 
 from management.authentication import management_login_required
 from management.forms import StartElectionForm, AddElectionForm, AddSessionForm, AddVotersForm, ApplicationUploadForm, \
     StopElectionForm
-from vote.models import Election, Application
+from vote.models import Election, Application, Voter
 
 logger = logging.getLogger('management.view')
 
@@ -144,3 +147,25 @@ def election_upload_application(request, pk, application_id=None):
         'with_description': False,
     }
     return render(request, template_name='management/application.html', context=context)
+
+
+@management_login_required
+def voters_list(request, pk):
+    manager, election, session = _unpack(request, pk)
+    context = {
+        'voters': session.participants.all(),
+        'session': session
+    }
+    return render(request, template_name='management/voters_list.html', context=context)
+
+
+@management_login_required
+@csrf_protect
+def invalidate_voter(request, pk):
+    v = Voter.objects.filter(session__in=request.user.sessions.all(), pk=pk)
+    if not v.exists():
+        raise Http404('Voter does not exist')
+    v = v.first()
+    session = v.session
+    v.delete()
+    return redirect('management:voters_list', pk=session.pk)

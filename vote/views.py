@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
+from django.http import Http404
 from django.shortcuts import render, redirect
 from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, VoteForm, EmptyForm
-from vote.models import OpenVote, Voter
+from vote.models import Election
 
 
 class LoginView(auth_views.LoginView):
@@ -47,25 +48,11 @@ def code_login(request, access_code=None):
 @voter_login_required
 def index(request):
     voter = request.user
-    election_id = getattr(request, 'election', False)
     context = {
         'title': voter.session.title,
         'meeting_link': voter.session.meeting_link,
         'voter': voter,
     }
-    # vote
-    if OpenVote.objects.filter(election_id=election_id, voter_id=voter.pk).exists():
-        if request.POST and request.GET.get('action') == 'vote':
-            form = VoteForm(request, request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('vote:index')
-            else:
-                form = VoteForm(request)
-            context['form'] = form
-            context['election'] = election
-            context['max_votes_yes'] = min(election.max_votes_yes, form.num_applications)
-            return render(request, template_name='vote/vote.html', context=context)
 
     # remind me
     if request.POST and request.GET.get('action') in ('remind_me', 'dont_remind_me'):
@@ -74,7 +61,9 @@ def index(request):
             voter.remind_me = request.GET['action'] == 'remind_me'
             voter.save()
 
-    context['elections'] = map(lambda e: (e, voter.can_vote(e)), voter.session.elections.all())
+    context['elections'] = [
+        (e, voter.can_vote(e)) for e in voter.session.elections.all()
+    ]
     # overview
     return render(request, template_name='vote/index.html', context=context)
 
@@ -82,18 +71,23 @@ def index(request):
 @voter_login_required
 def vote(request, election_id):
     voter = request.user
-    election = voter.get_election(election_id)
+    try:
+        election = voter.session.elections.get(pk=election_id)
+    except Election.DoesNotExist:
+        raise Http404('election does not exists')
+
     can_vote = voter.can_vote(election)
     context = {
         'title': election.title,
         'election': election,
         'voter': voter,
         'can_vote': can_vote,
-        'form': VoteForm(request)
+        'max_votes_yes': min(election.max_votes_yes, election.applications.count()),
+        'form': VoteForm(request, election=election)
     }
 
     if request.POST and can_vote:
-        form = VoteForm(request, request.POST)
+        form = VoteForm(request, election=election, data=request.POST)
         if form.is_valid():
             form.save()
             return redirect('vote:index')

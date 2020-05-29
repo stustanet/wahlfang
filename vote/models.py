@@ -75,7 +75,7 @@ class Election(models.Model):
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField()
-    session = models.ForeignKey(Session, related_name='elections', default=None, on_delete=CASCADE)
+    session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
 
     @property
     def started(self):
@@ -233,7 +233,7 @@ class Voter(models.Model):
 
     @property
     def is_active(self):
-        return True
+        return self.has_usable_password()
 
     def can_vote(self, election):
         return election.is_open and OpenVote.objects.filter(voter_id=self.voter_id, election_id=election.id).exists()

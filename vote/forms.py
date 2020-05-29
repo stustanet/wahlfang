@@ -1,6 +1,6 @@
 from django import forms
-from django.db import transaction
 from django.contrib.auth import authenticate
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT, Election
@@ -103,11 +103,10 @@ class VoteField(forms.ChoiceField):
 
 
 class VoteForm(forms.Form):
-    def __init__(self, request, *args, **kwargs):
+    def __init__(self, request, election, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
-        election_id = getattr(request, 'election',False)
-        self.election = Election.objects.get(election_id=election_id)
+        self.election = election
         self.request = request
 
         for application in self.election.applications:

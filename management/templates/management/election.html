@@ -1,4 +1,5 @@
 {% extends 'management/base.html' %}
+{% load crispy_forms_filters %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -20,7 +21,7 @@
                   <input dir="rtl" type="number"
                          class="form-control form-control-user col-6 text-right"
                          id="id_run_time"
-                         name="{{ form.run_time.name }}"
+                         name="{{ start_election_form.run_time.name }}"
                          min="1"
                          value="5"
                          required="true">
@@ -53,7 +54,7 @@
             <h4>Bewerber</h4>
             <hr>
             <table class="table table-striped">
-              <thead class="thead-dark">
+              <thead>
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Bewerber</th>

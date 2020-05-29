@@ -1,19 +1,48 @@
+from datetime import timedelta
 from typing import Tuple, List
 
 from django import forms
 from django.core.validators import validate_email
 from django.utils import timezone
 
-from vote.models import Election, Application, Session, Voter
+from vote.models import Election, Application, Session, Voter, OpenVote
 
 
-class StartElectionForm(forms.Form):
+class StartElectionForm(forms.ModelForm):
     run_time = forms.IntegerField(label="run time")
+
+    class Meta:
+        model = Election
+        fields = []
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.start_date = timezone.now()
+        instance.end_date = timezone.now() + timedelta(minutes=self.cleaned_data['run_time'])
+        if commit:
+            instance.save()
+
+        return instance
+
+
+class StopElectionForm(forms.ModelForm):
+    class Meta:
+        model = Election
+        fields = []
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.end_date = timezone.now()
+        if commit:
+            instance.save()
+
+        return instance
 
 
 class AddSessionForm(forms.ModelForm):
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
         self.user = user
         self.request = request
 
@@ -36,15 +65,16 @@ class AddSessionForm(forms.ModelForm):
 
 
 class AddElectionForm(forms.ModelForm):
-
     def __init__(self, user, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = user
-        self.session = session
         self.fields['session'].disabled = True
         self.fields['session'].initial = session
         self.fields['session'].widget = forms.HiddenInput()
+        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
+        self.fields['end_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
         # self.fields['start_date'].initial = timezone.now()
+        self.user = user
+        self.session = session
 
     class Meta:
         model = Election
@@ -67,6 +97,11 @@ class AddElectionForm(forms.ModelForm):
         self.session.elections.add(instance)
         if commit:
             self.session.save()
+            open_votes = [
+                OpenVote(voter=v, session=self.session)
+                for v in self.session.participants
+            ]
+            OpenVote.objects.bulk_create(open_votes)
 
         return instance
 
@@ -116,6 +151,13 @@ class AddVotersForm(forms.Form):
             Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['email_list']
         ]
 
+        open_votes = []
+        for election in self.session.elections.all():
+            if not election.closed:
+                open_votes += [OpenVote(election=election, voter=v) for v, _ in voters]
+
+        OpenVote.objects.bulk_create(open_votes)
+
         for voter, code in voters:
             voter.send_invitation(code)
 
@@ -125,8 +167,10 @@ class AddVotersForm(forms.Form):
         emails = self.cleaned_data['voters_list'].splitlines()
         for email in emails:
             validate_email(email)
+            if Voter.objects.filter(email=email, session=self.session).exists():
+                raise forms.ValidationError('voter with this email address already exists')
 
         if not len(emails) == len(set(emails)):
-            raise forms.ValidationError("duplicate email address")
+            raise forms.ValidationError('duplicate email address')
 
         self.cleaned_data['email_list'] = emails

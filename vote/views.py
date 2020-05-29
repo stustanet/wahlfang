@@ -50,6 +50,7 @@ def index(request):
     election_id = getattr(request, 'election', False)
     context = {
         'title': voter.session.title,
+        'meeting_link': voter.session.meeting_link,
         'voter': voter,
     }
     # vote

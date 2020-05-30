@@ -7,8 +7,6 @@
         <div class="card-header  bg-dark text-light">
           <h4 class="d-inline">{{ session.title }}</h4>
           <a class="btn btn-success d-inline float-right ml-2"
-             href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
-          <a class="btn btn-success d-inline float-right ml-2"
              href="{% url 'management:add_election' pk=session.id %}">Add Election</a>
         </div>
         <div class="card-body">
@@ -36,8 +34,39 @@
             {% endfor %}
           </div>
         </div>
-
       </div>
+      <div class="card shadow mt-4">
+          <div class="card-body">
+            <h4>Voters
+            <a class="btn btn-success d-inline float-right ml-2"
+             href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
+            </h4>
+            <hr>
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="row">E-Mail</th>
+                <th scope="row"></th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for voter in voters %}
+                <tr>
+                  <td>{{ voter.email }}</td>
+                  <td class="text-right">
+                    <form action="{% url 'management:invalidate_voter' voter.pk %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger" aria-label="remove from election">
+                        Remove
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
     </div>
   </div>
 {% endblock %}

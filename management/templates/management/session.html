@@ -1,4 +1,7 @@
 {% extends 'management/base.html' %}
+{% load static %}
+
+
 
 {% block content %}
   <div class="row justify-content-center">
@@ -16,7 +19,10 @@
         <div class="card-body">
           <div class="list-group">
             {% for election in elections %}
-              <a class="list-group-item list-group-item-action" href="{% url 'management:election' pk=election.id %}">
+              <div class="list-group-item list-group-item-action">
+
+                <a class="main-link" href="{% url 'management:election' pk=election.id %}"></a>
+
                 <span><b>{{ election.title }}</b></span>
                 <small class="float-right">
                   {% if not election.start_date %}
@@ -27,7 +33,7 @@
                     Closed
                   {% endif %}
                 </small>
-              </a>
+              </div>
             {% endfor %}
           </div>
         </div>
@@ -63,7 +69,29 @@
               </tbody>
             </table>
           </div>
-        </div>
+      </div>
     </div>
   </div>
+  {% for election in elections %}
+    <div class="modal fade" id="deleteModel{{ election.pk }}" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Delete Election</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete {{ election.title }}?</p>
+          </div>
+          <div class="modal-footer">
+            <form action="{% url 'management:delete_election' pk=election.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 {% endblock %}

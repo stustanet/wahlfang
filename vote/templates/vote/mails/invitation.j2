@@ -1,86 +1,27 @@
 ---
-You are receiving this e-mail because you are a member of StuStaNet e. V., the network organization in StuSta.
----
 English version below.
 ---
 
-Liebe Bewohner,
+Lieber Wähler,
 
-die StuSta lebt von gegenseitger Hilfe. So auch bei der Netzwerkinfrastruktur. Hausadministratoren (Netzwerk Admins) sind Freiwillige, die ihren Mitbewohnern insbesondere beim Einrichten des Internetzugangs helfen und für eine funktionierende Netzwerkinfrastruktur sorgen.
-
-<b>Jedes Semester wählen die Hausbewohner dazu geeignete Freiwillige zu den Netzwerk Admins ihres Hauses (Hausadmins).</b>
-Auch Du hast die Möglichkeit deine Stimme für geeignete Kandidaten abzugeben oder dich sogar selbst aufstellen zu lassen!
-
-Der aktuellen Situation geschuldet muss die Wahl dieses Semester online stattfinden.
-<b>Du kannst unter folgendem Link an der Wahl teilnehmen und dich auch selbst als Hausadmin bewerben:</b>
+du wurdest zur Versammlung "{{ session.title }}" eingeladen. Mit dem folgenden Link kannst du an den Abstimmungen teilnehmen:
 
 <a href="{{ login_url }}">{{ login_url }}</a>
-(nur innerhalb des MWN/Münchner Wissenschaftsnetz erreichbar, z.B. innerhalb der StuSta, eduroam, lrz VPN oder
-ähnliche Universitäts-VPNs.)
+(nur innerhalb des MWN/Münchner Wissenschaftsnetz erreichbar, z.B. innerhalb der StuSta, eduroam, lrz VPN oder ähnliche Universitäts-VPNs.)
 
-Die Ergebnisse der Online-Abstimmung werden dann in einer kurzen Hausversammlung per Videokonferenz gesammelt angenommen oder abgelehnt.
-Unter <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a> kannst du am {{ session.meeting_start_time|date:"d.m.Y" }} um {{ session.meeting_start_time|date:"H:i" }} Uhr teilnehmen.
-
-
-Was macht ein Hausadmin?
-- Mitbewohner bei allgemeinen Netzwerkproblemen unterstützen
-- Ehrenamtliches Engagement, das wir auch gerne Bescheinigen!
-
-Was musst du können um Hausadmin zu werden?
-Wenn du deinen Internetzugang selbst eingerichtet hast bist du bereits ausreichend qualifiziert!
-Falls du selbst ein Problem einmal nicht lösen kannst ist das auch nicht schlimm, deine Mitadmins helfen gerne weiter.
-
-<b>Optional</b> hast du darüber hinaus als Hausadmin die Möglichkeit dich weiter im StuStaNet zu engagieren:
-- Du wirst Teil des Adminrats, der die technischen Entscheidungen im StuStaNet trifft
-- Interessante Einblicke in die StuSta Netzwerkinfrastruktur mit knapp 2500 Nutzern
-- Viele lehrreiche Erfahrungen im Bereich Programmierung, Computernetzwerke und anderen IT Bereichen
-- Je nach Lust und Laune kannst du auch bei den Sprechstunden mithelfen
-- Engagierte Netzwerkadmins haben die Möglichkeit Wohnzeitverlängerungen durch ein Engagementsemester zu erhalten
-
-Mehr Infos über Hausadmin werden: <a href="https://wiki.stusta.de/Admin_werden">https://wiki.stusta.de/Admin_werden</a>
-Mehr Infos über StuStaNet: <a href="https://stustanet.de">https://stustanet.de</a>
-
-
-
+{% if session.meeting_link %}Am Meeting kannst du unter <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a> teilnehmen.{% endif %}
+{% if session.start_date %}Es beginnt am {{ session.start_date|date:"d.m.Y" }} um {{ session.start_date|date:"H:i" }} Uhr.{% endif %}
 
 ---
 English version
 ---
 
-Dear residents,
+Dear voter,
 
-as in many parts of StuSta its network also lives of residents helping each other.
-House admins are volunteers that help their housemates setup their internet connection and
-help with the overall network infrastructure of StuSta.
-
-<b>Network admins (house admins) are elected every semester by the residents of each house in StuSta.</b>
-You can also take part in this election and even apply yourself.
-
-Due do the current situation we are unable to hold the election in person, which is why it will be held online.
-<b>By visiting the following link you can take part and also submit your application as a house admin.</b>
+you were invited to the meeting "{{ session.title }}". To participate in the elections, click the following link:
 
 <a href="{{ login_url }}">{{ login_url }}</a>
-(only accessible within munich scientific network MWN/Münchner Wissenschaftsnetz, e.g. within StuSta, eduroam or
-via lrz VPN or similar university VPNs)
+(only accessible within munich scientific network MWN/Münchner Wissenschaftsnetz, e.g. within StuSta, eduroam or via lrz VPN or similar university VPNs)
 
-The results of this online-election will afterwards be either accepted or rejected by a short house assembly via video conference.
-This conference will take part on {{ session.meeting_start_time|date:"Y/m/d" }} at {{ session.meeting_start_time|date:"h:i A" }}.
-You can join at that time via <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a>.
-
-What does a network admin do?
-- Helps coresidents with general internet problems
-- Voluntary engagement which we will gladly certify
-
-What are the requirements to be a network admin?
-If you succesfully managed to configure your Internet access, you already have all the requirements you need.
-In case you cannot solve a problem yourself, don't worry, the other admins are willing to help you.
-
-<b>Optionally</b>, you can get further involved with StuStanet:
-- You become part of the Adminrat (administrator council) that decides on the technical aspects of StuStaNet
-- Interesting insights into the network architecture of StuSta
-- Gain experience in programming and network/server administration through StuStaNet projects
-- You can help us with the consultation hours
-- Especially dedicated house admins can receive honorary semester to extend their tenancy agreement in StuSta
-
-More information about house admins: <a href="https://wiki.stusta.de/Admin_werden">https://wiki.stusta.de/Admin_werden</a>
-More information about StuStaNet <a href="https://stustanet.de">https://stustanet.de</a>
+{% if session.meeting_link %}You can take part in the meeting via <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a>.{% endif %}
+{% if session.start_date %}It starts on {{ session.start_date|date:"Y/m/d" }} at {{ session.start_date|date:"h:i A" }}.{% endif %}

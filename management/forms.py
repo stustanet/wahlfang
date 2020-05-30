@@ -82,7 +82,7 @@ class AddElectionForm(forms.ModelForm):
 
         labels = {
             'title': 'Name',
-            'max_votes_yes': 'Maximale Anzahl an JA Stimmen',
+            'max_votes_yes': 'Maximale Anzahl an JA Stimmen (optional)',
             'start_date': 'Wahlbeginn (optional)',
             'end_date': 'Wahlende (optional)',
         }
@@ -111,7 +111,7 @@ class AvatarFileInput(forms.ClearableFileInput):
 
 
 class ApplicationUploadForm(forms.ModelForm):
-    field_order = ['election', 'first_name', 'last_name', 'email', 'text', 'avatar']
+    field_order = ['election', 'display_name', 'email', 'text', 'avatar']
 
     def __init__(self, election, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -123,7 +123,7 @@ class ApplicationUploadForm(forms.ModelForm):
 
     class Meta:
         model = Application
-        fields = ('election', 'first_name', 'last_name', 'email', 'text', 'avatar')
+        fields = ('election', 'display_name', 'email', 'text', 'avatar')
 
     def clean(self):
         super().clean()

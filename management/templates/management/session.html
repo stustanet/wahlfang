@@ -8,16 +8,25 @@
           <h4 class="d-inline">{{ session.title }}</h4>
           <a class="btn btn-success d-inline float-right ml-2"
              href="{% url 'management:add_election' pk=session.id %}">Add Election</a>
+          {% if session.meeting_link %}
+          <br/>
+            <small>Meeting on <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
+          {% endif %}
         </div>
         <div class="card-body">
           <div class="list-group">
             {% for election in elections %}
               <a class="list-group-item list-group-item-action" href="{% url 'management:election' pk=election.id %}">
                 <span><b>{{ election.title }}</b></span>
-                {% if election.closed %}
-                  <hr>
-                  {% include 'management/results.html' %}
-                {% endif %}
+                <small class="float-right">
+                  {% if not election.start_date %}
+                    Not started yet
+                  {% elif election.is_open %}
+                    Open {{ election.start_date|date:"H:i"}} - {{ election.end_date|date:"H:i"}}
+                  {% elif election.closed %}
+                    Closed
+                  {% endif %}
+                </small>
               </a>
             {% endfor %}
           </div>

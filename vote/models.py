@@ -74,7 +74,7 @@ class Election(models.Model):
     title = models.CharField(max_length=512)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    max_votes_yes = models.IntegerField()
+    max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
 
     @property

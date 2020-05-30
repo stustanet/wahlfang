@@ -108,6 +108,10 @@ class VoteForm(forms.Form):
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
         self.election = election
         self.request = request
+        if self.election.max_votes_yes is not None:
+            self.max_votes_yes = self.election.max_votes_yes
+        else:
+            self.max_votes_yes = self.election.applications.count()
 
         for application in self.election.applications:
             self.fields[f'{application.pk}'] = VoteField(application=application)
@@ -125,9 +129,9 @@ class VoteForm(forms.Form):
             if vote == VOTE_ACCEPT:
                 votes_yes += 1
 
-        if votes_yes > self.election.max_votes_yes:
+        if votes_yes > self.max_votes_yes:
             raise forms.ValidationError(
-                f'Too many "yes" votes, only max. {self.voter.election.max_votes_yes} allowed.')
+                f'Too many "yes" votes, only max. {self.voter.max_votes_yes} allowed.')
 
     def save(self, commit=True):
         votes = [

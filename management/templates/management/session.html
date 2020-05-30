@@ -14,28 +14,16 @@
             {% for election in elections %}
               <a class="list-group-item list-group-item-action" href="{% url 'management:election' pk=election.id %}">
                 <span><b>{{ election.title }}</b></span>
-                {% if not election.closed and not election.open %}
-                  <form class="d-inline float-right"
-                        action="{% url 'management:election' pk=election.id %}?action=open">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-success, btn-sm">Open</button>
-                  </form>
-                {% elif election.closed %}
+                {% if election.closed %}
                   <hr>
                   {% include 'management/results.html' %}
-                {% elif election.open %}
-                  <form class="d-inline float-right"
-                        action="{% url 'management:election' pk=election.id %}?action=close">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger, btn-sm">Close</button>
-                  </form>
                 {% endif %}
               </a>
             {% endfor %}
           </div>
         </div>
       </div>
-      <div class="card shadow mt-4">
+      <div class="card shadow my-4">
           <div class="card-body">
             <h4>Voters
             <a class="btn btn-success d-inline float-right ml-2"

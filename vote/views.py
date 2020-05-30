@@ -77,12 +77,17 @@ def vote(request, election_id):
         raise Http404('election does not exists')
 
     can_vote = voter.can_vote(election)
+    if election.max_votes_yes is not None:
+        max_votes_yes = min(election.max_votes_yes, election.applications.count())
+    else:
+        max_votes_yes = election.applications.count()
+
     context = {
         'title': election.title,
         'election': election,
         'voter': voter,
         'can_vote': can_vote,
-        'max_votes_yes': min(election.max_votes_yes, election.applications.count()),
+        'max_votes_yes': max_votes_yes,
         'form': VoteForm(request, election=election)
     }
 

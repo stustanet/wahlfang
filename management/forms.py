@@ -82,7 +82,7 @@ class AddElectionForm(forms.ModelForm):
 
         labels = {
             'title': 'Name',
-            'max_votes_yes': 'Maximale Anzahl an JA Stimmen',
+            'max_votes_yes': 'Maximale Anzahl an JA Stimmen (optional)',
             'start_date': 'Wahlbeginn (optional)',
             'end_date': 'Wahlende (optional)',
         }

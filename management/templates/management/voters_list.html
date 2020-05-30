@@ -3,10 +3,10 @@
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-8">
-      <div class="card shadow mt-4">
+      <div class="card shadow">
         <div class="card-header bg-dark text-light">
-          <h4 class="d-inline">{{ election.title }}</h4>
-          <a class="btn btn-light d-inline float-right" href="{% url "management:election" session.pk %}">Back</a>
+          <h4 class="d-inline">{{ session.title }}</h4>
+          <a class="btn btn-light d-inline float-right" href="{% url "management:session" session.pk %}">Back</a>
         </div>
         <div class="card-body">
           <h4>Wahlberechtigte</h4>
@@ -15,17 +15,19 @@
             <thead>
             <tr>
               <th scope="row">E-Mail</th>
-              <th scope="row">Remove</th>
+              <th scope="row"><!--<div class="float-right">Remove</div>--></th>
             </tr>
             </thead>
             <tbody>
             {% for voter in voters %}
               <tr>
-                <td>{{ voter.email }}</td>
                 <td>
-                  <form action="{% url 'management:invalidate_voter' voter.pk %}" method="post">
+                  {{ voter.email }}
+                </td>
+                <td>
+                  <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
                     {% csrf_token %}
-                    <button type="submit" class="close" aria-label="remove from election">
+                    <button type="submit" class="close" aria-label="remove voter from session">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </form>

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT, Election
+from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
 
 
 class AccessCodeAuthenticationForm(forms.Form):
@@ -116,7 +116,7 @@ class VoteForm(forms.Form):
 
     def clean(self):
         super().clean()
-        if not OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.id):
+        if not OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.voter_id):
             raise forms.ValidationError('You are not allowed to vote')
 
         votes_yes = 0
@@ -125,9 +125,9 @@ class VoteForm(forms.Form):
             if vote == VOTE_ACCEPT:
                 votes_yes += 1
 
-        if votes_yes > self.voter.election.max_votes_yes:
+        if votes_yes > self.election.max_votes_yes:
             raise forms.ValidationError(
-                f'Too many "yes" votes, only max. {self.voter.election.max_votes_yes} allowed.')
+                f'Too many "yes" votes, only max. {self.election.max_votes_yes} allowed.')
 
     def save(self, commit=True):
         votes = [
@@ -140,7 +140,7 @@ class VoteForm(forms.Form):
 
         if commit:
             with transaction.atomic():
-                can_vote = OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.id)
+                can_vote = OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.voter_id)
                 if not can_vote:
                     raise forms.ValidationError('You are not allowed to vote')
                 Vote.objects.bulk_create(votes)

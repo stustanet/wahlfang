@@ -8,9 +8,15 @@
           <h4>My Meetings</h4>
           <div class="list-group">
             {% for session in sessions %}
-              <a class="list-group-item list-group-item-action" href="{% url 'management:session' session.id %}">
+              <div class="list-group-item list-group-item-action">
+                <a class="main-link" href="{% url 'management:session' session.id %}"></a>
+                <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
+                        data-target="#deleteModel{{ session.pk }}"
+                        aria-label="remove session">
+                  <span aria-hidden="true">&times;</span>
+                </button>
                 <span>{{ session.title }}</span>
-                <small class="float-right text-muted">
+                <small class="float-right text-muted right-margin">
                   {% if session.start_date %}
                     {{ session.start_date|date:"l Y-m-d H:i:s" }}
                   {% else %}
@@ -18,9 +24,10 @@
                   {% endif %}
                 </small>
                 {% if session.meeting_link %}
-                  <small>Meeting on <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
+                  <small class="left-margin">Meeting on <a
+                      href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
                 {% endif %}
-              </a>
+              </div>
             {% endfor %}
           </div>
           <hr>
@@ -32,4 +39,26 @@
       </div>
     </div>
   </div>
+  {% for session in sessions %}
+    <div class="modal fade" id="deleteModel{{ session.pk }}" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Delete Election</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete session {{ session.title }}?</p>
+          </div>
+          <div class="modal-footer">
+            <form action="{% url 'management:delete_session' pk=session.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 {% endblock %}

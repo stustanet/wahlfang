@@ -23,7 +23,7 @@
                          id="id_run_time"
                          name="{{ start_election_form.run_time.name }}"
                          min="1"
-                         value="5"
+                         value="15"
                          required="true">
                   <input type="hidden" name="action" value="open">
                   <div class="col-6 my-auto">Minuten</div>
@@ -93,7 +93,6 @@
       <div class="card shadow mt-4">
         <div class="card-body">
           <h4>Wahlberechtigte
-            <a class="btn btn-success float-right" href="{% url 'management:voters_list' election.pk %}">List Participants</a>
           </h4>
           <hr>
           <table class="table">

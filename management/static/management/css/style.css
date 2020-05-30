@@ -1,0 +1,27 @@
+/*
+  expands the clickable area of the main link
+  to fill the parent container, because it's the nearest
+  ancestor with "position:relative"
+*/
+.list-group-item-action .main-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin-right: 30mm;
+}
+
+.right-margin {
+    margin-right: 5mm;
+}
+
+.left-margin {
+    margin-left: 5mm;
+}
+
+
+#content {
+    height: 100%
+}

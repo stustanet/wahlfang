@@ -1,10 +1,8 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.sessions.models import Session as DjangoSession
 from django.http import Http404
 from django.shortcuts import render, redirect
-from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
 from management.authentication import management_login_required
@@ -151,7 +149,8 @@ def election_upload_application(request, pk, application_id=None):
 
 @management_login_required
 def voters_list(request, pk):
-    manager, election, session = _unpack(request, pk)
+    manager = request.user
+    session = manager.sessions.get(id=pk)
     context = {
         'voters': session.participants.all(),
         'session': session
@@ -161,7 +160,7 @@ def voters_list(request, pk):
 
 @management_login_required
 @csrf_protect
-def invalidate_voter(request, pk):
+def delete_voter(request, pk):
     v = Voter.objects.filter(session__in=request.user.sessions.all(), pk=pk)
     if not v.exists():
         raise Http404('Voter does not exist')
@@ -169,3 +168,26 @@ def invalidate_voter(request, pk):
     session = v.session
     v.delete()
     return redirect('management:voters_list', pk=session.pk)
+
+
+@management_login_required
+@csrf_protect
+def delete_election(request, pk):
+    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
+    if not e.exists():
+        raise Http404('Election does not exist')
+    e = e.first()
+    session = e.session
+    e.delete()
+    return redirect('management:session', pk=session.pk)
+
+
+@management_login_required
+@csrf_protect
+def delete_session(request, pk):
+    s = request.user.sessions.filter(pk=pk)
+    if not s.exists():
+        raise Http404('Session does not exist')
+    s = s.first()
+    s.delete()
+    return redirect('management:index')

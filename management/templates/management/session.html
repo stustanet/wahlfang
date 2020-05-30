@@ -1,11 +1,17 @@
 {% extends 'management/base.html' %}
+{% load static %}
+
+
 
 {% block content %}
+
   <div class="row justify-content-center">
     <div class="col-8">
       <div class="card shadow ">
         <div class="card-header  bg-dark text-light">
           <h4 class="d-inline">{{ session.title }}</h4>
+          <a class="btn btn-success d-inline float-right ml-2"
+             href="{% url 'management:voters_list' pk=session.id %}">List Voters</a>
           <a class="btn btn-success d-inline float-right ml-2"
              href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
           <a class="btn btn-success d-inline float-right ml-2"
@@ -14,30 +20,57 @@
         <div class="card-body">
           <div class="list-group">
             {% for election in elections %}
-              <a class="list-group-item list-group-item-action" href="{% url 'management:election' pk=election.id %}">
+              <div class="list-group-item list-group-item-action">
+
+                <a class="main-link" href="{% url 'management:election' pk=election.id %}"></a>
+
                 <span><b>{{ election.title }}</b></span>
-                {% if not election.closed and not election.open %}
+                <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
+                        data-target="#deleteModel{{ election.pk }}"
+                        aria-label="remove election from session">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                {% if election.is_open %}
                   <form class="d-inline float-right"
-                        action="{% url 'management:election' pk=election.id %}?action=open">
+                        action="{% url 'management:election' pk=election.id %}" method="post">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-success, btn-sm">Open</button>
+                    <input type="hidden" name="action" value="close">
+                    <button type="submit" class="btn btn-outline-danger, btn-sm btn-danger right-margin">
+                      Close
+                    </button>
                   </form>
+                  </button>
                 {% elif election.closed %}
                   <hr>
                   {% include 'management/results.html' %}
-                {% elif election.open %}
-                  <form class="d-inline float-right"
-                        action="{% url 'management:election' pk=election.id %}?action=close">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger, btn-sm">Close</button>
-                  </form>
                 {% endif %}
-              </a>
+              </div>
             {% endfor %}
           </div>
         </div>
-
       </div>
     </div>
   </div>
+  {% for election in elections %}
+    <div class="modal fade" id="deleteModel{{ election.pk }}" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Delete Election</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete {{ election.title }}?</p>
+          </div>
+          <div class="modal-footer">
+            <form action="{% url 'management:delete_election' pk=election.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 {% endblock %}

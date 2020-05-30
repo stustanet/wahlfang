@@ -46,37 +46,6 @@ class AvatarFileInput(forms.ClearableFileInput):
     template_name = 'vote/image_input.html'
 
 
-class ApplicationUploadForm(forms.ModelForm):
-    field_order = ['first_name', 'last_name', 'email', 'text', 'avatar']
-
-    def __init__(self, request, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.voter = Voter.objects.get(voter_id=request.user.voter_id)
-
-        self.fields['avatar'].widget = AvatarFileInput()
-        self.fields['first_name'].initial = self.voter.first_name
-        self.fields['last_name'].initial = self.voter.last_name
-        self.fields['email'].initial = self.voter.email
-
-    class Meta:
-        model = Application
-        fields = ('first_name', 'last_name', 'email', 'text', 'avatar')
-
-    def clean(self):
-        super().clean()
-        if not self.voter.election.can_apply:
-            raise forms.ValidationError('Applications are currently not allowed')
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        instance.voter = self.voter
-
-        if commit:
-            instance.save()
-
-        return instance
-
-
 class EmptyForm(forms.Form):
     pass
 

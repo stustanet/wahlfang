@@ -66,7 +66,7 @@
                   </tbody>
                 </table>
               </div>
-            {% elif not electon.started and not election.closed %}
+            {% elif not electon.started and not election.is_open %}
               <a class="btn btn-outline-dark disabled" role="button" href="#">
                 {% if election.end_date %}
                   Voting starts {{ election.start_date|date:"l Y-m-d H:i:s" }}
@@ -86,7 +86,9 @@
           {% if election.can_apply %}
             <hr>
             <h5 class="mb-0 mt-4">Current Applications</h5>
-            <small class="text-muted">Up to {{ max_votes_yes }} applicants will be elected.</small>
+            {% if max_votes_yes %}
+              <small class="text-muted">Up to {{ max_votes_yes }} applicants will be elected.</small>
+            {% endif %}
             <div class="mt-3">
             <div class="row row-cols-1 row-cols-md-2 vote-list">
               {% for application in election.applications|shuffle %}

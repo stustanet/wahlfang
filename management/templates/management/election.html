@@ -11,12 +11,12 @@
         </div>
         <div class="card-body">
           {% if not election.started %}
-            <div>Abstimmung noch nicht gestarted.</div>
+            <div>Election not started yet.</div>
             <hr>
             <form class="user" action="{% url 'management:election' election.pk %}" method="post">
               {% csrf_token %}
               <div class="form-group">
-                <label for="id_run_time">Dauer der Abstimmung:</label>
+                <label for="id_run_time">Duration:</label>
                 <div class="container row">
                   <input dir="rtl" type="number"
                          class="form-control form-control-user col-6 text-right"
@@ -26,23 +26,23 @@
                          value="5"
                          required="true">
                   <input type="hidden" name="action" value="open">
-                  <div class="col-6 my-auto">Minuten</div>
+                  <div class="col-6 my-auto">minutes</div>
                 </div>
               </div>
-              <button type="submit" id="id_btn_start" class="btn btn-success">Abstimmung starten
+              <button type="submit" id="id_btn_start" class="btn btn-success">Start election
               </button>
             </form>
           {% elif not election.closed %}
-            <div>Abstimmung noch offen</div>
+            <div>Election still open.</div>
             <div>
-              Wahlzeitraum: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
+              Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
               {{ election.end_date|date:"l Y-m-d H:i:s" }}
             </div>
             <hr>
             <form class="user" action="{% url 'management:election' election.pk %}" method="post">
               {% csrf_token %}
               <input type="hidden" name="action" value="close">
-              <button type="submit" id="id_btn_close" class="btn btn-danger">Abstimmung jetzt schließen
+              <button type="submit" id="id_btn_close" class="btn btn-danger">Close election now
               </button>
             </form>
           {% endif %}
@@ -51,13 +51,22 @@
       <div class="card shadow mt-4">
         <div class="card-body">
           {% if not election.closed %}
-            <h4>Bewerber</h4>
+            <h4>
+              Applicants
+              {% if election.can_apply %}
+                <a class="btn btn-success float-right" role="button"
+                   href="{% url 'management:add_application' election.pk %}">
+                  Add applicant
+                </a>
+              {% endif %}
+            </h4>
+
             <hr>
             <table class="table table-striped">
               <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Bewerber</th>
+                <th scope="col">Applicant</th>
                 <th scope="col"></th>
               </tr>
               </thead>
@@ -70,7 +79,7 @@
                     {% if election.can_apply %}
                       <a class="btn btn-warning" role="button"
                          href="{% url 'management:edit_application' pk=election.pk application_id=application.pk %}">
-                        Bearbeiten
+                        Edit
                       </a>
                     {% endif %}
                   </td>
@@ -78,21 +87,15 @@
               {% endfor %}
               </tbody>
             </table>
-            {% if election.can_apply %}
-              <a class="btn btn-primary" role="button"
-                 href="{% url 'management:add_application' election.pk %}">
-                Bewerber hinzufügen
-              </a>
-            {% endif %}
           {% else %}
-            <h4>Ergebnis</h4>
+            <h4>Result</h4>
             {% include 'management/results.html' %}
           {% endif %}
         </div>
       </div>
       <div class="card shadow mt-4">
         <div class="card-body">
-          <h4>Wahlberechtigte</h4>
+          <h4>Voters</h4>
           <hr>
           <table class="table">
             <thead>

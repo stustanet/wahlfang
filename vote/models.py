@@ -74,7 +74,7 @@ class Election(models.Model):
     title = models.CharField(max_length=512)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    max_votes_yes = models.IntegerField()
+    max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
 
     @property
@@ -312,8 +312,7 @@ class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)
     avatar = models.ImageField(upload_to=avatar_file_name, null=True, blank=True)
     election = models.ForeignKey(Election, related_name='application', on_delete=models.CASCADE)
-    last_name = models.CharField(max_length=256)
-    first_name = models.CharField(max_length=256)
+    display_name = models.CharField(max_length=256)
     email = models.EmailField(null=True, blank=True)
 
     _old_avatar = None
@@ -326,7 +325,7 @@ class Application(models.Model):
         return f'Application of {self.get_display_name()} for {self.election}'
 
     def get_display_name(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.display_name}'
 
     def save(self, *args, **kwargs):
         if self.avatar and self._old_avatar != self.avatar:

@@ -3,15 +3,15 @@
     <thead>
     <tr>
         <th scope="col">#</th>
-        <th scope="col">Bewerber</th>
-        <th scope="col">Für</th>
-        <th scope="col">Gegen</th>
-        <th scope="col">Enthaltung</th>
+        <th scope="col">Applicant</th>
+        <th scope="col">Yes</th>
+        <th scope="col">No</th>
+        <th scope="col">Abstention</th>
     </tr>
     </thead>
     <tbody>
     {% for application in election.election_summary %}
-        <tr class="{% if forloop.counter < election.max_votes_yes %}bg-success{% endif %}">
+        <tr class="{% if forloop.counter <= election.max_votes_yes %}bg-success{% endif %}">
             <th scope="row">{{ forloop.counter }}</th>
             <td>{{ application.get_display_name }}</td>
             <td>{{ application.votes_accept }}</td>

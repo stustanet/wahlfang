@@ -40,6 +40,7 @@ def session_detail(request, pk=None):
     context = {
         'session': session,
         'elections': session.elections.all(),
+        'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)
 
@@ -150,16 +151,6 @@ def election_upload_application(request, pk, application_id=None):
 
 
 @management_login_required
-def voters_list(request, pk):
-    manager, election, session = _unpack(request, pk)
-    context = {
-        'voters': session.participants.all(),
-        'session': session
-    }
-    return render(request, template_name='management/voters_list.html', context=context)
-
-
-@management_login_required
 @csrf_protect
 def invalidate_voter(request, pk):
     v = Voter.objects.filter(session__in=request.user.sessions.all(), pk=pk)
@@ -168,4 +159,4 @@ def invalidate_voter(request, pk):
     v = v.first()
     session = v.session
     v.delete()
-    return redirect('management:voters_list', pk=session.pk)
+    return redirect('management:session', pk=session.pk)

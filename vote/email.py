@@ -34,15 +34,6 @@ def remind_voters():
     voters = Voter.objects.filter(remind_me=True)
     email_voters(
         voters=voters,
-        subject='Hausadminwahlen: Abstimmung gestartet | House Admin Elections: Voting has started',
+        subject='Abstimmung gestartet | Voting has started',
         template='vote/mails/reminder.j2'
-    )
-
-
-def send_time_correction():
-    voters = Voter.objects.all()
-    email_voters(
-        voters=voters,
-        subject='Korrektur Hausadmin Wahlen | Correction house admin elections',
-        template='vote/mails/time_correction.j2'
     )

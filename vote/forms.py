@@ -46,37 +46,6 @@ class AvatarFileInput(forms.ClearableFileInput):
     template_name = 'vote/image_input.html'
 
 
-class ApplicationUploadForm(forms.ModelForm):
-    field_order = ['first_name', 'last_name', 'email', 'text', 'avatar']
-
-    def __init__(self, request, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.voter = Voter.objects.get(voter_id=request.user.voter_id)
-
-        self.fields['avatar'].widget = AvatarFileInput()
-        self.fields['first_name'].initial = self.voter.first_name
-        self.fields['last_name'].initial = self.voter.last_name
-        self.fields['email'].initial = self.voter.email
-
-    class Meta:
-        model = Application
-        fields = ('first_name', 'last_name', 'email', 'text', 'avatar')
-
-    def clean(self):
-        super().clean()
-        if not self.voter.election.can_apply:
-            raise forms.ValidationError('Applications are currently not allowed')
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        instance.voter = self.voter
-
-        if commit:
-            instance.save()
-
-        return instance
-
-
 class EmptyForm(forms.Form):
     pass
 
@@ -108,6 +77,10 @@ class VoteForm(forms.Form):
         self.voter = Voter.objects.get(voter_id=request.user.voter_id)
         self.election = election
         self.request = request
+        if self.election.max_votes_yes is not None:
+            self.max_votes_yes = self.election.max_votes_yes
+        else:
+            self.max_votes_yes = self.election.applications.count()
 
         for application in self.election.applications:
             self.fields[f'{application.pk}'] = VoteField(application=application)
@@ -116,7 +89,7 @@ class VoteForm(forms.Form):
 
     def clean(self):
         super().clean()
-        if not OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.id):
+        if not OpenVote.objects.get(election_id=self.election.pk, voter_id=self.voter.pk):
             raise forms.ValidationError('You are not allowed to vote')
 
         votes_yes = 0
@@ -125,9 +98,9 @@ class VoteForm(forms.Form):
             if vote == VOTE_ACCEPT:
                 votes_yes += 1
 
-        if votes_yes > self.voter.election.max_votes_yes:
+        if votes_yes > self.max_votes_yes:
             raise forms.ValidationError(
-                f'Too many "yes" votes, only max. {self.voter.election.max_votes_yes} allowed.')
+                f'Too many "yes" votes, only max. {self.voter.max_votes_yes} allowed.')
 
     def save(self, commit=True):
         votes = [
@@ -140,7 +113,7 @@ class VoteForm(forms.Form):
 
         if commit:
             with transaction.atomic():
-                can_vote = OpenVote.objects.get(election_id=self.election.id, voter_id=self.voter.id)
+                can_vote = OpenVote.objects.get(election_id=self.election.pk, voter_id=self.voter.pk)
                 if not can_vote:
                     raise forms.ValidationError('You are not allowed to vote')
                 Vote.objects.bulk_create(votes)

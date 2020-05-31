@@ -28,7 +28,6 @@ class VoterAdmin(UserAdmin):
     model = Voter
     fieldsets = (
         (None, {'fields': ('voter_id', 'password', 'session',)}),
-        # (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Personal info'), {'fields': ('email',)}),
         (_('Status'), {'fields': ('voted',)}),
     )

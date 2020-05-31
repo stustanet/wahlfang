@@ -146,8 +146,6 @@ class Election(models.Model):
 class Voter(models.Model):
     voter_id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=256)
-    first_name = models.CharField(max_length=128, null=True, blank=True)
-    last_name = models.CharField(max_length=128, null=True, blank=True)
     email = models.EmailField()
     session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
 
@@ -161,7 +159,7 @@ class Voter(models.Model):
         unique_together = ('session', 'email')
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return self.email
 
     def save(self, *args, **kwargs):
         fields = kwargs.pop('update_fields', [])
@@ -292,10 +290,8 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, session, email, first_name=None, last_name=None):
+    def from_data(cls, session, email):
         voter = Voter(
-            first_name=first_name,
-            last_name=last_name,
             session=session,
             email=email,
         )

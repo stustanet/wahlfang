@@ -32,8 +32,6 @@ def gen_data():
     )
     voter, access_code = Voter.from_data(
         voter_id='012345',
-        first_name='First',
-        last_name='Last',
         room='123',
         email='spam@spam.spam',
         election=election

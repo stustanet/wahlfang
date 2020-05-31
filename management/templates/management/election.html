@@ -9,8 +9,9 @@
           <h4 class="d-inline">{{ election.title }}</h4>
           <a class="btn btn-light d-inline float-right" href="{% url "management:session"  pk=session.id %}">Back</a>
         </div>
-        <div class="card-body">
-          {% if not election.started %}
+        {% if not election.started %}
+          <div class="card-body">
+
             <div>Election not started yet.</div>
             <hr>
             <form class="user" action="{% url 'management:election' election.pk %}" method="post">
@@ -32,7 +33,7 @@
               <button type="submit" id="id_btn_start" class="btn btn-success">Start election
               </button>
             </form>
-          {% elif not election.closed %}
+            {% elif not election.closed %}
             <div>Election still open.</div>
             <div>
               Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
@@ -45,8 +46,9 @@
               <button type="submit" id="id_btn_close" class="btn btn-danger">Close election now
               </button>
             </form>
-          {% endif %}
-        </div>
+
+          </div>
+        {% endif %}
       </div>
       <div class="card shadow mt-4">
         <div class="card-body">
@@ -90,6 +92,14 @@
           {% else %}
             <h4>Result</h4>
             {% include 'management/results.html' %}
+            <hr>
+            <h5>Publish result</h5>
+            <form action="{% url 'management:election' election.pk %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="publish">
+              {{ election_upload_application_form |crispy }}
+              <button type="submit" class="btn btn-info">Apply</button>
+            </form>
           {% endif %}
         </div>
       </div>

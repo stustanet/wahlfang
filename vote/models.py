@@ -76,6 +76,8 @@ class Election(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
+    result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'only winners published'),
+                                                               ('2', 'fully published')], default='0')
 
     @property
     def started(self):

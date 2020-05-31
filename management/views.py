@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from management.authentication import management_login_required
 from management.forms import StartElectionForm, AddElectionForm, AddSessionForm, AddVotersForm, ApplicationUploadForm, \
-    StopElectionForm
+    StopElectionForm, ChangeElectionPublicStateForm
 from vote.models import Election, Application, Voter
 
 logger = logging.getLogger('management.view')
@@ -94,7 +94,8 @@ def election_detail(request, pk):
         'session': session,
         'applications': election.applications.all(),
         'stop_election_form': StopElectionForm(instance=election),
-        'start_election_form': StartElectionForm(instance=election)
+        'start_election_form': StartElectionForm(instance=election),
+        'election_upload_application_form': ChangeElectionPublicStateForm(instance=election)
     }
 
     if request.POST and request.POST.get('action') == "close" and election.is_open:
@@ -110,6 +111,12 @@ def election_detail(request, pk):
             form.save()
         else:
             context['start_election_form'] = form
+
+    if request.POST and request.POST.get('action') == "publish":
+        form = ChangeElectionPublicStateForm(instance=election, data=request.POST)
+        if form.is_valid():
+            form.save()
+            context['election_upload_application_form'] = form
 
     return render(request, template_name='management/election.html', context=context)
 

@@ -39,7 +39,7 @@
           <div class="list-group mt-3">
             {% if can_vote %}
               <a class="btn btn-primary" role="button" href="{% url 'vote:vote' election.pk %}">Vote Now!</a>
-            {% elif election.closed %}
+            {% elif election.closed and election.result_published == '2' %}
               <div class="alert alert-info" role="alert">
                 <h4 class="alert-heading">Voting Ended:</h4>
                 <hr>
@@ -47,15 +47,15 @@
                   <thead class="thead-dark">
                   <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Bewerber</th>
-                    <th scope="col">Für</th>
-                    <th scope="col">Gegen</th>
-                    <th scope="col">Enthaltung</th>
+                    <th scope="col">Applicant</th>
+                    <th scope="col">Yes</th>
+                    <th scope="col">No</th>
+                    <th scope="col">Absention</th>
                   </tr>
                   </thead>
                   <tbody>
-                  {% for application in applications %}
-                    <tr class="{% if forloop.counter < election.max_votes_yes %}bg-success{% endif %}">
+                  {% for application in election.election_summary %}
+                    <tr class="{% if forloop.counter <= election.max_votes_yes %}bg-success{% endif %}">
                       <th scope="row">{{ forloop.counter }}</th>
                       <td>{{ application.get_display_name }}</td>
                       <td>{{ application.votes_accept }}</td>
@@ -66,7 +66,32 @@
                   </tbody>
                 </table>
               </div>
-            {% elif not electon.started and not election.is_open %}
+            {% elif election.closed and election.result_published == '1' %}
+              <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">Voting Ended:</h4>
+                <hr>
+                <table class="table table-striped">
+                  <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Applicant</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% with  max_votes_yes=election.max_votes_yes|stringformat:"s" %}
+                    {% with  myslice=":"|add:max_votes_yes %}
+                      {% for application in election.election_summary|slice:myslice %}
+                        <tr class="bg-success">
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ application.get_display_name }}</td>
+                        </tr>
+                      {% endfor %}
+                    {% endwith %}
+                  {% endwith %}
+                  </tbody>
+                </table>
+              </div>
+            {% elif not electon.started and not election.is_open and not election.closed %}
               <a class="btn btn-outline-dark disabled" role="button" href="#">
                 {% if election.end_date %}
                   Voting starts {{ election.start_date|date:"l Y-m-d H:i:s" }}
@@ -96,18 +121,18 @@
                   <div class="applicant">
                     {% if application.avatar %}
                       <img src="{{ application.avatar.url }}" class="applicant-picture" alt="applicant-picture">
-{#                    {% else %}#}
-{#                      <img src="{% static 'img/blank_avatar.png' %}" class="applicant-picture"#}
-{#                           alt="applicant-picture">#}
+                      {#                    {% else %}#}
+                      {#                      <img src="{% static 'img/blank_avatar.png' %}" class="applicant-picture"#}
+                      {#                           alt="applicant-picture">#}
                     {% endif %}
                     <h6>{% applicant_name application %}</h6>
                     <p class="description">{{ application.text|escape }}</p>
                   </div>
                 </div>
-{#              {% empty %}#}
-{#                <div class="col mb-2">#}
-{#                  <span class="badge badge-light">Be the first!</span>#}
-{#                </div>#}
+                {#              {% empty %}#}
+                {#                <div class="col mb-2">#}
+                {#                  <span class="badge badge-light">Be the first!</span>#}
+                {#                </div>#}
               {% endfor %}
             </div>
           {% endif %}

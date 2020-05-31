@@ -39,6 +39,18 @@ class StopElectionForm(forms.ModelForm):
         return instance
 
 
+class ChangeElectionPublicStateForm(forms.ModelForm):
+    class Meta:
+        model = Election
+        fields = ['result_published']
+        widgets = {
+            'result_published': forms.RadioSelect
+        }
+        labels = {
+            'result_published': '',
+        }
+
+
 class AddSessionForm(forms.ModelForm):
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)

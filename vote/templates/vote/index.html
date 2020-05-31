@@ -26,7 +26,7 @@
           <div class="list-group mt-3">
             {% if can_vote %}
               <a class="btn btn-primary" role="button" href="{% url 'vote:vote' election.pk %}">Vote Now!</a>
-            {% elif election.closed and election.result_published == '2' %}
+            {% elif election.closed and election.result_published == '1' %}
               <div class="alert alert-info" role="alert">
                 <h4 class="alert-heading">Voting Ended:</h4>
                 <hr>
@@ -50,31 +50,6 @@
                       <td>{{ application.votes_abstention }}</td>
                     </tr>
                   {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            {% elif election.closed and election.result_published == '1' %}
-              <div class="alert alert-info" role="alert">
-                <h4 class="alert-heading">Voting Ended:</h4>
-                <hr>
-                <table class="table table-striped">
-                  <thead class="thead-dark">
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Applicant</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {% with  max_votes_yes=election.max_votes_yes|stringformat:"s" %}
-                    {% with  myslice=":"|add:max_votes_yes %}
-                      {% for application in election.election_summary|slice:myslice %}
-                        <tr class="bg-success">
-                          <th scope="row">{{ forloop.counter }}</th>
-                          <td>{{ application.get_display_name }}</td>
-                        </tr>
-                      {% endfor %}
-                    {% endwith %}
-                  {% endwith %}
                   </tbody>
                 </table>
               </div>

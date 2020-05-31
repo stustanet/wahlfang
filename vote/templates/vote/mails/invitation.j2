@@ -2,12 +2,15 @@
 English version below.
 ---
 
-Lieber Wähler,
+Hallo,
 
 du wurdest zur Versammlung "{{ session.title }}" eingeladen. Mit dem folgenden Link kannst du an den Abstimmungen teilnehmen:
-
 <a href="{{ login_url }}">{{ login_url }}</a>
-(nur innerhalb des MWN/Münchner Wissenschaftsnetz erreichbar, z.B. innerhalb der StuSta, eduroam, lrz VPN oder ähnliche Universitäts-VPNs.)
+
+Alternativ kannst du dich auch mit dem Zugangscode "{{ access_code }}" auf {{ base_url }} einloggen.
+
+Ein Login ist nur aus der StuSta bzw. dem Münchner Wissenschaftsnetz (MWN) möglich.
+Sofern nötig, verbinde dich also über eduroam, das LRZ VPN oder ähnliche Universitäts-VPNs.
 
 {% if session.meeting_link %}Am Meeting kannst du unter <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a> teilnehmen.{% endif %}
 {% if session.start_date %}Es beginnt am {{ session.start_date|date:"d.m.Y" }} um {{ session.start_date|date:"H:i" }} Uhr.{% endif %}
@@ -16,12 +19,15 @@ du wurdest zur Versammlung "{{ session.title }}" eingeladen. Mit dem folgenden L
 English version
 ---
 
-Dear voter,
+Hello,
 
 you were invited to the meeting "{{ session.title }}". To participate in the elections, click the following link:
-
 <a href="{{ login_url }}">{{ login_url }}</a>
-(only accessible within munich scientific network MWN/Münchner Wissenschaftsnetz, e.g. within StuSta, eduroam or via lrz VPN or similar university VPNs)
+
+Alternatively, you can also login at {{ base_url }} with the access code "{{ access_code }}".
+
+Login is only possible from within the StuSta or the Munich Scientific Network (Münchner Wissenschaftsnetz/MWN).
+If necessary, connect via eduroam, the LRZ VPN or similar university VPNs.
 
 {% if session.meeting_link %}You can take part in the meeting via <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a>.{% endif %}
 {% if session.start_date %}It starts on {{ session.start_date|date:"Y/m/d" }} at {{ session.start_date|date:"h:i A" }}.{% endif %}

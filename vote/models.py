@@ -254,6 +254,7 @@ class Voter(models.Model):
         context = {
             'voter': self,
             'session': self.session,
+            'base_url': 'https://vote.stustanet.de',
             'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}),
             'access_code': access_code,
         }

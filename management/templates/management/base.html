@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/favicon16.png' %}" sizes="16x16" />
@@ -15,85 +15,57 @@
   <title>{% block title %}StuStaNet Wahlfang{% endblock %}</title>
 </head>
 <body>
-
-<!-- Page Wrapper -->
-<div id="wrapper">
-
-  <!-- Content Wrapper -->
-  <div id="content-wrapper" class="d-flex flex-column">
-
-    <!-- Main Content -->
-    <div id="content">
-
-      <!-- Topbar -->
-      <nav class="navbar navbar-expand navbar-dark bg-dark shadow justify-content-center">
-        <div class="d-flex">
-          <a class="navbar-brand" href="{% url 'management:index' %}">
-            <img src="{% static "img/logo_inv.png" %}" width="180px" alt="StuStaNet-Logo">
-          </a>
-          <span class="navbar-text">StuStaNet Wahlfang</span>
-          <ul class="navbar-nav">
-            {% if user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'management:logout' %}">Logout</a>
-              </li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
-      <!-- End of Topbar -->
-
-      <!-- Begin Page Content -->
-      <div class="container-fluid">
-        <div class="row pt-3 justify-content-center">
-          <div class="col-12">
-            {% if messages %}
-              <div class="messages">
-                {% for message in messages %}
-                  <div
-                      class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
-                      role="alert">
-                    {{ message|escape }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-{#            {% if form and form.errors %}#}
-{#              <div class="messages">#}
-{#                {% for error in form.non_field_errors %}#}
-{#                  <div class="alert alert-dismissible fade show alert-danger"#}
-{#                       role="alert">#}
-{#                    {{ error|escape }}#}
-{#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">#}
-{#                      <span aria-hidden="true">&times;</span>#}
-{#                    </button>#}
-{#                  </div>#}
-{#                {% endfor %}#}
-{#              </div>#}
-{#            {% endif %}#}
-          </div>
-        </div>
-        {% block content_pre %}{% endblock %}
-        {% block content %}
-          No content here.
-        {% endblock %}
+<div id="content">
+  <nav class="navbar navbar-expand navbar-dark bg-dark shadow">
+    <div class="container-md">
+      <a class="navbar-brand" href="{% url 'vote:index' %}">
+        <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
+      </a>
+      <div class="navbar-text">Wahlfang</div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'vote:logout' %}">Logout</a>
+            </li>
+          {% endif %}
+        </ul>
       </div>
-      <!-- /.container-fluid -->
-
     </div>
-    <!-- End of Main Content -->
+  </nav>
 
-  </div>
+  <article class="container-lg mb-4" role="main">
+    <div class="row pt-3 justify-content-center">
+      <div class="col-12">
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
+                  role="alert">
+                {{ message|escape }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% block content_pre %}{% endblock %}
+    {% block content %}
+      No content here.
+    {% endblock %}
+  </article>
+
 </div>
-<script src="{% static "js/jquery-3.4.1.slim.min.js" %}" type="text/javascript"></script>
-<script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
-        type="text/javascript"></script>
-{% block javascript %}
-{% endblock %}
-
+{% comment "Not needed :)" %}
+<script src="{% static "js/jquery-3.4.1.slim.min.js" %}" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
+<script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+{% endcomment %}
 {% block footer_scripts %}
 {% endblock %}
 </body>

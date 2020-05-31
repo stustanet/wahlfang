@@ -1,9 +1,12 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import views as auth_views
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
+from ratelimit.decorators import ratelimit
 
 from management.authentication import management_login_required
 from management.forms import StartElectionForm, AddElectionForm, AddSessionForm, AddVotersForm, ApplicationUploadForm, \
@@ -11,6 +14,19 @@ from management.forms import StartElectionForm, AddElectionForm, AddSessionForm,
 from vote.models import Election, Application, Voter
 
 logger = logging.getLogger('management.view')
+
+
+class LoginView(auth_views.LoginView):
+    # login view settings
+    # https://docs.djangoproject.com/en/3.0/topics/auth/default/#django.contrib.auth.views.LoginView
+    template_name = 'management/login.html'
+
+    @ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST')
+    def post(self, request, *args, **kwargs):
+        ratelimited = getattr(request, 'limited', False)
+        if ratelimited:
+            return render(request, template_name='vote/ratelimited.html', status=429)
+        return super().post(request, *args, **kwargs)
 
 
 @management_login_required

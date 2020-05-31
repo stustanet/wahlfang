@@ -263,7 +263,7 @@ class Voter(models.Model):
         self.email_user(
             subject=subject,
             message=strip_tags(body_html),
-            from_email=settings.EMAIL_SENDER,
+            from_email=self.session.managers.all().first().email,
             html_message=body_html.replace('\n', '<br/>'),
             fail_silently=True
         )

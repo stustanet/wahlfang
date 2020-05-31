@@ -4,7 +4,7 @@ from vote.models import Voter
 
 
 class Command(BaseCommand):
-    help = 'Reset Voter and resend invitation'
+    help = 'Revoke the given access code'
 
     def add_arguments(self, parser):
         parser.add_argument('--access_code', type=str, required=True)

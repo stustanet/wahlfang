@@ -18,9 +18,7 @@ urlpatterns = [
     path('meeting/<int:pk>/delete_session', views.delete_session, name='delete_session'),
 
     # account management stuff
-    path('login', auth_views.LoginView.as_view(
-        template_name='management/login.html'
-    ), name='login'),
+    path('login', views.LoginView.as_view(), name='login'),
     path('logout', auth_views.LogoutView.as_view(
         next_page='management:login',
     ), name='logout')

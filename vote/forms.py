@@ -82,6 +82,7 @@ class VoteForm(forms.Form):
         else:
             self.max_votes_yes = self.election.applications.count()
 
+        # dynamically construct form fields
         for application in self.election.applications:
             self.fields[f'{application.pk}'] = VoteField(application=application)
 
@@ -89,7 +90,7 @@ class VoteForm(forms.Form):
 
     def clean(self):
         super().clean()
-        if not OpenVote.objects.get(election_id=self.election.pk, voter_id=self.voter.pk):
+        if not OpenVote.objects.filter(election_id=self.election.pk, voter_id=self.voter.pk).exists():
             raise forms.ValidationError('You are not allowed to vote')
 
         votes_yes = 0
@@ -111,11 +112,12 @@ class VoteForm(forms.Form):
             ) for name, value in self.cleaned_data.items()
         ]
 
+        # existence of can_vote object already checked in clean()
+        can_vote = OpenVote.objects.get(election_id=self.election.pk, voter_id=self.voter.pk)
+
         if commit:
             with transaction.atomic():
-                can_vote = OpenVote.objects.get(election_id=self.election.pk, voter_id=self.voter.pk)
-                if not can_vote:
-                    raise forms.ValidationError('You are not allowed to vote')
                 Vote.objects.bulk_create(votes)
                 can_vote.delete()
+
         return votes

@@ -6,8 +6,8 @@ from django.shortcuts import render, redirect
 from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
-from vote.forms import AccessCodeAuthenticationForm, VoteForm, EmptyForm
-from vote.models import Election
+from vote.forms import AccessCodeAuthenticationForm, VoteForm
+from vote.models import Election, Voter
 
 
 class LoginView(auth_views.LoginView):
@@ -15,7 +15,14 @@ class LoginView(auth_views.LoginView):
     # https://docs.djangoproject.com/en/3.0/topics/auth/default/#django.contrib.auth.views.LoginView
     authentication_form = AccessCodeAuthenticationForm
     template_name = 'vote/login.html'
-    redirect_authenticated_user = True
+    redirect_authenticated_user = False
+
+    def get(self, request, *args, **kwargs):
+        print(request, args)
+        u = request.user
+        if u.is_authenticated and isinstance(u, Voter):
+            return redirect('vote:index')
+        return super().get(request, *args, **kwargs)
 
     @ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST')
     def post(self, request, *args, **kwargs):

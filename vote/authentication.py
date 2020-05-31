@@ -35,6 +35,9 @@ class AccessCodeBackend(BaseBackend):
             Voter().set_password(password)
         else:
             if voter.check_password(password):
+                if not voter.logged_in:
+                    voter.logged_in = True
+                    voter.save()
                 voter.backend = 'vote.authentication.AccessCodeBackend'
                 return voter
 

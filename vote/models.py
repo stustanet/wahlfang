@@ -148,6 +148,7 @@ class Voter(models.Model):
     password = models.CharField(max_length=256)
     email = models.EmailField()
     session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
+    logged_in = models.BooleanField(default=False)
 
     # Stores the raw password if set_password() is called so that it can
     # be passed to password_changed() after the model is saved.

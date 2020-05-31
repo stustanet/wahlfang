@@ -61,7 +61,7 @@
             <tbody>
             {% for voter in voters %}
               <tr>
-                <td>{{ voter.email }}</td>
+                <td class="{% if voter.logged_in %}text-success{% endif %}">{{ voter.email }}</td>
                 <td class="text-right">
                   <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
                     {% csrf_token %}

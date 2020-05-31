@@ -33,7 +33,9 @@
               <button type="submit" id="id_btn_start" class="btn btn-success">Start election
               </button>
             </form>
-            {% elif not election.closed %}
+          </div>
+        {% elif not election.closed %}
+          <div class="card-body">
             <div>Election still open.</div>
             <div>
               Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -

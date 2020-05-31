@@ -28,12 +28,3 @@ def email_voters(voters, subject, template):
             message.attach_alternative(body_html, 'text/html')
             message.send(fail_silently=True)
     print(f'Successfully sent emails to {voters.count()} voters')
-
-
-def remind_voters():
-    voters = Voter.objects.filter(remind_me=True)
-    email_voters(
-        voters=voters,
-        subject='Abstimmung gestartet | Voting has started',
-        template='vote/mails/reminder.j2'
-    )

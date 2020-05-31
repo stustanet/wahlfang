@@ -54,13 +54,6 @@ def index(request):
         'voter': voter,
     }
 
-    # remind me
-    if request.POST and request.GET.get('action') in ('remind_me', 'dont_remind_me'):
-        f = EmptyForm(request.POST)
-        if f.is_valid():
-            voter.remind_me = request.GET['action'] == 'remind_me'
-            voter.save()
-
     context['elections'] = [
         (e, voter.can_vote(e)) for e in voter.session.elections.all()
     ]

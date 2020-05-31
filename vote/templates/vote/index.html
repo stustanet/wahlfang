@@ -9,19 +9,6 @@
       <div class="card bg-dark text-light shadow mb-2 py-2">
         <div class="card-body">
           <h4 class="text-center d-inline">{{ title }}</h4>
-          <div class="d-inline float-right">
-            {% if voter.remind_me %}
-              <form action="{% url 'vote:index' %}?action=dont_remind_me" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger btn-sm">Don't remind me</button>
-              </form>
-            {% else %}
-              <form action="{% url 'vote:index' %}?action=remind_me" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary btn-sm">Remind me (via email)</button>
-              </form>
-            {% endif %}
-          </div>
           {% if meeting_link %}
             <div><small>Meeting at <a href="{{ meeting_link }}">{{ meeting_link }}</a></small></div>
           {% endif %}

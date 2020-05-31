@@ -1,5 +1,5 @@
-from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
+from django.urls import path
 
 from management import views
 
@@ -13,7 +13,9 @@ urlpatterns = [
     path('election/<int:pk>/add_application', views.election_upload_application, name='add_application'),
     path('election/<int:pk>/edit/<int:application_id>', views.election_upload_application, name='edit_application'),
     path('election/<int:pk>', views.election_detail, name='election'),
-    path('election/<int:pk>/invalidate_voter', views.invalidate_voter, name='invalidate_voter'),
+    path('election/<int:pk>/delete_voter', views.delete_voter, name='delete_voter'),
+    path('election/<int:pk>/delete_election', views.delete_election, name='delete_election'),
+    path('meeting/<int:pk>/delete_session', views.delete_session, name='delete_session'),
 
     # account management stuff
     path('login', auth_views.LoginView.as_view(

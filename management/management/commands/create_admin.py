@@ -27,9 +27,11 @@ class Command(BaseCommand):
         manager.set_password(password)
         send_mail(
             'Wahlleiter Login vote.stustanet.de',
-            f'Für dich wurde ein Wahlleiterlogin auf vote.stustanet.de angelegt.'
-            f'Du kannst dich unter https://vote.stustanet.de/management mit dem '
-            f'Benutzernamen {email} und Passwort {password} anmelden',
+            f'Für dich wurde ein Wahlleiterlogin auf vote.stustanet.de angelegt.\n'
+            f'Du kannst dich unter https://vote.stustanet.de/management mit den '
+            f'folgenden Daten einloggen:\n\n'
+            f'Benutzername: {email}\n'
+            f'Passwort: {password}',
             settings.EMAIL_SENDER,
             [email],
             fail_silently=False,

@@ -12,7 +12,7 @@
           <a class="btn btn-success d-inline float-right ml-2"
              href="{% url 'management:add_election' pk=session.id %}">Add Election</a>
           {% if session.meeting_link %}
-          <br/>
+            <br/>
             <small>Meeting on <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
           {% endif %}
         </div>
@@ -24,13 +24,19 @@
                 <a class="main-link" href="{% url 'management:election' pk=election.id %}"></a>
 
                 <span><b>{{ election.title }}</b></span>
+                <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
+                        data-target="#deleteModel{{ election.pk }}"
+                        aria-label="remove election from session">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+
                 <small class="float-right">
                   {% if not election.start_date %}
-                    Not started yet
+                    <span class="right-margin">Not started yet</span>
                   {% elif election.is_open %}
-                    Open {{ election.start_date|date:"H:i"}} - {{ election.end_date|date:"H:i"}}
+                    <span class="right-margin">Open {{ election.start_date|date:"H:i" }} - {{ election.end_date|date:"H:i" }}</span>
                   {% elif election.closed %}
-                    Closed
+                    <span class="right-margin">Closed</span>
                   {% endif %}
                 </small>
               </div>
@@ -39,36 +45,36 @@
         </div>
       </div>
       <div class="card shadow my-4">
-          <div class="card-body">
-            <h4>Voters
+        <div class="card-body">
+          <h4>Voters
             <a class="btn btn-success d-inline float-right ml-2"
-             href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
-            </h4>
-            <hr>
-            <table class="table">
-              <thead>
+               href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
+          </h4>
+          <hr>
+          <table class="table">
+            <thead>
+            <tr>
+              <th scope="row">E-Mail</th>
+              <th scope="row"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for voter in voters %}
               <tr>
-                <th scope="row">E-Mail</th>
-                <th scope="row"></th>
+                <td>{{ voter.email }}</td>
+                <td class="text-right">
+                  <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="close btn btn-danger" aria-label="remove voter">
+                      &times;
+                    </button>
+                  </form>
+                </td>
               </tr>
-              </thead>
-              <tbody>
-              {% for voter in voters %}
-                <tr>
-                  <td>{{ voter.email }}</td>
-                  <td class="text-right">
-                    <form action="{% url 'management:invalidate_voter' voter.pk %}" method="post">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger" aria-label="remove from election">
-                        Remove
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              {% endfor %}
-              </tbody>
-            </table>
-          </div>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

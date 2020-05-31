@@ -23,10 +23,6 @@
                     Not started yet
                   {% endif %}
                 </small>
-                {% if session.meeting_link %}
-                  <small class="left-margin">Meeting on <a
-                      href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
-                {% endif %}
               </div>
             {% endfor %}
           </div>
@@ -48,7 +44,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to delete session {{ session.title }}?</p>
+            <p>Are you sure you want to delete the {{ session.title }} meeting?</p>
           </div>
           <div class="modal-footer">
             <form action="{% url 'management:delete_session' pk=session.pk %}" method="post">

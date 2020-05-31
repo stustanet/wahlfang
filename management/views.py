@@ -150,7 +150,7 @@ def election_upload_application(request, pk, application_id=None):
 
 @management_login_required
 @csrf_protect
-def invalidate_voter(request, pk):
+def delete_voter(request, pk):
     v = Voter.objects.filter(session__in=request.user.sessions.all(), pk=pk)
     if not v.exists():
         raise Http404('Voter does not exist')

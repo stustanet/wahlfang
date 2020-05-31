@@ -7,11 +7,11 @@
     <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Create Meeting</h4>
+          <h4>Create Session</h4>
           <form class="user" action="{% url 'management:index' %}?action=add_session" method="post">
             {% csrf_token %}
             {{ form|crispy }}
-            <button type="submit" id="id_btn_start" class="btn btn-success">Submit</button>
+            <button type="submit" id="id_btn_start" class="btn btn-success">Create Session</button>
           </form>
         </div>
       </div>

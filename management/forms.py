@@ -54,7 +54,8 @@ class ChangeElectionPublicStateForm(forms.ModelForm):
 class AddSessionForm(forms.ModelForm):
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00'})
+        self.fields['meeting_link'].widget = forms.TextInput(attrs={'placeholder': 'e.g. https://bbb.stusta.de/b/ssn-abc-123'})
         self.user = user
         self.request = request
 
@@ -62,7 +63,7 @@ class AddSessionForm(forms.ModelForm):
         model = Session
         fields = ('title', 'start_date', 'meeting_link')
         labels = {
-            'title': 'Meeting name',
+            'title': 'Session Name',
             'start_date': 'Meeting start (optional)',
             'meeting_link': 'Link to meeting call platform (optional)',
         }

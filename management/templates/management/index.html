@@ -5,7 +5,7 @@
     <div class="col-8">
       <div class="card shadow">
         <div class="card-body">
-          <h4>My Meetings</h4>
+          <h4>My Sessions</h4>
           <div class="list-group">
             {% for session in sessions %}
               <div class="list-group-item list-group-item-action">
@@ -29,7 +29,7 @@
           <hr>
           <form class="d-inline" action="{% url 'management:index' %}?action=add_session" method="post">
             {% csrf_token %}
-            <button class="btn btn-success" type="submit">Create Meeting</button>
+            <button class="btn btn-success" type="submit">Create Session</button>
           </form>
         </div>
       </div>

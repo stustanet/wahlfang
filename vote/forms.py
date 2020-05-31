@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT, Election
+from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
 
 
 class AccessCodeAuthenticationForm(forms.Form):
@@ -100,7 +100,7 @@ class VoteForm(forms.Form):
 
         if votes_yes > self.max_votes_yes:
             raise forms.ValidationError(
-                f'Too many "yes" votes, only max. {self.voter.max_votes_yes} allowed.')
+                f'Too many "yes" votes, only max. {self.max_votes_yes} allowed.')
 
     def save(self, commit=True):
         votes = [

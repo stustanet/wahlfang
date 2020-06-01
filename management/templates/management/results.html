@@ -11,7 +11,7 @@
     </thead>
     <tbody>
     {% for application in election.election_summary %}
-        <tr class="{% if forloop.counter <= election.max_votes_yes %}bg-success{% endif %}">
+        <tr>
             <th scope="row">{{ forloop.counter }}</th>
             <td>{{ application.get_display_name }}</td>
             <td>{{ application.votes_accept }}</td>

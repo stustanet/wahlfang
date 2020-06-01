@@ -27,7 +27,7 @@
                 </div>
               {% endif %}
               {% if form.visible_fields %}
-                <div class="card card-dual">
+                <div class="card">
                   <h5 class="card-header">Instruction</h5>
                   <div class="card-body">
                     {% if max_votes_yes > 1 %}You may give up to {{ max_votes_yes }} YES votes.<br>{% endif %}
@@ -59,13 +59,15 @@
                     <tr>
                       <td class="applicant">
                         <div class="row no-gutters">
+                          {% if field.application.avatar %}
                           <div class="col-3">
-                            {% if field.application.avatar %}
+                            {#{% if field.application.avatar %}#}
                               <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
                             {#{% else %}#}
                             {#  <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">#}
-                            {% endif %}
+                            {#{% endif %}#}
                           </div>
+                          {% endif %}
                           <div class="col-9">
                             <div class="card-body">
                               <h6 class="card-title">{{ field.label|escape }}</h6>

@@ -28,16 +28,9 @@
               {% endif %}
               {% if form.visible_fields %}
                 <div class="card card-dual">
-                  <h5 class="card-header">Voting Procedure</h5>
+                  <h5 class="card-header">Instruction</h5>
                   <div class="card-body">
-                    <h6 class="card-subtitle mb-2">Elected are those candidates who:</h6>
-                    <ol>
-                      <li>received more YES than NO votes and</li>
-                      <li>are among the {{ max_votes_yes }} remaining candidates with the most votes.</li>
-                    </ol>
-                  </div>
-                  <div class="card-body">
-                    You may give up to {{ max_votes_yes }} YES votes.<br>
+                    {% if max_votes_yes > 1 %}You may give up to {{ max_votes_yes }} YES votes.<br>{% endif %}
                     NO votes should only be used if you are explicitly against a candidate.<br>
                     The display order of the applicants is randomized.<br>
                     Your vote is anonymous.
@@ -69,8 +62,8 @@
                           <div class="col-3">
                             {% if field.application.avatar %}
                               <img src="{{ field.application.avatar.url }}" class="card-img" alt="applicant-picture">
-                            {% else %}
-                              <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">
+                            {#{% else %}#}
+                            {#  <img src="{% static 'img/blank_avatar.png' %}" class="card-img" alt="applicant-picture">#}
                             {% endif %}
                           </div>
                           <div class="col-9">

@@ -173,7 +173,10 @@ def election_upload_application(request, pk, application_id=None):
 
 @management_login_required
 def election_delete_application(request, pk, application_id):
-    e = Election.objects.get(pk=pk)
+    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
+    if not e.exists():
+        raise Http404('Election does not exist')
+    e = e.first()
     try:
         a = e.applications.get(pk=application_id)
     except Application.DoesNotExist:

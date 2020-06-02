@@ -7,9 +7,9 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Wahlberechtigte hinzufügen</h4>
-          <span><b>Eine E-Mail Adresse pro Zeile</b> in das Feld eintragen.<br>
-            An diese Adressen wird nach abschicken dieses Formulars ein Zugangscode für diese Wahl geschickt.
+          <h4>Add Voters</h4>
+          <span>Enter <b>one email address per line</b> in the field below.<br>
+            These emails will receive an access code for this session after clicking "Submit".
           </span>
           <hr>
           <form class="user" action="{% url 'management:add_voters' session.pk %}" method="post">

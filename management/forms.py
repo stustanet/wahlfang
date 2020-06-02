@@ -94,10 +94,10 @@ class AddElectionForm(forms.ModelForm):
         fields = ('title', 'max_votes_yes', 'start_date', 'end_date', 'session')
 
         labels = {
-            'title': 'Name',
-            'max_votes_yes': 'Maximale Anzahl an JA Stimmen (optional)',
-            'start_date': 'Wahlbeginn (optional)',
-            'end_date': 'Wahlende (optional)',
+            'title': 'Election Name',
+            'max_votes_yes': 'Maximum number of YES votes (optional)',
+            'start_date': 'Start time (optional)',
+            'end_date': 'End time (optional)',
         }
 
     def clean(self):
@@ -153,7 +153,7 @@ class ApplicationUploadForm(forms.ModelForm):
 
 
 class AddVotersForm(forms.Form):
-    voters_list = forms.CharField(widget=forms.Textarea, label='E-Mail Adressen')  # explicitly no max_length here
+    voters_list = forms.CharField(widget=forms.Textarea, label='Emails')  # explicitly no max_length here
 
     def __init__(self, session, *args, **kwargs):
         super().__init__(*args, **kwargs)

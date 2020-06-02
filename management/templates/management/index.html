@@ -1,4 +1,5 @@
 {% extends 'management/base.html' %}
+{% load static %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -55,4 +56,10 @@
       </div>
     </div>
   {% endfor %}
+
+  <script src="{% static "js/jquery-3.4.1.slim.min.js" %}"
+          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
+  <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
+          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
 {% endblock %}
+

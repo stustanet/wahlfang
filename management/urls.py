@@ -12,6 +12,8 @@ urlpatterns = [
     path('meeting/<int:pk>', views.session_detail, name='session'),
     path('election/<int:pk>/add_application', views.election_upload_application, name='add_application'),
     path('election/<int:pk>/edit/<int:application_id>', views.election_upload_application, name='edit_application'),
+    path('election/<int:pk>/edit/<int:application_id>/delete_application', views.election_delete_application,
+         name='delete_application'),
     path('election/<int:pk>', views.election_detail, name='election'),
     path('election/<int:pk>/delete_voter', views.delete_voter, name='delete_voter'),
     path('election/<int:pk>/delete_election', views.delete_election, name='delete_election'),

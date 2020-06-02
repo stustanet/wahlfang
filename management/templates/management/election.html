@@ -79,12 +79,23 @@
                 <tr>
                   <th scope="row">{{ forloop.counter }}</th>
                   <td>{{ application.get_display_name }}</td>
-                  <td class="text-right">
+                  <td>
                     {% if election.can_apply %}
-                      <a class="btn btn-warning" role="button"
-                         href="{% url 'management:edit_application' pk=election.pk application_id=application.pk %}">
-                        Edit
-                      </a>
+                    <form action="{% url 'management:delete_application' pk=election.pk application_id=application.pk %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="close btn btn-danger col-3 float-right" aria-label="remove remove"
+                              title="Delete">
+                        &times;
+                      </button>
+                    </form>
+                    <form action="{% url 'management:edit_application' pk=election.pk application_id=application.pk %}" method="post">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="edit">
+                      <button type="submit" class="close btn btn-warning col-3 float-right"
+                              aria-label="edit application" title="Edit">
+                        ✎
+                      </button>
+                    </form>
                     {% endif %}
                   </td>
                 </tr>

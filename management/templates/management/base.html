@@ -18,7 +18,7 @@
 <div id="content">
   <nav class="navbar navbar-expand navbar-dark bg-dark shadow">
     <div class="container-md">
-      <a class="navbar-brand" href="{% url 'vote:index' %}">
+      <a class="navbar-brand" href="{% url 'management:index' %}">
         <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
       </a>
       <div class="navbar-text">Wahlfang</div>
@@ -29,7 +29,7 @@
         <ul class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'vote:logout' %}">Logout</a>
+              <a class="nav-link" href="{% url 'management:logout' %}">Logout</a>
             </li>
           {% endif %}
         </ul>

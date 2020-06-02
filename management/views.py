@@ -153,13 +153,13 @@ def election_upload_application(request, pk, application_id=None):
     else:
         instance = None
 
-    if request.POST:
+    if request.POST.get("action") == "edit":
+        form = ApplicationUploadForm(election, request, instance=instance)
+    else:
         form = ApplicationUploadForm(election, request, data=request.POST, files=request.FILES, instance=instance)
         if form.is_valid():
             form.save()
             return redirect('management:election', election.pk)
-    else:
-        form = ApplicationUploadForm(election, request, instance=instance)
 
     context = {
         'form': form,
@@ -169,6 +169,20 @@ def election_upload_application(request, pk, application_id=None):
         'with_description': False,
     }
     return render(request, template_name='management/application.html', context=context)
+
+
+@management_login_required
+def election_delete_application(request, pk, application_id):
+    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
+    if not e.exists():
+        raise Http404('Election does not exist')
+    e = e.first()
+    try:
+        a = e.applications.get(pk=application_id)
+    except Application.DoesNotExist:
+        raise Http404('Application does not exist')
+    a.delete()
+    return redirect('management:election', pk=pk)
 
 
 @management_login_required

@@ -18,7 +18,6 @@ from django.urls import reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -31,12 +30,11 @@ DEBUG = True
 if DEBUG:
     # will output to your console
     logging.basicConfig(
-        level = logging.DEBUG,
-        format = '%(asctime)s %(levelname)s %(message)s',
+        level=logging.DEBUG,
+        format='%(asctime)s %(levelname)s %(message)s',
     )
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -89,7 +87,6 @@ AUTHENTICATION_BACKENDS = {
 
 WSGI_APPLICATION = 'wahlfang.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -130,7 +127,6 @@ LOGIN_REDIRECT_URL = reverse_lazy('vote:index')
 
 RATELIMIT_KEY = 'ip'
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -143,7 +139,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -159,14 +154,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Content Security Policy
 # https://django-csp.readthedocs.io/en/latest/configuration.html#policy-settings
 CSP_DEFAULT_SRC = ("'self'",)
-CSP_IMG_SRC = ("'self'", "data:", )
+CSP_IMG_SRC = ("'self'", "data:",)
 
 # Mail
 
 EMAIL_HOST = 'mail.stusta.de'
 EMAIL_SENDER = 'vorstand@stustanet.de'
 EMAIL_PORT = 25
-
 
 # File upload, etc...
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

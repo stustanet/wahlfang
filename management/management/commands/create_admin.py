@@ -1,7 +1,6 @@
 from secrets import token_hex
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.core.validators import validate_email
@@ -20,7 +19,12 @@ class Command(BaseCommand):
         validate_email(email)
         domain = email.split('@')[1]
         if domain not in ['stusta.de', 'stusta.mhn.de', 'stustanet.de', 'stusta.net']:
-            raise ValidationError('Email must be a @stusta.de or @stusta.mhn.de email')
+            self.stdout.write(self.style.ERROR('Email must be a @stusta.de or @stusta.mhn.de email'))
+            return
+
+        if ElectionManager.objects.filter(email=email).exists():
+            self.stdout.write(self.style.ERROR('An election manager with this email already exists'))
+            return
 
         password = token_hex(12)
         manager = ElectionManager(email=email)

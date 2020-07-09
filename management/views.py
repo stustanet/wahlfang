@@ -53,7 +53,7 @@ def session_detail(request, pk=None):
     session = manager.sessions.get(id=pk)
     context = {
         'session': session,
-        'elections': session.elections.all(),
+        'elections': session.elections.order_by('-pk'),
         'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)

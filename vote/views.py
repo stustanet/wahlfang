@@ -62,7 +62,7 @@ def index(request):
     }
 
     context['elections'] = [
-        (e, voter.can_vote(e)) for e in voter.session.elections.all()
+        (e, voter.can_vote(e)) for e in voter.session.elections.order_by('-pk')
     ]
     # overview
     return render(request, template_name='vote/index.html', context=context)

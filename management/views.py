@@ -42,7 +42,7 @@ def index(request):
             return render(request, template_name='management/add_session.html', context={'form': form})
 
     context = {
-        'sessions': manager.sessions.all()
+        'sessions': manager.sessions.order_by('-pk')
     }
     return render(request, template_name='management/index.html', context=context)
 
@@ -53,7 +53,7 @@ def session_detail(request, pk=None):
     session = manager.sessions.get(id=pk)
     context = {
         'session': session,
-        'elections': session.elections.order_by('-pk'),
+        'elections': session.elections.order_by('pk'),
         'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)

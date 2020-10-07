@@ -172,7 +172,7 @@ class AddVotersForm(forms.Form):
         OpenVote.objects.bulk_create(open_votes)
 
         for voter, code in voters:
-            voter.send_invitation(code)
+            voter.send_invitation(code, self.session.managers.all().first().stusta_email)
 
         return voters
 

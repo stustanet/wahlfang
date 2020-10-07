@@ -3,13 +3,14 @@ from django.core.management.base import BaseCommand
 from vote.models import Voter
 
 
+# FIXME: TODO: THIS IS NOT WORKING ANYMORE, FIX
 class Command(BaseCommand):
     help = 'Reset Voter and resend invitation'
 
     def add_arguments(self, parser):
         parser.add_argument('--voter_id', type=int, required=True)
         parser.add_argument('--email', type=str)
-        parser.add_argument('--send_invitation', type=bool, default=True)
+        parser.add_argument('--send-invitation', type=bool, default=True)
 
     def handle(self, *args, **options):
         voter_id = options['voter_id']

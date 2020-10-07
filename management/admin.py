@@ -8,14 +8,14 @@ from management.models import ElectionManager
 class ElectionManagerCreateForm(UserCreationForm):
     class Meta:
         model = ElectionManager
-        fields = ('email', 'password')
+        fields = ('username', 'email', 'password')
         field_classes = {}
 
 
 class ElectionManagerChangeForm(UserChangeForm):
     class Meta:
         model = ElectionManager
-        fields = ('email',)
+        fields = ('username', 'email',)
         field_classes = {}
 
 
@@ -24,17 +24,17 @@ class ElectionManagerAdmin(UserAdmin):
     form = ElectionManagerChangeForm
     model = ElectionManager
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('username', 'email', 'password')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')}
+            'fields': ('username', 'email', 'password1', 'password2')}
          ),
     )
-    list_display = ('email',)
-    list_filter = ('email',)
-    ordering = ('email',)
+    list_display = ('username', 'email',)
+    list_filter = ('username', 'email',)
+    ordering = ('username', 'email',)
     filter_horizontal = tuple()
 
 

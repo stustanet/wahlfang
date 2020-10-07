@@ -12,9 +12,11 @@ class Command(BaseCommand):
     help = 'Create a new management login'
 
     def add_arguments(self, parser):
+        parser.add_argument('-u', '--username', type=str, required=True)
         parser.add_argument('-e', '--email', type=str, required=True)
 
     def handle(self, *args, **options):
+        username = options['username']
         email = options['email']
         validate_email(email)
         domain = email.split('@')[1]
@@ -27,14 +29,14 @@ class Command(BaseCommand):
             return
 
         password = token_hex(12)
-        manager = ElectionManager(email=email)
+        manager = ElectionManager(username=username, email=email)
         manager.set_password(password)
         send_mail(
             'Wahlleiter Login vote.stustanet.de',
             f'Für dich wurde ein Wahlleiterlogin auf vote.stustanet.de angelegt.\n'
             f'Du kannst dich unter https://vote.stustanet.de/management mit den '
             f'folgenden Daten einloggen:\n\n'
-            f'Benutzername: {email}\n'
+            f'Benutzername: {username}\n'
             f'Passwort: {password}',
             settings.EMAIL_SENDER,
             [email],
@@ -42,4 +44,4 @@ class Command(BaseCommand):
         )
         manager.save()
         self.stdout.write(self.style.SUCCESS(
-            f'Successfully created management login with email {email}, password: {password}'))
+            f'Successfully created management login with username {username}, email {email}, password: {password}'))

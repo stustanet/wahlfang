@@ -8,9 +8,8 @@ class Command(BaseCommand):
     help = 'Creates a new Voter'
 
     def add_arguments(self, parser):
-        parser.add_argument('--session_id', type=int, required=True)
-        parser.add_argument('--voter_id', type=int, required=True)
-        parser.add_argument('--no_invitation', default=False, action='store_true')
+        parser.add_argument('--session-id', type=int, required=True)
+        parser.add_argument('--no-invitation', default=False, action='store_true')
 
         # Make things a little bit easier for dev and debugging convenience
         if settings.DEBUG:
@@ -22,10 +21,9 @@ class Command(BaseCommand):
         session = Session.objects.get(pk=options['session_id'])
 
         voter, access_code = Voter.from_data(
-            voter_id=options['voter_id'],
             email=options['email'],
             session=session,
         )
         if not options['no_invitation']:
-            voter.send_invitation(access_code)
+            voter.send_invitation(access_code, session.managers.all().first().stusta_email)
         self.stdout.write(self.style.SUCCESS('Successfully created voter "%s"\nAccess Code: %s' % (voter, access_code)))

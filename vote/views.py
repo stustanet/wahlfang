@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
@@ -24,7 +25,7 @@ class LoginView(auth_views.LoginView):
             return redirect('vote:index')
         return super().get(request, *args, **kwargs)
 
-    @ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST')
+    @method_decorator(ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST'))
     def post(self, request, *args, **kwargs):
         ratelimited = getattr(request, 'limited', False)
         if ratelimited:
@@ -59,11 +60,11 @@ def index(request):
         'title': voter.session.title,
         'meeting_link': voter.session.meeting_link,
         'voter': voter,
+        'elections': [
+            (e, voter.can_vote(e)) for e in voter.session.elections.order_by('pk')
+        ]
     }
 
-    context['elections'] = [
-        (e, voter.can_vote(e)) for e in voter.session.elections.order_by('pk')
-    ]
     # overview
     return render(request, template_name='vote/index.html', context=context)
 

@@ -247,7 +247,7 @@ class Voter(models.Model):
     def get_username(self):
         return str(self)
 
-    def send_invitation(self, access_code):
+    def send_invitation(self, access_code: str, from_email: str):
         subject = f'Einladung {self.session.title}'
         context = {
             'voter': self,
@@ -261,7 +261,7 @@ class Voter(models.Model):
         self.email_user(
             subject=subject,
             message=strip_tags(body_html),
-            from_email=self.session.managers.all().first().email,
+            from_email=from_email,
             html_message=body_html.replace('\n', '<br/>'),
             fail_silently=True
         )

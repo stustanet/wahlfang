@@ -14,7 +14,9 @@ import logging
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import ldap
 from django.urls import reverse_lazy
+from django_auth_ldap.config import LDAPSearch
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -161,7 +163,15 @@ CSP_IMG_SRC = ("'self'", "data:",)
 EMAIL_HOST = 'mail.stusta.de'
 EMAIL_SENDER = 'vorstand@stustanet.de'
 EMAIL_PORT = 25
+VALID_STUSTA_EMAIL_SUFFIXES = [
+    'stusta.de', 'stustanet.de', 'stusta.mhn.de', 'stusta.net', 'stusta.sexy', 'stusta.party', 'stusta.io'
+]
 
 # File upload, etc...
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# LDAP
+AUTH_LDAP_SERVER_URI = "ldap://ldap.stusta.de"
+AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=account,ou=pnyx,dc=stusta,dc=mhn,dc=de"
+AUTH_LDAP_START_TLS = True

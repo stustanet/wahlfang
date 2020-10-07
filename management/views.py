@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from ratelimit.decorators import ratelimit
 
@@ -21,7 +22,7 @@ class LoginView(auth_views.LoginView):
     # https://docs.djangoproject.com/en/3.0/topics/auth/default/#django.contrib.auth.views.LoginView
     template_name = 'management/login.html'
 
-    @ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST')
+    @method_decorator(ratelimit(key=settings.RATELIMIT_KEY, rate='10/h', method='POST'))
     def post(self, request, *args, **kwargs):
         ratelimited = getattr(request, 'limited', False)
         if ratelimited:

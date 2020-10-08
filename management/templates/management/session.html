@@ -51,7 +51,7 @@
             <a class="btn btn-success d-inline float-right ml-2"
                href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
           </h4>
-          <hr>
+          <br>
           <table class="table">
             <thead>
             <tr>
@@ -62,7 +62,7 @@
             <tbody>
             {% for voter in voters %}
               <tr>
-                <td class="{% if voter.logged_in %}text-success{% endif %}">{{ voter.email }}</td>
+                <td class="{% if voter.logged_in %}text-success{% endif %}"> {{ voter }}</td>
                 <td class="text-right">
                   <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
                     {% csrf_token %}
@@ -75,6 +75,8 @@
             {% endfor %}
             </tbody>
           </table>
+          <a class="btn btn-dark d-inline float-left ml-2"
+             href="{% url 'management:print_token' session.pk %}">Print Tokens</a>
         </div>
       </div>
     </div>

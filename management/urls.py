@@ -18,6 +18,7 @@ urlpatterns = [
     path('election/<int:pk>/delete_voter', views.delete_voter, name='delete_voter'),
     path('election/<int:pk>/delete_election', views.delete_election, name='delete_election'),
     path('meeting/<int:pk>/delete_session', views.delete_session, name='delete_session'),
+    path('meeting/<int:pk>/print_token', views.print_token, name='print_token'),
 
     # account management stuff
     path('login', views.LoginView.as_view(), name='login'),

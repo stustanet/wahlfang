@@ -13,7 +13,7 @@ class StartElectionForm(forms.ModelForm):
 
     class Meta:
         model = Election
-        fields = []
+        fields: List[str] = []
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -28,7 +28,7 @@ class StartElectionForm(forms.ModelForm):
 class StopElectionForm(forms.ModelForm):
     class Meta:
         model = Election
-        fields = []
+        fields: List[str] = []
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -55,7 +55,8 @@ class AddSessionForm(forms.ModelForm):
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00'})
-        self.fields['meeting_link'].widget = forms.TextInput(attrs={'placeholder': 'e.g. https://bbb.stusta.de/b/ssn-abc-123'})
+        self.fields['meeting_link'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g. https://bbb.stusta.de/b/ssn-abc-123'})
         self.user = user
         self.request = request
 

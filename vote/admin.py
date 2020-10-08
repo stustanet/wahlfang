@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
 
-from .models import Election
 from .models import Application
+from .models import Election
 from .models import Voter
 
 
@@ -35,7 +35,7 @@ class VoterAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': ('voter_id', 'password1', 'password2', 'session')}
-        ),
+         ),
         (_('Personal info'), {'fields': ('email',)}),
     )
     list_display = ('voter_id', 'session',)

@@ -71,7 +71,7 @@ def add_election(request, pk=None):
     form = AddElectionForm(session=session, user=manager, data=request.POST if request.POST else None)
     context['form'] = form
     if request.POST and form.is_valid():
-        elect = form.save()
+        form.save()
         return redirect('management:session', pk=session.pk)
 
     return render(request, template_name='management/add_election.html', context=context)

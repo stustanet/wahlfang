@@ -14,9 +14,7 @@ import logging
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import ldap
 from django.urls import reverse_lazy
-from django_auth_ldap.config import LDAPSearch
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -36,7 +34,7 @@ if DEBUG:
         format='%(asctime)s %(levelname)s %(message)s',
     )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -84,6 +82,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = {
     'vote.authentication.AccessCodeBackend',
     'management.authentication.ManagementBackend',
+    'management.authentication.ManagementBackendLDAP',
     'django.contrib.auth.backends.ModelBackend'
 }
 

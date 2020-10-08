@@ -1,0 +1,3 @@
+[bandit]
+exclude: /.venv/,*_test.py,/tests/,/venv/
+skips: B108

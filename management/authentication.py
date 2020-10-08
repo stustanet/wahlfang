@@ -20,27 +20,27 @@ def management_login_required(function=None, redirect_field_name=REDIRECT_FIELD_
         return actual_decorator(function)
     return actual_decorator
 
-#
-# class ManagementBackend(BaseBackend):
-#     def authenticate(self, request, username=None, password=None):
-#         if username is None or password is None:
-#             return
-#
-#         try:
-#             user = ElectionManager.objects.get(email=username)
-#         except ElectionManager.DoesNotExist:
-#             # Run the default password hasher once to reduce the timing
-#             # difference between an existing and a nonexistent user (#20760).
-#             ElectionManager().set_password(password)
-#         else:
-#             if user.check_password(password):
-#                 user.backend = 'management.authentication.ManagementBackend'
-#                 return user
-#
-#     def get_user(self, user_id):
-#         return ElectionManager.objects.filter(pk=user_id).first()
+
+class ManagementBackend(BaseBackend):
+    def authenticate(self, request, username=None, password=None):
+        if username is None or password is None:
+            return
+
+        try:
+            user = ElectionManager.objects.get(username=username)
+        except ElectionManager.DoesNotExist:
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a nonexistent user (#20760).
+            ElectionManager().set_password(password)
+        else:
+            if user.check_password(password):
+                user.backend = 'management.authentication.ManagementBackend'
+                return user
+
+    def get_user(self, user_id):
+        return ElectionManager.objects.filter(pk=user_id).first()
 
 
-class ManagementBackend(LDAPBackend):
+class ManagementBackendLDAP(LDAPBackend):
     def get_user_model(self):
         return ElectionManager

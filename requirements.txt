@@ -5,3 +5,6 @@ django-crispy-forms==1.9.*
 django-csp==3.7.*
 django-ratelimit==3.0.*
 django-auth-ldap==2.2.*
+qrcode==6.1
+Pillow==7.1.*
+latex==0.7.*

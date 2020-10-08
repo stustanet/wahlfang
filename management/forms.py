@@ -154,7 +154,8 @@ class ApplicationUploadForm(forms.ModelForm):
 
 
 class AddVotersForm(forms.Form):
-    voters_list = forms.CharField(widget=forms.Textarea, label='Emails')  # explicitly no max_length here
+    voters_list = forms.CharField(widget=forms.Textarea, label='Emails', required=False)  # explicitly no max_length here
+    nr_anonymous_voters = forms.IntegerField(min_value=0, max_value=50, required=False, label="Anonymous Voters")
 
     def __init__(self, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -164,11 +165,14 @@ class AddVotersForm(forms.Form):
         voters = [
             Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['email_list']
         ]
+        anonymous_voters = [
+            Voter.from_data(session=self.session) for _ in range(self.cleaned_data['nr_anonymous_voters'])
+        ]
 
         open_votes = []
         for election in self.session.elections.all():
             if not election.closed:
-                open_votes += [OpenVote(election=election, voter=v) for v, _ in voters]
+                open_votes += [OpenVote(election=election, voter=v) for v, _ in voters+anonymous_voters]
 
         OpenVote.objects.bulk_create(open_votes)
 

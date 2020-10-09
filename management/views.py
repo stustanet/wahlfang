@@ -18,7 +18,7 @@ from ratelimit.decorators import ratelimit
 
 from management.authentication import management_login_required
 from management.forms import StartElectionForm, AddElectionForm, AddSessionForm, AddVotersForm, ApplicationUploadForm, \
-    StopElectionForm, ChangeElectionPublicStateForm
+    StopElectionForm, ChangeElectionPublicStateForm, AddTokensForm
 from vote.models import Election, Application, Voter
 
 logger = logging.getLogger('management.view')
@@ -99,6 +99,23 @@ def add_voters(request, pk):
         return redirect('management:session', pk=pk)
 
     return render(request, template_name='management/add_voters.html', context=context)
+
+
+@management_login_required
+def add_tokens(request, pk):
+    manager = request.user
+    session = manager.sessions.get(pk=pk)
+    context = {
+        'session': session,
+        'form': AddTokensForm(session=session)
+    }
+    form = AddTokensForm(session=session, data=request.POST if request.POST else None)
+    context['form'] = form
+    if request.POST and form.is_valid():
+        form.save()
+        return redirect('management:session', pk=pk)
+
+    return render(request, template_name='management/add_tokens.html', context=context)
 
 
 def _unpack(request, pk):
@@ -227,6 +244,7 @@ def delete_session(request, pk):
     s.delete()
     return redirect('management:index')
 
+
 @management_login_required
 def print_token(request, pk):
     session = request.user.sessions.filter(pk=pk)
@@ -257,6 +275,7 @@ def print_token(request, pk):
     response['Content-Disposition'] = 'attachment; filename="tokenlist.pdf"'
     response.write(bytes(pdf))
     return response
+
 
 def generate_pdf(template_name: str, context: Dict, tex_path: str):
     template = get_template(template_name).render(context).encode('utf8')

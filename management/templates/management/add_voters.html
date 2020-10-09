@@ -9,9 +9,7 @@
         <div class="card-body">
           <h4>Add Voters</h4>
           <span>Enter <b>one email address per line</b> in the field below.<br>
-            These emails will receive an access code for this session after clicking "Submit".<br><br>
-            You can also add anonymous voters where the email addresses are not known. Access tokens for anonymous
-            voters can be printed in the session view later on.
+            These emails will receive an access code for this session after clicking "Submit".
           </span>
           <hr>
           <form class="user" action="{% url 'management:add_voters' session.pk %}" method="post">

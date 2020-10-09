@@ -79,6 +79,7 @@ class AddSessionForm(forms.ModelForm):
 
 
 class AddElectionForm(forms.ModelForm):
+    max_votes_yes = forms.IntegerField(min_value=1, required=False, label='Maximum number of YES votes (optional)')
     def __init__(self, user, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['session'].disabled = True
@@ -92,11 +93,10 @@ class AddElectionForm(forms.ModelForm):
 
     class Meta:
         model = Election
-        fields = ('title', 'max_votes_yes', 'start_date', 'end_date', 'session')
+        fields = ('title', 'start_date', 'end_date', 'session')
 
         labels = {
             'title': 'Election Name',
-            'max_votes_yes': 'Maximum number of YES votes (optional)',
             'start_date': 'Start time (optional)',
             'end_date': 'End time (optional)',
         }
@@ -188,3 +188,25 @@ class AddVotersForm(forms.Form):
             raise forms.ValidationError('duplicate email address')
 
         self.cleaned_data['email_list'] = emails
+
+
+class AddTokensForm(forms.Form):
+    nr_anonymous_voters = forms.IntegerField(min_value=1, max_value=50, label='Number of Tokens:')
+
+    def __init__(self, session, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.session = session
+
+    def save(self) -> List[Tuple[Voter, str]]:
+        anonymous_voters = [
+            Voter.from_data(session=self.session) for _ in range(self.cleaned_data['nr_anonymous_voters'])
+        ]
+
+        open_votes = []
+        for election in self.session.elections.all():
+            if not election.closed:
+                open_votes += [OpenVote(election=election, voter=v) for v, _ in anonymous_voters]
+
+        OpenVote.objects.bulk_create(open_votes)
+
+        return anonymous_voters

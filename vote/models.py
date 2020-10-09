@@ -146,7 +146,7 @@ class Election(models.Model):
 class Voter(models.Model):
     voter_id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=256)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
     session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
     logged_in = models.BooleanField(default=False)
 
@@ -160,7 +160,10 @@ class Voter(models.Model):
         unique_together = ('session', 'email')
 
     def __str__(self):
-        return self.email
+        if self.email is None:
+            return f'anonymous-{self.pk}'
+        else:
+            return self.email
 
     def save(self, *args, **kwargs):
         fields = kwargs.pop('update_fields', [])
@@ -188,7 +191,7 @@ class Voter(models.Model):
             self.set_password(raw_password)
             # Password hash upgrades shouldn't be considered password changes.
             self._password = None
-            self.save(update_fields=["password"])
+            self.save(update_fields=['password'])
 
         return check_password(raw_password, self.password, setter)
 
@@ -221,7 +224,8 @@ class Voter(models.Model):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+        if self.email is not None:
+            send_mail(subject, message, from_email, [self.email], **kwargs)
 
     @property
     def is_authenticated(self):
@@ -241,6 +245,10 @@ class Voter(models.Model):
     @property
     def is_staff(self):
         return False
+
+    @property
+    def is_anonymous(self):
+        return self.email is None
 
     def has_module_perms(self, app_label):
         return False
@@ -291,7 +299,7 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, session, email):
+    def from_data(cls, session, email=None):
         voter = Voter(
             session=session,
             email=email,
@@ -301,10 +309,16 @@ class Voter(models.Model):
 
         return voter, cls.get_access_code(voter.voter_id, password)
 
+    def new_access_token(self):
+        password = self.set_password()
+        self.save()
+        return self.get_access_code(self, password)
+
+
 
 def avatar_file_name(instance, filename):
     ext = filename.split('.')[-1]
-    return os.path.join('avatars', str(uuid.uuid4()) + "." + ext)
+    return os.path.join('avatars', str(uuid.uuid4()) + '.' + ext)
 
 
 class Application(models.Model):
@@ -358,7 +372,7 @@ class Application(models.Model):
             output = BytesIO()
             img.save(output, format='JPEG', quality=95)
             output.seek(0)
-            self.avatar = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.avatar.name.split('.')[0],
+            self.avatar = InMemoryUploadedFile(output, 'ImageField', '%s.jpg' % self.avatar.name.split('.')[0],
                                                'image/jpeg', sys.getsizeof(output), None)
             self._old_avatar = self.avatar
 

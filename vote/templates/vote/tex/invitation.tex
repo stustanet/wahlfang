@@ -1,0 +1,61 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[
+	colorlinks=false,
+]{hyperref}
+
+\title{\vspace{-3.5cm}Invitation to Participate in an Online Election}
+\author{}
+\date{}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{pifont}
+\usepackage{lipsum}
+\usepackage[a4paper, left=3cm, right=3cm, bottom=2.5cm, top=3cm]{geometry}
+
+\pagenumbering{gobble}
+\newcommand{\cuthere}{%
+\noindent
+\raisebox{-2.8pt}[0pt][0.75\baselineskip]{\small\ding{34}}
+\unskip{\tiny\dotfill}
+}
+
+\begin{document}
+
+{% for token in tokens %}
+    {% if forloop.counter0|divisibleby:2 == 0 %}
+        \cuthere
+        \vspace{1cm}
+    {% endif %}
+
+    \section*{Invitation to Participate in an Online Election}
+    \noindent You have been in invited to attend the following online election session:\\\\
+    Title: {{session.title}}\\
+    {% if session.meeting_link %}
+        Meeting room link: {{ session.meeting_link}}\\
+    {% endif %}%
+    {% if session.start_date %}
+        Start date: {{session.start_date}}\\
+    {% endif %}%
+    Access token: {{token.token}}\\
+
+    \noindent Access to the election session can be gained by either entering the access token
+    in \url{https://vote.stustanet.de} or by scanning the following QR-Code:
+    \begin{center}
+        \includegraphics[scale=0.3]{{'{'}}{{token.path}}{{'}'}}
+    \end{center}
+
+    \noindent Wahlfang is an open source online voting system developed and hosted by StuStaNet. If you have any questions
+    or want to help expanding the feature set feel free to contact us: \texttt{admins@stusta.de}\\
+
+    {% if forloop.counter0|divisibleby:2 == 0 %}
+        \pagebreak
+    {% else %}
+        \vspace{0.5cm}
+    {% endif %}
+
+{% endfor %}
+
+
+\end{document}

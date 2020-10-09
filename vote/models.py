@@ -161,7 +161,7 @@ class Voter(models.Model):
 
     def __str__(self):
         if self.email is None:
-            return f"anonymous-{self.pk}"
+            return f'anonymous-{self.pk}'
         else:
             return self.email
 
@@ -191,7 +191,7 @@ class Voter(models.Model):
             self.set_password(raw_password)
             # Password hash upgrades shouldn't be considered password changes.
             self._password = None
-            self.save(update_fields=["password"])
+            self.save(update_fields=['password'])
 
         return check_password(raw_password, self.password, setter)
 
@@ -318,7 +318,7 @@ class Voter(models.Model):
 
 def avatar_file_name(instance, filename):
     ext = filename.split('.')[-1]
-    return os.path.join('avatars', str(uuid.uuid4()) + "." + ext)
+    return os.path.join('avatars', str(uuid.uuid4()) + '.' + ext)
 
 
 class Application(models.Model):
@@ -372,7 +372,7 @@ class Application(models.Model):
             output = BytesIO()
             img.save(output, format='JPEG', quality=95)
             output.seek(0)
-            self.avatar = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.avatar.name.split('.')[0],
+            self.avatar = InMemoryUploadedFile(output, 'ImageField', '%s.jpg' % self.avatar.name.split('.')[0],
                                                'image/jpeg', sys.getsizeof(output), None)
             self._old_avatar = self.avatar
 

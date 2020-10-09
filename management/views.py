@@ -139,21 +139,21 @@ def election_detail(request, pk):
         'election_upload_application_form': ChangeElectionPublicStateForm(instance=election)
     }
 
-    if request.POST and request.POST.get('action') == "close" and election.is_open:
+    if request.POST and request.POST.get('action') == 'close' and election.is_open:
         form = StopElectionForm(instance=election, data=request.POST)
         if form.is_valid():
             form.save()
         else:
             context['stop_election_form'] = form
 
-    if request.POST and request.POST.get('action') == "open":
+    if request.POST and request.POST.get('action') == 'open':
         form = StartElectionForm(instance=election, data=request.POST)
         if form.is_valid():
             form.save()
         else:
             context['start_election_form'] = form
 
-    if request.POST and request.POST.get('action') == "publish":
+    if request.POST and request.POST.get('action') == 'publish':
         form = ChangeElectionPublicStateForm(instance=election, data=request.POST)
         if form.is_valid():
             form.save()
@@ -174,11 +174,11 @@ def election_upload_application(request, pk, application_id=None):
         try:
             instance = election.applications.get(pk=application_id)
         except Application.DoesNotExist:
-            raise Http404("Application does not exist")
+            raise Http404('Application does not exist')
     else:
         instance = None
 
-    if request.POST.get("action") == "edit":
+    if request.POST.get('action') == 'edit':
         form = ApplicationUploadForm(election, request, instance=instance)
     else:
         form = ApplicationUploadForm(election, request, data=request.POST, files=request.FILES, instance=instance)
@@ -256,17 +256,17 @@ def print_token(request, pk):
 
     img = [qrcode.make('https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}))
            for access_code in tokens]
-    tmp_qr_path = "/tmp/wahlfang/qr_codes/session_{}".format(session.pk)
+    tmp_qr_path = '/tmp/wahlfang/qr_codes/session_{}'.format(session.pk)
     Path(tmp_qr_path).mkdir(parents=True, exist_ok=True)
     paths = []
     for idx, i in enumerate(img):
-        path_i = os.path.join(tmp_qr_path, "qr_{}.png".format(idx))
+        path_i = os.path.join(tmp_qr_path, 'qr_{}.png'.format(idx))
         i.save(path_i)
         paths.append(path_i)
     zipped = [{'path': path, 'token': token} for path, token in zip(paths, tokens)]
     context = {
-        "session": session,
-        "tokens": zipped
+        'session': session,
+        'tokens': zipped
     }
 
     template_name = 'vote/tex/invitation.tex'

@@ -79,6 +79,7 @@ class AddSessionForm(forms.ModelForm):
 
 
 class AddElectionForm(forms.ModelForm):
+    max_votes_yes = forms.IntegerField(min_value=1, required=False, label='Maximum number of YES votes (optional)')
     def __init__(self, user, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['session'].disabled = True
@@ -92,11 +93,10 @@ class AddElectionForm(forms.ModelForm):
 
     class Meta:
         model = Election
-        fields = ('title', 'max_votes_yes', 'start_date', 'end_date', 'session')
+        fields = ('title', 'start_date', 'end_date', 'session')
 
         labels = {
             'title': 'Election Name',
-            'max_votes_yes': 'Maximum number of YES votes (optional)',
             'start_date': 'Start time (optional)',
             'end_date': 'End time (optional)',
         }
@@ -191,7 +191,7 @@ class AddVotersForm(forms.Form):
 
 
 class AddTokensForm(forms.Form):
-    nr_anonymous_voters = forms.IntegerField(min_value=1, max_value=50, label="Number of Tokens:")
+    nr_anonymous_voters = forms.IntegerField(min_value=1, max_value=50, label='Number of Tokens:')
 
     def __init__(self, session, *args, **kwargs):
         super().__init__(*args, **kwargs)

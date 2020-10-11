@@ -87,24 +87,24 @@
                 <small class="text-muted">Up to {{ max_votes_yes }} applicants will be elected.</small>
               {% endif %}
               <div class="mt-3">
-              <div class="row row-cols-1 row-cols-md-2 vote-list">
-                {% for application in election.applications|shuffle %}
-                  <div class="col mb-2">
-                    <div class="applicant">
-                      {% if application.avatar %}
-                        <img src="{{ application.avatar.url }}" class="applicant-picture" alt="applicant-picture">
-                        {#                    {% else %}#}
-                        {#                      <img src="{% static 'img/blank_avatar.png' %}" class="applicant-picture"#}
-                        {#                           alt="applicant-picture">#}
-                      {% endif %}
-                      <h6>{% applicant_name application %}</h6>
-                      <p class="description">{{ application.text|escape }}</p>
+                <div class="row row-cols-1 row-cols-md-2 vote-list">
+                  {% for application in election.applications|shuffle %}
+                    <div class="col mb-2">
+                      <div class="applicant">
+                        {% if application.avatar %}
+                          <img src="{{ application.avatar.url }}" class="applicant-picture" alt="applicant-picture">
+                          {#                    {% else %}#}
+                          {#                      <img src="{% static 'img/blank_avatar.png' %}" class="applicant-picture"#}
+                          {#                           alt="applicant-picture">#}
+                        {% endif %}
+                        <h6>{% applicant_name application %}</h6>
+                        <p class="description">{{ application.text|escape }}</p>
+                      </div>
                     </div>
-                  </div>
-                {% endfor %}
+                  {% endfor %}
+                </div>
               </div>
             {% endif %}
-            </div>
           </div>
         </div>
       {% endfor %}

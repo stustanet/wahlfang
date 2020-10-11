@@ -20,7 +20,7 @@ class Command(BaseCommand):
         if not voter.check_password(password):
             raise CommandError("incorrect access_code")
 
-        password = voter.set_unusable_password()
+        voter.set_unusable_password()
         voter.save()
 
         if voter.has_usable_password():

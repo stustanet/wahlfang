@@ -93,12 +93,13 @@ class AddElectionForm(forms.ModelForm):
 
     class Meta:
         model = Election
-        fields = ('title', 'start_date', 'end_date', 'session')
+        fields = ('title', 'voters_self_apply', 'start_date', 'end_date', 'session')
 
         labels = {
             'title': 'Election Name',
             'start_date': 'Start time (optional)',
             'end_date': 'End time (optional)',
+            'voters_self_apply': 'Voters can apply for the election'
         }
 
     def clean(self):

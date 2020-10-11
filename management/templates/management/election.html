@@ -81,21 +81,20 @@
                   <td>{{ application.get_display_name }}</td>
                   <td>
                     {% if election.can_apply %}
-                    <form action="{% url 'management:delete_application' pk=election.pk application_id=application.pk %}" method="post">
-                      {% csrf_token %}
-                      <button type="submit" class="close btn btn-danger col-3 float-right" aria-label="remove remove"
-                              title="Delete">
-                        &times;
-                      </button>
-                    </form>
-                    <form action="{% url 'management:edit_application' pk=election.pk application_id=application.pk %}" method="post">
-                      {% csrf_token %}
-                      <input type="hidden" name="action" value="edit">
-                      <button type="submit" class="close btn btn-warning col-3 float-right"
-                              aria-label="edit application" title="Edit">
-                        ✎
-                      </button>
-                    </form>
+                      <form
+                          action="{% url 'management:delete_application' pk=election.pk application_id=application.pk %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="close btn btn-danger col-3 float-right" aria-label="remove remove"
+                                title="Delete">
+                          &times;
+                        </button>
+                      </form>
+                      {% if not application.voter %}
+                        <a class="myclose btn btn-warning col-3 float-right" role="button"
+                           href="{% url 'management:edit_application' pk=election.pk application_id=application.pk %}">
+                          ✎ </a>
+                      {% endif %}
                     {% endif %}
                   </td>
                 </tr>

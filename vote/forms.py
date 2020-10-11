@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
+from management.forms import ApplicationUploadForm
 from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
 
 
@@ -121,3 +122,14 @@ class VoteForm(forms.Form):
                 can_vote.delete()
 
         return votes
+
+
+class ApplicationUploadFormUser(ApplicationUploadForm):
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.voter = self.request.user
+
+        if commit:
+            instance.save()
+
+        return instance

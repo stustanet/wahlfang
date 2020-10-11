@@ -25,3 +25,12 @@
 #content {
     height: 100%
 }
+
+.myclose {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}

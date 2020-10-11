@@ -14,10 +14,20 @@
           {% endif %}
         </div>
       </div>
-      {% for election, can_vote in elections %}
+      {% for election, can_vote, edit in elections %}
         <div class="card shadow mb-2">
           <div class="card-body">
-            <h4 class="mb-0">{{ election.title }}</h4>
+            <h4 class="mb-0">{{ election.title }}
+              {% if not electon.started and not election.is_open and not election.closed and election.voters_self_apply %}
+                {% if edit %}
+                  <a class="btn btn-danger float-right ml-3"
+                     href="{% url 'vote:delete_own_application' election.pk %}"> Delete application </a>
+                {% endif %}
+                <a class="btn btn-dark float-right"
+                   href="{% url 'vote:apply' election.pk %}"> {% if edit %} Edit application {% else %}
+                  Apply {% endif %}</a>
+              {% endif %}
+            </h4>
             {% if election.end_date %}
               <small class="text-muted">Voting Period: {{ election.start_date|date:"D Y-m-d H:i:s" }}
                 - {{ election.end_date|date:"D Y-m-d H:i:s" }} (UTC{{ election.end_date|date:"O" }})</small>

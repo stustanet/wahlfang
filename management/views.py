@@ -7,11 +7,11 @@ import qrcode
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
-from django.http import Http404, FileResponse, HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
-from django.utils.decorators import method_decorator
 from django.template.loader import get_template
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from latex.build import PdfLatexBuilder
 from ratelimit.decorators import ratelimit
@@ -178,7 +178,7 @@ def election_upload_application(request, pk, application_id=None):
     else:
         instance = None
 
-    if request.POST.get('action') == 'edit':
+    if request.method == 'GET':
         form = ApplicationUploadForm(election, request, instance=instance)
     else:
         form = ApplicationUploadForm(election, request, data=request.POST, files=request.FILES, instance=instance)
@@ -253,6 +253,9 @@ def print_token(request, pk):
     session = session.first()
     participants = session.participants
     tokens = [participant.new_access_token() for participant in participants.all() if participant.is_anonymous]
+    if len(tokens) == 0:
+        messages.add_message(request, messages.ERROR, 'No tokens have yet been generated.')
+        return redirect('management:session', pk=session.pk)
 
     img = [qrcode.make('https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}))
            for access_code in tokens]

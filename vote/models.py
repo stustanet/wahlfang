@@ -78,6 +78,7 @@ class Election(models.Model):
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
     result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'fully published')],
                                         default='0')
+    voters_self_apply = models.BooleanField(default=False, blank=False, null=False)
 
     @property
     def started(self):
@@ -327,8 +328,12 @@ class Application(models.Model):
     election = models.ForeignKey(Election, related_name='application', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=256)
     email = models.EmailField(null=True, blank=True)
+    voter = models.ForeignKey(Voter, related_name="application", null=True, blank=True, on_delete=models.CASCADE)
 
     _old_avatar = None
+
+    class Meta:
+        unique_together = ('voter', 'election')
 
     def __init__(self, *args, **kwargs):
         super(Application, self).__init__(*args, **kwargs)

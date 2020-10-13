@@ -1,0 +1,36 @@
+{% extends 'vote/base.html' %}
+{% load static %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header  bg-dark text-light">
+          <h3 class="d-inline">Help Page</h3>
+        </div>
+        <div class="card-body">
+          {# todo fill in help text #}
+          <h4>Voter</h4>
+          {# Fill in information on how to vote and how votes are counted (abstention)#}
+          <p>{% lorem %}</p>
+
+          <h4>Manager</h4>
+          {# Fill in information on how to use the management page #}
+          {# * Reverence with link to the management site #}
+          {# * Explain (maybe with screenshots) how stustanet members can generate a password for wahlfang on their #}
+          {#   accounts website #}
+          {# * Explain how one can create an election and what the fields mean #}
+          {# * Explain how one can add voters (email, anonymous and csv file) #}
+          <p>{% lorem %}</p>
+          <figure>
+            <img src="{% static 'img/example.png' %}" alt="Example" class="pic">
+            <figcaption>Example screenshot with caption.</figcaption>
+          </figure>
+          <p>{% lorem %}</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -18,7 +18,7 @@ from ratelimit.decorators import ratelimit
 
 from management.authentication import management_login_required
 from management.forms import StartElectionForm, AddElectionForm, AddSessionForm, AddVotersForm, ApplicationUploadForm, \
-    StopElectionForm, ChangeElectionPublicStateForm, AddTokensForm
+    StopElectionForm, ChangeElectionPublicStateForm, AddTokensForm, CSVUploaderForm
 from vote.models import Election, Application, Voter
 
 logger = logging.getLogger('management.view')
@@ -284,3 +284,20 @@ def generate_pdf(template_name: str, context: Dict, tex_path: str):
     template = get_template(template_name).render(context).encode('utf8')
     pdf = PdfLatexBuilder(pdflatex='pdflatex').build_pdf(template, texinputs=[tex_path, ''])
     return pdf
+
+
+@management_login_required
+def import_csv(request, pk):
+    session = request.user.sessions.filter(pk=pk)
+    if not session.exists():
+        raise Http404('Session does not exist')
+    session = session.first()
+
+    if request.method == 'POST':
+        form = CSVUploaderForm(session, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('management:session', session.pk)
+    else:
+        form = CSVUploaderForm(session)
+    return render(request, 'management/import_csv.html', {'form': form, 'session': session})

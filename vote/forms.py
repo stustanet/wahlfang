@@ -125,9 +125,19 @@ class VoteForm(forms.Form):
 
 
 class ApplicationUploadFormUser(ApplicationUploadForm):
+    def __init__(self, election, request, *args, **kwargs):
+        super().__init__(election, request, *args, **kwargs)
+        if self.request.user.name:
+            # these rules are meant for the StuStaNet Hausadmin election
+            self.fields['display_name'].initial = self.request.user.name
+            self.fields['display_name'].disabled = True
+            self.fields['email'].required = True
+        self.fields['email'].initial = self.request.user.email
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.voter = self.request.user
+        instance.election = self.election
 
         if commit:
             instance.save()

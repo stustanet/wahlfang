@@ -150,6 +150,7 @@ class Voter(models.Model):
     email = models.EmailField(null=True, blank=True)
     session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
     logged_in = models.BooleanField(default=False)
+    name = models.CharField(max_length=256, blank=True, null=True)
 
     # Stores the raw password if set_password() is called so that it can
     # be passed to password_changed() after the model is saved.
@@ -300,10 +301,11 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, session, email=None):
+    def from_data(cls, session, email=None, name=None):
         voter = Voter(
             session=session,
             email=email,
+            name=name,
         )
         password = voter.set_password()
         voter.save()

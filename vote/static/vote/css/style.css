@@ -130,3 +130,7 @@ table.vote-list .applicant .card-body {
     -moz-appearance: none;
     appearance: none;
 }
+
+.pic {
+    width: 100%;
+}

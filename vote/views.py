@@ -148,3 +148,7 @@ def delete_own_application(request, election_id):
         return redirect('vote:index')
     else:
         raise Http404('Application does not exist')
+
+
+def help(request):
+    return render(request, template_name='vote/help.html')

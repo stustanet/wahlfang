@@ -108,8 +108,9 @@ def apply(request, election_id):
 
     election = get_object_or_404(voter.session.elections, pk=election_id)
 
-    if not election.can_apply:
-        messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
+    if not election.can_apply or not election.voters_self_apply:
+        messages.add_message(request, messages.ERROR, 'Self applications are either not possible for this election or'
+                                                      ' currently not accepted')
         return redirect('vote:index')
 
     application = voter.application.filter(election__id=election_id)

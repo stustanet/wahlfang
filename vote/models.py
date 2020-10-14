@@ -78,7 +78,7 @@ class Election(models.Model):
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
     result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'fully published')],
                                         default='0')
-    voters_self_apply = models.BooleanField(default=False, blank=False, null=False)
+    voters_self_apply = models.BooleanField(default=False)
 
     @property
     def started(self):

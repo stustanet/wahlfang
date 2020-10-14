@@ -227,7 +227,7 @@ class CSVUploaderForm(forms.Form):
             with io.TextIOWrapper(f, encoding='utf-8') as text_file:
                 csv_reader = csv.DictReader(text_file)
                 if csv_reader.fieldnames != ['email', 'name']:
-                    raise RuntimeError
+                    raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
                 voters = []
                 for row in csv_reader:
                     if row['email']:
@@ -235,13 +235,7 @@ class CSVUploaderForm(forms.Form):
                     else:
                         row['email'] = None
                     voters.append(Voter.from_data(session=self.session, email=row['email'], name=row['name']))
-        except forms.ValidationError as e:
-            print(e)
-            raise forms.ValidationError(
-                'The email field needs to contain only valid email addresses or the empty string')
-        except RuntimeError:
-            raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
-        except Exception as e:
+        except UnicodeDecodeError:
             raise forms.ValidationError('File seems to be not in CSV format.')
 
         self.cleaned_data['file'] = voters

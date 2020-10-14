@@ -5,10 +5,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
-  <link rel="icon" type="image/png" href="{% static 'img/favicon16.png' %}" sizes="16x16" />
-  <link rel="icon" type="image/png" href="{% static 'img/favicon32.png' %}" sizes="32x32" />
-  <link rel="icon" type="image/png" href="{% static 'img/favicon64.png' %}" sizes="64x64" />
-  <link rel="icon" type="image/png" href="{% static 'img/favicon128.png' %}" sizes="128x128" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon16.png' %}" sizes="16x16"/>
+  <link rel="icon" type="image/png" href="{% static 'img/favicon32.png' %}" sizes="32x32"/>
+  <link rel="icon" type="image/png" href="{% static 'img/favicon64.png' %}" sizes="64x64"/>
+  <link rel="icon" type="image/png" href="{% static 'img/favicon128.png' %}" sizes="128x128"/>
   <link rel="stylesheet" href="{% static "bootstrap-4.4.1-dist/css/bootstrap.min.css" %}"/>
   <link rel="stylesheet" href="{% static "vote/css/style.css" %}"/>
   <link rel="stylesheet" href="{% static "management/css/style.css" %}"/>
@@ -22,11 +22,15 @@
         <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
       </a>
       <div class="navbar-text">Wahlfang</div>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'vote:help' %}">Help</a>
+          </li>
           {% if user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'management:logout' %}">Logout</a>
@@ -43,7 +47,8 @@
         {% if messages %}
           <div class="messages">
             {% for message in messages %}
-              <div class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
+              <div
+                  class="alert alert-dismissible fade show alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}"
                   role="alert">
                 {{ message|escape }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">

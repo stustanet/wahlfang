@@ -49,6 +49,8 @@
         <div class="card-body">
           <h4>Voters
             <a class="btn btn-success d-inline float-right ml-2"
+               href="{% url 'management:import_csv' pk=session.id %}">Import from CSV</a>
+            <a class="btn btn-success d-inline float-right ml-2"
                href="{% url 'management:add_tokens' pk=session.id %}">Add Tokens</a>
             <a class="btn btn-success d-inline float-right ml-2"
                href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>

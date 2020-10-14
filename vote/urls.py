@@ -1,5 +1,5 @@
-from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.urls import path
 from django.views.generic.base import RedirectView
 
 from vote import views
@@ -17,4 +17,7 @@ urlpatterns = [
     path('logout', auth_views.LogoutView.as_view(
         next_page='vote:index',
     ), name='logout'),
+    path('vote/<int:election_id>/apply', views.apply, name='apply'),
+    path('vote/<int:election_id>/delete-own-application', views.delete_own_application, name='delete_own_application'),
+    path('help', views.help, name='help'),
 ]

@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
+from management.forms import ApplicationUploadForm
 from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
 
 
@@ -121,3 +122,24 @@ class VoteForm(forms.Form):
                 can_vote.delete()
 
         return votes
+
+
+class ApplicationUploadFormUser(ApplicationUploadForm):
+    def __init__(self, election, request, *args, **kwargs):
+        super().__init__(election, request, *args, **kwargs)
+        if self.request.user.name:
+            # these rules are meant for the StuStaNet Hausadmin election
+            self.fields['display_name'].initial = self.request.user.name
+            self.fields['display_name'].disabled = True
+            self.fields['email'].required = True
+        self.fields['email'].initial = self.request.user.email
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.voter = self.request.user
+        instance.election = self.election
+
+        if commit:
+            instance.save()
+
+        return instance

@@ -1,3 +1,5 @@
+import csv
+import io
 from datetime import timedelta
 from typing import Tuple, List
 
@@ -80,6 +82,7 @@ class AddSessionForm(forms.ModelForm):
 
 class AddElectionForm(forms.ModelForm):
     max_votes_yes = forms.IntegerField(min_value=1, required=False, label='Maximum number of YES votes (optional)')
+
     def __init__(self, user, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['session'].disabled = True
@@ -93,12 +96,13 @@ class AddElectionForm(forms.ModelForm):
 
     class Meta:
         model = Election
-        fields = ('title', 'start_date', 'end_date', 'session')
+        fields = ('title', 'voters_self_apply', 'start_date', 'end_date', 'session')
 
         labels = {
             'title': 'Election Name',
             'start_date': 'Start time (optional)',
             'end_date': 'End time (optional)',
+            'voters_self_apply': 'Voters can apply for the election'
         }
 
     def clean(self):
@@ -131,9 +135,7 @@ class ApplicationUploadForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.request = request
         self.election = election
-        self.fields['election'].initial = self.election
-        self.fields['election'].disabled = True
-        self.fields['election'].widget = forms.HiddenInput()
+        self.fields['election'].required = False
 
     class Meta:
         model = Application
@@ -146,7 +148,7 @@ class ApplicationUploadForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-
+        instance.election = self.election
         if commit:
             instance.save()
 
@@ -210,3 +212,34 @@ class AddTokensForm(forms.Form):
         OpenVote.objects.bulk_create(open_votes)
 
         return anonymous_voters
+
+
+class CSVUploaderForm(forms.Form):
+    file = forms.FileField(label='CSV File')
+
+    def __init__(self, session, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.session = session
+
+    def clean(self):
+        f = self.cleaned_data['file'].file
+        try:
+            with io.TextIOWrapper(f, encoding='utf-8') as text_file:
+                csv_reader = csv.DictReader(text_file)
+                if csv_reader.fieldnames != ['email', 'name']:
+                    raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
+                voters = []
+                for row in csv_reader:
+                    if row['email']:
+                        validate_email(row['email'])
+                    else:
+                        row['email'] = None
+                    voters.append(Voter.from_data(session=self.session, email=row['email'], name=row['name']))
+        except UnicodeDecodeError:
+            raise forms.ValidationError('File seems to be not in CSV format.')
+
+        self.cleaned_data['file'] = voters
+
+    def save(self):
+        for voter, code in self.cleaned_data['file']:
+            voter.send_invitation(code, self.session.managers.all().first().stusta_email)

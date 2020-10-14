@@ -120,3 +120,17 @@ table.vote-list .applicant .card-body {
 .image-input .applicant-picture {
     margin-right: 1rem;
 }
+
+
+.myclose {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.pic {
+    width: 100%;
+}

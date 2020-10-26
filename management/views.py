@@ -42,7 +42,7 @@ def index(request):
     manager = request.user
 
     if request.GET.get("action") == "add_session":
-        form = AddSessionForm(request=request, user=request.user, data=request.POST if request.POST else None)
+        form = AddSessionForm(request=request, user=request.user, data=request.POST or None)
         if request.POST and form.is_valid():
             ses = form.save()
             return redirect('management:session', ses.id)

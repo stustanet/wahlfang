@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Dict
 
 import qrcode
+import csv
+import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
@@ -301,3 +303,46 @@ def import_csv(request, pk):
     else:
         form = CSVUploaderForm(session)
     return render(request, 'management/import_csv.html', {'form': form, 'session': session})
+
+
+@management_login_required
+def export_csv(request, pk):
+    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
+    if not e.exists():
+        raise Http404('Election does not exist')
+    e = e.first()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="results.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['#', 'applicant', 'yes', 'no', 'abstention'])
+    for i in range(len(e.election_summary)):
+        a = e.election_summary[i]
+        writer.writerow([i+1, a.get_display_name(), a.votes_accept, a.votes_reject, a.votes_abstention])
+
+    return response
+
+
+@management_login_required
+def export_json(request, pk):
+    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
+    if not e.exists():
+        raise Http404('Election does not exist')
+    e = e.first()
+
+    json_data = []
+    for a in e.election_summary:
+        json_data.append({
+            "applicant": a.get_display_name(),
+            "yes": a.votes_accept,
+            "no": a.votes_reject,
+            "abstention": a.votes_abstention
+        })
+
+    json_str = json.dumps(json_data)
+
+    response = HttpResponse(json_str, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename=result.json'
+
+    return response

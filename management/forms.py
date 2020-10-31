@@ -81,8 +81,6 @@ class AddSessionForm(forms.ModelForm):
 
 
 class AddElectionForm(forms.ModelForm):
-    max_votes_yes = forms.IntegerField(min_value=1, required=False, label='Maximum number of YES votes (optional)')
-
     def __init__(self, user, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['session'].disabled = True
@@ -91,12 +89,14 @@ class AddElectionForm(forms.ModelForm):
         self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
         self.fields['end_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
         # self.fields['start_date'].initial = timezone.now()
+        self.fields['max_votes_yes'] = forms.IntegerField(min_value=1, required=False,
+                                                          label='Maximum number of YES votes (optional)')
         self.user = user
         self.session = session
 
     class Meta:
         model = Election
-        fields = ('title', 'voters_self_apply', 'start_date', 'end_date', 'session')
+        fields = ('title', 'voters_self_apply', 'start_date', 'end_date', 'max_votes_yes', 'session')
 
         labels = {
             'title': 'Election Name',

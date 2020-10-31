@@ -316,10 +316,17 @@ def export_csv(request, pk):
     response['Content-Disposition'] = 'attachment; filename="results.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['#', 'applicant', 'yes', 'no', 'abstention'])
+    header = ['#', 'applicant', 'email', 'yes', 'no', 'abstention']
+    print(e.max_votes_yes)
+    if e.max_votes_yes is not None:
+        header.append('elected')
+    writer.writerow(header)
     for i in range(len(e.election_summary)):
         a = e.election_summary[i]
-        writer.writerow([i+1, a.get_display_name(), a.votes_accept, a.votes_reject, a.votes_abstention])
+        row = [i+1, a.get_display_name(), a.email, a.votes_accept, a.votes_reject, a.votes_abstention]
+        if e.max_votes_yes is not None:
+            row.append(True if i < e.max_votes_yes else False)
+        writer.writerow(row)
 
     return response
 
@@ -332,13 +339,18 @@ def export_json(request, pk):
     e = e.first()
 
     json_data = []
-    for a in e.election_summary:
-        json_data.append({
+    for i in range(len(e.election_summary)):
+        a = e.election_summary[i]
+        appl_data = {
             "applicant": a.get_display_name(),
+            "email": a.email,
             "yes": a.votes_accept,
             "no": a.votes_reject,
             "abstention": a.votes_abstention
-        })
+        }
+        if e.max_votes_yes is not None:
+            appl_data["elected"] = True if i < e.max_votes_yes else False
+        json_data.append(appl_data)
 
     json_str = json.dumps(json_data)
 

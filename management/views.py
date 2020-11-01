@@ -1,11 +1,14 @@
+import csv
+import json
 import logging
 import os
+from argparse import Namespace
+from datetime import datetime
+from functools import partial
 from pathlib import Path
 from typing import Dict
 
 import qrcode
-import csv
-import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
@@ -46,10 +49,43 @@ def index(request):
     if request.GET.get("action") == "add_session":
         form = AddSessionForm(request=request, user=request.user, data=request.POST or None)
         if request.POST and form.is_valid():
-            ses = form.save()
-            return redirect('management:session', ses.id)
-        else:
-            return render(request, template_name='management/add_session.html', context={'form': form})
+
+            if request.POST.get("submit_type") != "test":
+                ses = form.save()
+                return redirect('management:session', ses.id)
+            else:
+                messages.add_message(request, messages.INFO, 'Test email sent.')
+
+                test_session = Namespace(**{
+                    "title": form.data['title'],
+                    "invite_text": form.data['invite_text'],
+                    "start_date": datetime.fromisoformat(form.data['start_date']) if form.data[
+                        'start_date'] else datetime.now(),
+                    'meeting_link': form.data['meeting_link'],
+                })
+
+                test_voter = Namespace(**{
+                    "name": "Testname",
+                    "email": form.data['email'],
+                    "session": test_session,
+                })
+                test_voter.email_user = partial(Voter.email_user, test_voter)
+
+                Voter.send_invitation(test_voter, "mock-up-access-token", manager.email)
+
+        variables = {
+            "{name}": "Voter's name if set",
+            "{title}": "Session's title",
+            "{access_code}": "Access code/token for the voter to login",
+            "{login_url}": "URL which instantly logs user in",
+            "{base_url}": "Basically vote.stusta.de",
+            "{start_time}": "Start time if datetime is set",
+            "{start_date}": "Start date if datetime is set",
+            "{start_time_en}": "Start time in english format e.g. 02:23 PM",
+            "{start_date_en}": "Start date in english format e.g. 12/12/2020",
+            "{meeting_link}": "Meeting link if set"
+        }
+        return render(request, template_name='management/add_session.html', context={'form': form, 'vars': variables})
 
     context = {
         'sessions': manager.sessions.order_by('-pk')
@@ -71,17 +107,46 @@ def session_detail(request, pk=None):
 
 @management_login_required
 def add_election(request, pk=None):
+    # todo add chron job script that sends emails
+    # todo apply changes to session
     manager = request.user
     session = manager.sessions.get(id=pk)
     context = {
         'session': session,
+        'vars': {
+            "{name}": "Voter's name if set",
+            "{title}": "Session's title",
+            "{url}": "URL to the election",
+            "{end_time}": "End time if datetime is set",
+            "{end_date}": "End date if datetime is set",
+            "{end_time_en}": "End time in english format e.g. 02:23 PM",
+            "{end_date_en}": "End date in english format e.g. 12/12/2020",
+        }
     }
 
-    form = AddElectionForm(session=session, user=manager, data=request.POST if request.POST else None)
+    form = AddElectionForm(session=session, request=request, user=manager, data=request.POST if request.POST else None)
     context['form'] = form
     if request.POST and form.is_valid():
-        form.save()
-        return redirect('management:session', pk=session.pk)
+        if request.POST.get("submit_type") == "test":
+            messages.add_message(request, messages.INFO, 'Test email sent.')
+
+            test_voter = Namespace(**{
+                "name": "Testname",
+                "email": form.data['email'],
+            })
+            test_voter.email_user = partial(Voter.email_user, test_voter)
+            test_election = Namespace(**{
+                "title": form.data['title'],
+                "remind_text": form.data['remind_text'],
+                "pk": 1,
+                "start_date": datetime.fromisoformat(form.data['start_date']) if form.data[
+                    'start_date'] else datetime.now(),
+            })
+
+            Voter.send_reminder(test_voter, manager.email, test_election)
+        else:
+            form.save()
+            return redirect('management:session', pk=session.pk)
 
     return render(request, template_name='management/add_election.html', context=context)
 
@@ -152,6 +217,9 @@ def election_detail(request, pk):
         form = StartElectionForm(instance=election, data=request.POST)
         if form.is_valid():
             form.save()
+            if election.send_emails_on_start:
+                for voter in session.participants.all():
+                    voter.send_reminder(session.managers.all().first().stusta_email, election)
         else:
             context['start_election_form'] = form
 

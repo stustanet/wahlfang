@@ -1,5 +1,6 @@
 import csv
 import io
+import re
 from datetime import timedelta
 from typing import Tuple, List
 
@@ -53,7 +54,27 @@ class ChangeElectionPublicStateForm(forms.ModelForm):
         }
 
 
-class AddSessionForm(forms.ModelForm):
+class TemplateStringForm(forms.ModelForm):
+    def clean_email_text(self, test_data: List[str], field: str):
+        """
+        checks if the cleaned_text fails when formatted on the test_data.
+        """
+        test_data_dict = {i: "" for i in test_data}
+        cleaned_text = self.cleaned_data[field]
+        try:
+            test = cleaned_text.format(**test_data_dict)
+        except (KeyError, ValueError, IndexError):
+            x = re.findall(r"\{\w*\}", cleaned_text)
+            test_data = set(x) - set([f"{{{i}}}" for i in test_data])
+            self.add_error(field, "The following variables are not allowed: " + ", ".join(test_data))
+        return cleaned_text
+
+
+class AddSessionForm(TemplateStringForm):
+    email = forms.EmailField(required=False, label="",
+                             widget=forms.EmailInput(attrs={"class": "emailinput form-control",
+                                                            "placeholder": "your@email.de"}))
+
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00'})
@@ -64,12 +85,26 @@ class AddSessionForm(forms.ModelForm):
 
     class Meta:
         model = Session
-        fields = ('title', 'start_date', 'meeting_link')
+        fields = ('title', 'start_date', 'meeting_link', 'invite_text')
         labels = {
             'title': 'Session Name',
             'start_date': 'Meeting start (optional)',
             'meeting_link': 'Link to meeting call platform (optional)',
+            'invite_text': ''
         }
+
+    def clean(self):
+        super().clean()
+        if self.request.POST.get("submit_type") == "test" and not self.cleaned_data['email']:
+            self.add_error('email', "Email must be set for sending the test mail.")
+        if self.request.POST.get("submit_type") == "test" and not self.cleaned_data['invite_text']:
+            self.add_error('invite_text', "The test email can only be send when the invite text is filled.")
+        return self.cleaned_data
+
+    def clean_invite_text(self):
+        test_data = ["name", "title", "access_code", "login_url", "base_url", "start_time",
+                     "start_date", "meeting_link", "start_date_en", "start_time_en"]
+        return self.clean_email_text(test_data, 'invite_text')
 
     def save(self, commit=True):
         instance = super().save(commit=commit)
@@ -80,8 +115,12 @@ class AddSessionForm(forms.ModelForm):
         return instance
 
 
-class AddElectionForm(forms.ModelForm):
-    def __init__(self, user, session, *args, **kwargs):
+class AddElectionForm(TemplateStringForm):
+    email = forms.EmailField(required=False, label="",
+                             widget=forms.EmailInput(attrs={"class": "emailinput form-control",
+                                                            "placeholder": "your@email.de"}))
+
+    def __init__(self, user, session, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['session'].disabled = True
         self.fields['session'].initial = session
@@ -93,22 +132,41 @@ class AddElectionForm(forms.ModelForm):
                                                           label='Maximum number of YES votes (optional)')
         self.user = user
         self.session = session
+        self.request = request
 
     class Meta:
         model = Election
-        fields = ('title', 'voters_self_apply', 'start_date', 'end_date', 'max_votes_yes', 'session')
+        fields = (
+            'title', 'start_date', 'end_date', 'session', 'max_votes_yes', 'voters_self_apply', 'send_emails_on_start',
+            'remind_text')
 
         labels = {
             'title': 'Election Name',
             'start_date': 'Start time (optional)',
             'end_date': 'End time (optional)',
-            'voters_self_apply': 'Voters can apply for the election'
+            'voters_self_apply': 'Voters can apply for the election',
+            'send_emails_on_start': 'Voters receive an e-mail when the election starts<br>'
+                                    '(useful for elections that last several days)',
+            'remind_text': '',
         }
+
+    def clean_remind_text(self):
+        test_data = ["name", "title", "url", "end_time", "end_date", "end_date_en", "end_time_en"]
+        print(self.cleaned_data['remind_text'])
+        return self.clean_email_text(test_data, 'remind_text')
 
     def clean(self):
         super().clean()
         if self.session not in self.user.sessions.all():
             raise forms.ValidationError("You don't have the permission to add an election here.")
+        if not self.cleaned_data['send_emails_on_start'] and self.cleaned_data['remind_text']:
+            self.add_error('send_emails_on_start', "Remind text can only be set when this option is activated.")
+        if self.request.POST.get("submit_type") == "test" and not self.cleaned_data['email']:
+            self.add_error('email', "Email must be set for sending the test mail.")
+        if self.request.POST.get("submit_type") == "test" and not self.cleaned_data['remind_text']:
+            print(self.cleaned_data['remind_text'])
+            self.add_error('remind_text', "The test email can only be send when the remind text is filled.")
+        return self.cleaned_data
 
     def save(self, commit=True):
         instance = super().save(commit=commit)
@@ -145,6 +203,7 @@ class ApplicationUploadForm(forms.ModelForm):
         super().clean()
         if not self.election.can_apply:
             raise forms.ValidationError('Applications are currently not allowed')
+        return self.cleaned_data
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -180,6 +239,7 @@ class AddVotersForm(forms.Form):
         return voters
 
     def clean(self):
+        super().clean()
         emails = self.cleaned_data['voters_list'].splitlines()
         for email in emails:
             validate_email(email)
@@ -190,6 +250,7 @@ class AddVotersForm(forms.Form):
             raise forms.ValidationError('duplicate email address')
 
         self.cleaned_data['email_list'] = emails
+        return self.cleaned_data
 
 
 class AddTokensForm(forms.Form):
@@ -222,6 +283,7 @@ class CSVUploaderForm(forms.Form):
         self.session = session
 
     def clean(self):
+        super().clean()
         f = self.cleaned_data['file'].file
         try:
             with io.TextIOWrapper(f, encoding='utf-8') as text_file:
@@ -239,6 +301,7 @@ class CSVUploaderForm(forms.Form):
             raise forms.ValidationError('File seems to be not in CSV format.')
 
         self.cleaned_data['file'] = voters
+        return self.cleaned_data
 
     def save(self):
         for voter, code in self.cleaned_data['file']:

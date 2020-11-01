@@ -11,7 +11,6 @@
 \usepackage{natbib}
 \usepackage{graphicx}
 \usepackage{pifont}
-\usepackage{lipsum}
 \usepackage[a4paper, left=3cm, right=3cm, bottom=2.5cm, top=3cm]{geometry}
 
 \pagenumbering{gobble}
@@ -32,11 +31,11 @@
     \section*{Invitation to Participate in an Online Election}
     \noindent You have been in invited to attend the following online election session:\\\\
     Title: {{session.title}}\\
-    {% if session.meeting_link %}
-        Meeting room link: {{ session.meeting_link}}\\
+    {% if session.meeting_link %}%
+    Meeting room: {{ session.meeting_link}}\\
     {% endif %}%
-    {% if session.start_date %}
-        Start date: {{session.start_date}}\\
+    {% if session.start_date %}%
+    Start date: {{session.start_date}}\\
     {% endif %}%
     Access token: {{token.token}}\\
 

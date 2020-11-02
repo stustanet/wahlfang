@@ -152,7 +152,6 @@ class AddElectionForm(TemplateStringForm):
 
     def clean_remind_text(self):
         test_data = ["name", "title", "url", "end_time", "end_date", "end_date_en", "end_time_en"]
-        print(self.cleaned_data['remind_text'])
         return self.clean_email_text(test_data, 'remind_text')
 
     def clean(self):
@@ -164,8 +163,12 @@ class AddElectionForm(TemplateStringForm):
         if self.request.POST.get("submit_type") == "test" and not self.cleaned_data['email']:
             self.add_error('email', "Email must be set for sending the test mail.")
         if self.request.POST.get("submit_type") == "test" and not self.cleaned_data['remind_text']:
-            print(self.cleaned_data['remind_text'])
             self.add_error('remind_text', "The test email can only be send when the remind text is filled.")
+        if self.cleaned_data['end_date'] and self.cleaned_data['end_date'] < timezone.now():
+            self.add_error('end_date', "End date cannot be in the past.")
+        if self.cleaned_data.get('end_date') and self.cleaned_data.get('start_date') and \
+                self.cleaned_data['start_date'] > self.cleaned_data['end_date']:
+            raise forms.ValidationError("Start date needs to be before end date")
         return self.cleaned_data
 
     def save(self, commit=True):

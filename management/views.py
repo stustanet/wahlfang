@@ -71,7 +71,7 @@ def index(request):
                 })
                 test_voter.email_user = partial(Voter.email_user, test_voter)
 
-                Voter.send_invitation(test_voter, "mock-up-access-token", manager.email)
+                Voter.send_invitation(test_voter, "mock-up-access-token", manager.stusta_email)
 
         variables = {
             "{name}": "Voter's name if set",
@@ -143,7 +143,7 @@ def add_election(request, pk=None):
                     'start_date'] else datetime.now(),
             })
 
-            Voter.send_reminder(test_voter, manager.email, test_election)
+            Voter.send_reminder(test_voter, manager.stusta_email, test_election)
         else:
             form.save()
             return redirect('management:session', pk=session.pk)

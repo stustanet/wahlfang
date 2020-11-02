@@ -67,7 +67,7 @@ class Enc32:
 class Session(models.Model):
     title = models.CharField(max_length=256)
     meeting_link = models.CharField(max_length=512, blank=True, null=True)
-    start_date = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    start_date = models.DateTimeField(blank=True, null=True)
     invite_text = models.TextField(max_length=1000, blank=True, null=True)
 
 
@@ -82,10 +82,11 @@ class Election(models.Model):
     voters_self_apply = models.BooleanField(default=False)
     send_emails_on_start = models.BooleanField(default=False)
     remind_text = models.TextField(max_length=1000, blank=True, null=True)
+    remind_text_sent = models.BooleanField(default=False)
 
     @property
     def started(self):
-        if self.start_date is not None and self.end_date is not None:
+        if self.start_date is not None:
             return timezone.now() > self.start_date
         else:
             return False
@@ -99,8 +100,10 @@ class Election(models.Model):
 
     @property
     def is_open(self):
-        if self.end_date:
+        if self.start_date and self.end_date:
             return self.start_date < timezone.now() < self.end_date
+        elif self.start_date:
+            return self.start_date < timezone.now()
         else:
             return False
 
@@ -262,6 +265,8 @@ class Voter(models.Model):
         return str(self)
 
     def send_invitation(self, access_code: str, from_email: str):
+        if not self.email:
+            return
         subject = f'Invitation for {self.session.title}'
         if self.session.invite_text:
             context = {
@@ -270,10 +275,10 @@ class Voter(models.Model):
                 'access_code': access_code,
                 'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login',
                                                                    kwargs={'access_code': access_code}),
-                'start_date': self.session.start_date.strftime("%d.%m.%Y"),
-                'start_time': self.session.start_date.strftime("%H:%M"),
-                'start_date_en': self.session.start_date.strftime("%Y/%m/%d"),
-                'start_time_en': self.session.start_date.strftime("%I:%M %p"),
+                'start_date': self.session.start_date.strftime("%d.%m.%Y") if self.session.start_date else "",
+                'start_time': self.session.start_date.strftime("%H:%M") if self.session.start_date else "",
+                'start_date_en': self.session.start_date.strftime("%Y/%m/%d") if self.session.start_date else "",
+                'start_time_en': self.session.start_date.strftime("%I:%M %p") if self.session.start_date else "",
                 'base_url': 'https://vote.stustanet.de',
                 'meeting_link': self.session.meeting_link
             }
@@ -298,16 +303,18 @@ class Voter(models.Model):
         )
 
     def send_reminder(self, from_email: str, election):
+        if not self.email:
+            return
         subject = f'{election.title} is now open'
         if election.remind_text:
             context = {
                 'name': self.name,
                 'title': election.title,
                 'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
-                'end_date': election.start_date.strftime("%d.%m.%y"),
-                'end_time': election.start_date.strftime("%H:%M"),
-                'end_date_en': election.start_date.strftime("%Y/%m/%d"),
-                'end_time_en': election.start_date.strftime("%I:%M %p"),
+                'end_date': election.start_date.strftime("%d.%m.%y") if election.start_date else "",
+                'end_time': election.start_date.strftime("%H:%M") if election.start_date else "",
+                'end_date_en': election.start_date.strftime("%Y/%m/%d") if election.start_date else "",
+                'end_time_en': election.start_date.strftime("%I:%M %p") if election.start_date else "",
             }
             body_html = election.remind_text.format(**context)
         else:

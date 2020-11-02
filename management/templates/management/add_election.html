@@ -1,5 +1,5 @@
 {% extends 'management/base.html' %}
-{% load static%}
+{% load static %}
 {% load crispy_forms_filters %}
 
 {% block content %}
@@ -10,11 +10,87 @@
           <h4>Create election</h4>
           <form class="user" action="{% url 'management:add_election' pk=session.id %}" method="post">
             {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" id="id_btn_start" class="btn btn-success">Submit</button>
+
+            {{ form|as_crispy_errors }}
+            {% for field in form %}
+              {% if field.html_name != "remind_text" and field.html_name != "send_emails_on_start" and field.html_name != "voters_self_apply" and field.html_name != "email" %}
+                {{ field|as_crispy_field }}
+              {% endif %}
+            {% endfor %}
+
+            {# collapse card example taken from https://www.codeply.com/p/cI2Pu6O5N5#}
+            <div class="card mb-0">
+              <div
+                  class="card-header mycard-header cursor-pointer{% if not form.remind_text.value %} collapsed{% endif %}"
+                  data-toggle="collapse" href="#collapseOne">
+                <a class="card-title">
+                  Advanced Options
+                </a>
+              </div>
+              <div id="collapseOne" class="card-body collapse{% if form.remind_text.value %} show{% endif %}">
+                {{ form.voters_self_apply|as_crispy_field }}
+                {{ form.send_emails_on_start|as_crispy_field }}
+                <h5>Remind email template text</h5>
+                The template has be written the python format string format. The following variables are available:<br>
+                <table class="table">
+                  <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Meaning</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% for key, val in vars.items %}
+                    <tr>
+                      <th scope="row" class="monospace">{{ key }}</th>
+                      <td>{{ val }}</td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+
+                Here is an example:<br><br>
+                <p class="monospace">Dear,<br><br>This is a reminder that the {title} election has just began.
+                  So you can now start voting for your favourite candidates on
+                  &lt;a href="{url}"&gt;{url}&lt;/a&gt;.
+                  The access code can be found in the invitation email. Please be reminded that you can only vote until
+                  {end_time_en} on the {end_date_en}.
+                  <br><br>
+                  Best regards,<br>
+                  Your awesome Organizers
+                </p>
+
+                <p>
+                  {{ form.remind_text|as_crispy_field }}
+                </p>
+                <br>
+                <h6>Send test mail</h6>
+                <div class="form-row">
+                  <div class="col-8">
+                    {{ form.email|as_crispy_field }}
+                  </div>
+                  <div class="col">
+                    <button type="submit" id="id_btn_start" class="btn btn-warning btn-block" name="submit_type"
+                            value="test">
+                      Send test mail
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+
+
+            <button type="submit" id="id_btn_start" class="btn btn-success" name="submit_type" value="commit">
+              Submit
+            </button>
           </form>
         </div>
       </div>
     </div>
   </div>
+  <script src="{% static "js/jquery-3.4.1.slim.min.js" %}"
+          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
+  <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
+          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
 {% endblock %}

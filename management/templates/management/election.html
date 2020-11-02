@@ -13,6 +13,16 @@
           <div class="card-body">
 
             <div>Election not started yet.</div>
+            <div>
+              {% if election.end_date and election.start_date %}
+                Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
+                {{ election.end_date|date:"l Y-m-d H:i:s" }}
+              {% elif election.start_date %}
+                Election starts {{ election.start_date|date:"l Y-m-d H:i:s" }}
+              {% else %}
+                This election needs to be started manually.
+              {% endif %}
+            </div>
             <hr>
             <form class="user" action="{% url 'management:election' election.pk %}" method="post">
               {% csrf_token %}
@@ -30,7 +40,7 @@
                   <div class="col-6 my-auto">minutes</div>
                 </div>
               </div>
-              <button type="submit" id="id_btn_start" class="btn btn-success">Start election
+              <button type="submit" id="id_btn_start" class="btn btn-success">Start election now
               </button>
             </form>
           </div>
@@ -38,8 +48,12 @@
           <div class="card-body">
             <div>Election still open.</div>
             <div>
-              Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
-              {{ election.end_date|date:"l Y-m-d H:i:s" }}
+              {% if election.end_date %}
+                Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
+                {{ election.end_date|date:"l Y-m-d H:i:s" }}
+              {% else %}
+                This election needs to be closed manually.
+              {% endif %}
             </div>
             <hr>
             <form class="user" action="{% url 'management:election' election.pk %}" method="post">

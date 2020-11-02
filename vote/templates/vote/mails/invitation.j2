@@ -2,26 +2,30 @@
 English version below.
 ---
 
-Hallo,
+Hallo{% if voter.name %} {{ voter.name }}{% endif %},
 
 du wurdest zur Versammlung "{{ session.title }}" eingeladen. Mit dem folgenden Link kannst du an den Abstimmungen teilnehmen:
 <a href="{{ login_url }}">{{ login_url }}</a>
 
 Alternativ kannst du dich auch mit dem Zugangscode "{{ access_code }}" auf {{ base_url }} einloggen.
 
-{% if session.meeting_link %}Am Meeting kannst du unter <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a> teilnehmen.{% endif %}
-{% if session.start_date %}Es beginnt am {{ session.start_date|date:"d.m.Y" }} um {{ session.start_date|date:"H:i" }} Uhr.{% endif %}
+{% if session.meeting_link %}Am Meeting kannst du unter
+  <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a> teilnehmen.{% endif %}
+{% if session.start_date %}Es beginnt am {{ session.start_date|date:"d.m.Y" }} um {{ session.start_date|date:"H:i" }}
+  Uhr.{% endif %}
 
 ---
 English version
 ---
 
-Hello,
+Hello{% if voter.name %} {{ voter.name }}{% endif %},
 
-you were invited to the meeting "{{ session.title }}". To participate in the elections, click the following link:
+You were invited to the meeting "{{ session.title }}". To participate in the elections, click the following link:
 <a href="{{ login_url }}">{{ login_url }}</a>
 
 Alternatively, you can also login at {{ base_url }} with the access code "{{ access_code }}".
 
-{% if session.meeting_link %}You can take part in the meeting via <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a>.{% endif %}
-{% if session.start_date %}It starts on {{ session.start_date|date:"Y/m/d" }} at {{ session.start_date|date:"h:i A" }}.{% endif %}
+{% if session.meeting_link %}You can take part in the meeting via
+  <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a>.{% endif %}
+{% if session.start_date %}It starts on {{ session.start_date|date:"Y/m/d" }} at {{ session.start_date|date:"h:i A" }}
+  .{% endif %}

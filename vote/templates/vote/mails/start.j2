@@ -1,0 +1,24 @@
+---
+English version below.
+---
+
+--- ERINNERUNG ---
+
+Hallo{% if voter.name %} {{ voter.name }} {% endif %},
+
+die Abstimmungsphase von "{{ election.title }}" hat nun begonnen und ihr könnt ab sofort abstimmen.
+Die Abstimmung ist möglich bis zum {{ election.end_date|date:"d.m.Y" }} um {{ election.end_date|date:"H:i" }} unter:
+<a href="{{ url }}">{{ url }}</a> (Persönlicher Zugangscode befindet sich in der ersten E-Mail).
+
+---
+English version
+---
+
+--- REMINDER ---
+
+Hi,
+
+The election phase of "{{ election.title }}" has begun and you can now vote.
+The election is possible until {{ election.end_date|date:"Y/m/d" }} at
+{{ election.end_date|date:"h:i A" }} via the following link:
+<a href="{{ url }}">{{ url }}</a> (personal access code can be found in the first email).

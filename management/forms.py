@@ -90,6 +90,7 @@ class AddSessionForm(TemplateStringForm):
             'title': 'Session Name',
             'start_date': 'Meeting start (optional)',
             'meeting_link': 'Link to meeting call platform (optional)',
+            # will be set by html
             'invite_text': ''
         }
 
@@ -229,13 +230,6 @@ class AddVotersForm(forms.Form):
             Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['email_list']
         ]
 
-        open_votes = []
-        for election in self.session.elections.all():
-            if not election.closed:
-                open_votes += [OpenVote(election=election, voter=v) for v, _ in voters]
-
-        OpenVote.objects.bulk_create(open_votes)
-
         for voter, code in voters:
             voter.send_invitation(code, self.session.managers.all().first().stusta_email)
 
@@ -267,13 +261,6 @@ class AddTokensForm(forms.Form):
         anonymous_voters = [
             Voter.from_data(session=self.session) for _ in range(self.cleaned_data['nr_anonymous_voters'])
         ]
-
-        open_votes = []
-        for election in self.session.elections.all():
-            if not election.closed:
-                open_votes += [OpenVote(election=election, voter=v) for v, _ in anonymous_voters]
-
-        OpenVote.objects.bulk_create(open_votes)
 
         return anonymous_voters
 

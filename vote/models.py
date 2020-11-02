@@ -366,6 +366,11 @@ class Voter(models.Model):
         password = voter.set_password()
         voter.save()
 
+        # add open elections from the session where the user was added
+        open_votes = [OpenVote(election=election, voter=voter) for election in session.elections.all()
+                      if not election.closed]
+        OpenVote.objects.bulk_create(open_votes)
+
         return voter, cls.get_access_code(voter.voter_id, password)
 
     def new_access_token(self):

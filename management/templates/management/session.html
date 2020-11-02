@@ -30,14 +30,18 @@
                 </button>
 
                 <small class="float-right">
-                  {% if not election.start_date %}
-                    <span class="right-margin">Not started yet</span>
-                  {% elif election.is_open %}
+                  {% if not election.started and election.start_date %}
+                    <span class="right-margin">Starts at {{ election.start_date|date:"Y-m-d H:i:s" }}</span>
+                  {% elif not election.started %}
+                    <span class="right-margin">Needs to be started manually</span>
+                  {% elif election.is_open and election.end_date %}
                     <span class="right-margin">
-                      Open {{ election.start_date|date:"H:i" }} - {{ election.end_date|date:"H:i" }}
+                      Open until {{ election.end_date|date:"Y-m-d H:i:s" }}
                     </span>
                   {% elif election.closed %}
                     <span class="right-margin">Closed</span>
+                  {% else %}
+                    <span class="right-margin">Open, needs to be closed manually</span>
                   {% endif %}
                 </small>
               </div>

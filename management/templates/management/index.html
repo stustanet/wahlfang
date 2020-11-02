@@ -26,10 +26,8 @@
             {% endfor %}
           </div>
           <hr>
-          <form class="d-inline" action="{% url 'management:index' %}?action=add_session" method="post">
-            {% csrf_token %}
-            <button class="btn btn-success" type="submit">Create Session</button>
-          </form>
+          <a class="btn btn-success"
+             href="{% url 'management:index' %}?action=add_session">Create Session</a>
         </div>
       </div>
     </div>

@@ -278,7 +278,7 @@ class CSVUploaderForm(forms.Form):
         try:
             with io.TextIOWrapper(f, encoding='utf-8') as text_file:
                 csv_reader = csv.DictReader(text_file)
-                if csv_reader.fieldnames != ['email', 'name']:
+                if 'email' not in csv_reader.fieldnames or 'name' not in csv_reader.fieldnames:
                     raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
                 voters = []
                 for row in csv_reader:

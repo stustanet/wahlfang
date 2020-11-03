@@ -385,7 +385,6 @@ def export_csv(request, pk):
 
     writer = csv.writer(response)
     header = ['#', 'applicant', 'email', 'yes', 'no', 'abstention']
-    print(e.max_votes_yes)
     if e.max_votes_yes is not None:
         header.append('elected')
     writer.writerow(header)

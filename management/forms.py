@@ -286,6 +286,10 @@ class CSVUploaderForm(forms.Form):
                         validate_email(row['email'])
                     else:
                         row['email'] = None
+
+                    if Voter.objects.filter(session=self.session, email=row['email']).exists():
+                        raise forms.ValidationError(f'Duplicate email address in csv: {row["email"]}')
+
                     voters.append(Voter.from_data(session=self.session, email=row['email'], name=row['name']))
         except UnicodeDecodeError:
             raise forms.ValidationError('File seems to be not in CSV format.')

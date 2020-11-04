@@ -132,15 +132,14 @@ def add_election(request, pk=None):
 
             test_voter = Namespace(**{
                 "name": "Testname",
-                "email": form.data['email'],
+                "email": form.cleaned_data['email'],
             })
             test_voter.email_user = partial(Voter.email_user, test_voter)
             test_election = Namespace(**{
-                "title": form.data['title'],
-                "remind_text": form.data['remind_text'],
+                "title": form.cleaned_data['title'],
+                "remind_text": form.cleaned_data['remind_text'],
                 "pk": 1,
-                "start_date": datetime.fromisoformat(form.data['start_date']) if form.data[
-                    'start_date'] else datetime.now(),
+                "end_date": datetime.fromisoformat(form.cleaned_data['end_date']) if form.cleaned_data['end_date'] else None,
             })
 
             Voter.send_reminder(test_voter, manager.stusta_email, test_election)

@@ -311,10 +311,10 @@ class Voter(models.Model):
                 'name': self.name,
                 'title': election.title,
                 'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
-                'end_date': election.start_date.strftime("%d.%m.%y") if election.start_date else "",
-                'end_time': election.start_date.strftime("%H:%M") if election.start_date else "",
-                'end_date_en': election.start_date.strftime("%Y/%m/%d") if election.start_date else "",
-                'end_time_en': election.start_date.strftime("%I:%M %p") if election.start_date else "",
+                'end_date': election.end_date.strftime("%d.%m.%y") if election.end_date else "",
+                'end_time': election.end_date.strftime("%H:%M") if election.end_date else "",
+                'end_date_en': election.end_date.strftime("%Y/%m/%d") if election.end_date else "",
+                'end_time_en': election.end_date.strftime("%I:%M %p") if election.end_date else "",
             }
             body_html = election.remind_text.format(**context)
         else:

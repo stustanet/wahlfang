@@ -68,7 +68,7 @@ class Session(models.Model):
     title = models.CharField(max_length=256)
     meeting_link = models.CharField(max_length=512, blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
-    invite_text = models.TextField(max_length=1000, blank=True, null=True)
+    invite_text = models.TextField(max_length=8000, blank=True, null=True)
 
 
 class Election(models.Model):
@@ -81,7 +81,7 @@ class Election(models.Model):
                                         default='0')
     voters_self_apply = models.BooleanField(default=False)
     send_emails_on_start = models.BooleanField(default=False)
-    remind_text = models.TextField(max_length=1000, blank=True, null=True)
+    remind_text = models.TextField(max_length=8000, blank=True, null=True)
     remind_text_sent = models.BooleanField(default=False)
 
     @property

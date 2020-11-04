@@ -275,12 +275,12 @@ class CSVUploaderForm(forms.Form):
     def clean(self):
         super().clean()
         f = self.cleaned_data['file'].file
+        data = {}
         try:
             with io.TextIOWrapper(f, encoding='utf-8') as text_file:
                 csv_reader = csv.DictReader(text_file)
                 if 'email' not in csv_reader.fieldnames or 'name' not in csv_reader.fieldnames:
                     raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
-                voters = []
                 for row in csv_reader:
                     if row['email']:
                         validate_email(row['email'])
@@ -288,15 +288,19 @@ class CSVUploaderForm(forms.Form):
                         row['email'] = None
 
                     if Voter.objects.filter(session=self.session, email=row['email']).exists():
-                        raise forms.ValidationError(f'Duplicate email address in csv: {row["email"]}')
+                        raise forms.ValidationError(f'Voter with email address {row["email"]} already exists')
 
-                    voters.append(Voter.from_data(session=self.session, email=row['email'], name=row['name']))
+                    if row['email'] in data:
+                        raise forms.ValidationError(f'Duplicate email in csv: {row["email"]}')
+
+                    data[row['email']] = row['name']
         except UnicodeDecodeError:
             raise forms.ValidationError('File seems to be not in CSV format.')
 
-        self.cleaned_data['file'] = voters
+        self.cleaned_data['csv_data'] = data
         return self.cleaned_data
 
     def save(self):
-        for voter, code in self.cleaned_data['file']:
+        for email, name in self.cleaned_data['csv_data'].items():
+            voter, code = Voter.from_data(session=self.session, email=email, name=name)
             voter.send_invitation(code, self.session.managers.all().first().stusta_email)

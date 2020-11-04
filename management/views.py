@@ -139,7 +139,7 @@ def add_election(request, pk=None):
                 "title": form.cleaned_data['title'],
                 "remind_text": form.cleaned_data['remind_text'],
                 "pk": 1,
-                "end_date": datetime.fromisoformat(form.cleaned_data['end_date']) if form.cleaned_data['end_date'] else None,
+                "end_date": form.cleaned_data['end_date'],
             })
 
             Voter.send_reminder(test_voter, manager.stusta_email, test_election)

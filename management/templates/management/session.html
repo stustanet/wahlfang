@@ -60,29 +60,30 @@
                href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
           </h4>
           <br>
-          <table class="table">
-            <thead>
-            <tr>
-              <th scope="row">E-Mail</th>
-              <th scope="row"></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for voter in voters %}
-              <tr>
-                <td class="{% if voter.logged_in %}text-success{% endif %}"> {{ voter }}</td>
-                <td class="text-right">
+
+          <div class="list-group list-group-flush">
+            <div class="list-group-item">
+              <span class="w-25 font-weight-bold">E-Mail</span>
+            </div>
+            <div class="voter-table">
+              {% for voter in voters %}
+                <div class="list-group-item">
+                  <span class="w-25 {% if voter.logged_in %}text-success{% endif %}"> {{ voter }}</span>
+                  <span class="float-right">
                   <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="close btn btn-danger" aria-label="remove voter">
                       &times;
                     </button>
                   </form>
-                </td>
-              </tr>
-            {% endfor %}
-            </tbody>
-          </table>
+                </span>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <br>
+
           <a class="btn btn-dark d-inline float-left ml-2"
              href="{% url 'management:print_token' session.pk %}">Download Tokens</a>
         </div>

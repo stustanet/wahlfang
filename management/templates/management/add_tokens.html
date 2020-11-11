@@ -11,8 +11,7 @@
           <span>Enter the amount of tokens that you want to generate and click "Submit". Tokens can then be
             downloaded in form of a PDF file in the session view.<br> Caution: The voters generated purely by
             token are anonymous. Also note that new tokens will be generated every time you download the PDF file,
-            invalidation any previously generated PDF.
-            This due to the nature that we never save any raw tokens in our database.
+            invalidating any previously generated PDF.
           </span>
           <hr>
           <form class="user" action="{% url 'management:add_tokens' session.pk %}" method="post">

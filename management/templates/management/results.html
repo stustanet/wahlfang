@@ -1,23 +1,27 @@
 {% load static %}
 <table class="table table-striped">
-    <thead>
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Applicant</th>
+    <th scope="col">Yes</th>
+    <th scope="col">No</th>
+    {% if not election.disable_abstention %}
+      <th scope="col">Abstention</th>
+    {% endif %}
+  </tr>
+  </thead>
+  <tbody>
+  {% for application in election.election_summary %}
     <tr>
-        <th scope="col">#</th>
-        <th scope="col">Applicant</th>
-        <th scope="col">Yes</th>
-        <th scope="col">No</th>
-        <th scope="col">Abstention</th>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ application.get_display_name }}</td>
+      <td>{{ application.votes_accept }}</td>
+      <td>{{ application.votes_reject }}</td>
+      {% if not election.disable_abstention %}
+        <td>{{ application.votes_abstention }}</td>
+      {% endif %}
     </tr>
-    </thead>
-    <tbody>
-    {% for application in election.election_summary %}
-        <tr>
-            <th scope="row">{{ forloop.counter }}</th>
-            <td>{{ application.get_display_name }}</td>
-            <td>{{ application.votes_accept }}</td>
-            <td>{{ application.votes_reject }}</td>
-            <td>{{ application.votes_abstention }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
+  {% endfor %}
+  </tbody>
 </table>

@@ -139,7 +139,7 @@ class AddElectionForm(TemplateStringForm):
         model = Election
         fields = (
             'title', 'start_date', 'end_date', 'session', 'max_votes_yes', 'voters_self_apply', 'send_emails_on_start',
-            'remind_text')
+            'remind_text', 'disable_abstention')
 
         labels = {
             'title': 'Election Name',
@@ -148,6 +148,8 @@ class AddElectionForm(TemplateStringForm):
             'voters_self_apply': 'Voters can apply for the election',
             'send_emails_on_start': 'Voters receive an e-mail when the election starts<br>'
                                     '(useful for elections that last several days)',
+            'disable_abstention': 'Disable the option to abstain in this election<br>'
+                                  '(only YES and NO votes will be allowed)',
             'remind_text': '',
         }
 

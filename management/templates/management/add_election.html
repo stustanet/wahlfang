@@ -13,7 +13,7 @@
 
             {{ form|as_crispy_errors }}
             {% for field in form %}
-              {% if field.html_name != "remind_text" and field.html_name != "send_emails_on_start" and field.html_name != "voters_self_apply" and field.html_name != "email" %}
+              {% if field.html_name != "remind_text" and field.html_name != "send_emails_on_start" and field.html_name != "voters_self_apply" and field.html_name != "email" and field.html_name != 'disable_abstention' %}
                 {{ field|as_crispy_field }}
               {% endif %}
             {% endfor %}
@@ -28,6 +28,7 @@
                 </a>
               </div>
               <div id="collapseOne" class="card-body collapse{% if form.remind_text.value %} show{% endif %}">
+                {{ form.disable_abstention|as_crispy_field }}
                 {{ form.voters_self_apply|as_crispy_field }}
                 {{ form.send_emails_on_start|as_crispy_field }}
                 <h5>Remind email template text</h5>

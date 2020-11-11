@@ -30,6 +30,11 @@ VOTE_CHOICES = [
     (VOTE_REJECT, 'No'),
 ]
 
+VOTE_CHOICES_NO_ABSTENTION = [
+    (VOTE_ACCEPT, 'Yes'),
+    (VOTE_REJECT, 'No'),
+]
+
 
 class Enc32:
     alphabet = "0123456789abcdefghjknpqrstuvwxyz"
@@ -79,6 +84,7 @@ class Election(models.Model):
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
     result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'fully published')],
                                         default='0')
+    disable_abstention = models.BooleanField(default=False)
     voters_self_apply = models.BooleanField(default=False)
     send_emails_on_start = models.BooleanField(default=False)
     remind_text = models.TextField(max_length=8000, blank=True, null=True)

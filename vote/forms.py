@@ -4,7 +4,8 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from management.forms import ApplicationUploadForm
-from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT
+from vote.models import Application, Voter, OpenVote, VOTE_CHOICES, Vote, VOTE_ABSTENTION, VOTE_ACCEPT, \
+    VOTE_CHOICES_NO_ABSTENTION
 
 
 class AccessCodeAuthenticationForm(forms.Form):
@@ -58,12 +59,12 @@ class VoteBoundField(forms.BoundField):
 
 
 class VoteField(forms.ChoiceField):
-    def __init__(self, *, application, **kwargs):
+    def __init__(self, *, application, disable_abstention=False, **kwargs):
         super().__init__(
             label=application.get_display_name(),
-            choices=VOTE_CHOICES,
+            choices=VOTE_CHOICES_NO_ABSTENTION if disable_abstention else VOTE_CHOICES,
             widget=forms.RadioSelect(),
-            initial=VOTE_ABSTENTION,
+            initial=None if disable_abstention else VOTE_ABSTENTION,
             **kwargs
         )
         self.application = application
@@ -85,7 +86,8 @@ class VoteForm(forms.Form):
 
         # dynamically construct form fields
         for application in self.election.applications:
-            self.fields[f'{application.pk}'] = VoteField(application=application)
+            self.fields[f'{application.pk}'] = VoteField(application=application,
+                                                         disable_abstention=self.election.disable_abstention)
 
         self.num_applications = len(self.election.applications)
 

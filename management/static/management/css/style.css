@@ -61,4 +61,8 @@ th.monospace {
     cursor: pointer;
 }
 
+.voter-table {
+    max-height: 400px;
+    overflow-y: auto;
+}
 

@@ -3,7 +3,6 @@ import json
 import logging
 import os
 from argparse import Namespace
-from datetime import datetime
 from functools import partial
 from pathlib import Path
 from typing import Dict
@@ -16,6 +15,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from latex.build import PdfLatexBuilder
@@ -57,16 +57,16 @@ def index(request):
                 messages.add_message(request, messages.INFO, 'Test email sent.')
 
                 test_session = Namespace(**{
-                    "title": form.data['title'],
-                    "invite_text": form.data['invite_text'],
-                    "start_date": datetime.fromisoformat(form.data['start_date']) if form.data[
-                        'start_date'] else datetime.now(),
-                    'meeting_link': form.data['meeting_link'],
+                    "title": form.cleaned_data['title'],
+                    "invite_text": form.cleaned_data['invite_text'],
+                    "start_date": form.cleaned_data['start_date'] if form.data[
+                        'start_date'] else timezone.now(),
+                    'meeting_link': form.cleaned_data['meeting_link'],
                 })
 
                 test_voter = Namespace(**{
                     "name": "Testname",
-                    "email": form.data['email'],
+                    "email": form.cleaned_data['email'],
                     "session": test_session,
                 })
                 test_voter.email_user = partial(Voter.email_user, test_voter)
@@ -389,7 +389,7 @@ def export_csv(request, pk):
     writer.writerow(header)
     for i in range(len(e.election_summary)):
         a = e.election_summary[i]
-        row = [i+1, a.get_display_name(), a.email, a.votes_accept, a.votes_reject, a.votes_abstention]
+        row = [i + 1, a.get_display_name(), a.email, a.votes_accept, a.votes_reject, a.votes_abstention]
         if e.max_votes_yes is not None:
             row.append(True if i < e.max_votes_yes else False)
         writer.writerow(row)

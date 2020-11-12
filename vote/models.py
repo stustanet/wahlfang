@@ -275,16 +275,20 @@ class Voter(models.Model):
             return
         subject = f'Invitation for {self.session.title}'
         if self.session.invite_text:
+            if self.session.start_date:
+                # cast to correct time zone
+                current_tz = timezone.get_current_timezone()
+                st = current_tz.normalize(self.session.start_date)
             context = {
                 'name': self.name,
                 'title': self.session.title,
                 'access_code': access_code,
                 'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login',
                                                                    kwargs={'access_code': access_code}),
-                'start_date': self.session.start_date.strftime("%d.%m.%Y") if self.session.start_date else "",
-                'start_time': self.session.start_date.strftime("%H:%M") if self.session.start_date else "",
-                'start_date_en': self.session.start_date.strftime("%Y/%m/%d") if self.session.start_date else "",
-                'start_time_en': self.session.start_date.strftime("%I:%M %p") if self.session.start_date else "",
+                'start_date': st.strftime("%d.%m.%Y") if self.session.start_date else "",
+                'start_time': st.strftime("%H:%M") if self.session.start_date else "",
+                'start_date_en': st.strftime("%Y/%m/%d") if self.session.start_date else "",
+                'start_time_en': st.strftime("%I:%M %p") if self.session.start_date else "",
                 'base_url': 'https://vote.stustanet.de',
                 'meeting_link': self.session.meeting_link
             }
@@ -313,14 +317,18 @@ class Voter(models.Model):
             return
         subject = f'{election.title} is now open'
         if election.remind_text:
+            if self.session.start_date:
+                # cast to correct time zone
+                current_tz = timezone.get_current_timezone()
+                et = current_tz.normalize(election.end_date)
             context = {
                 'name': self.name,
                 'title': election.title,
                 'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
-                'end_date': election.end_date.strftime("%d.%m.%y") if election.end_date else "",
-                'end_time': election.end_date.strftime("%H:%M") if election.end_date else "",
-                'end_date_en': election.end_date.strftime("%Y/%m/%d") if election.end_date else "",
-                'end_time_en': election.end_date.strftime("%I:%M %p") if election.end_date else "",
+                'end_date': et.strftime("%d.%m.%y") if election.end_date else "",
+                'end_time': et.strftime("%H:%M") if election.end_date else "",
+                'end_date_en': et.strftime("%Y/%m/%d") if election.end_date else "",
+                'end_time_en': et.strftime("%I:%M %p") if election.end_date else "",
             }
             body_html = election.remind_text.format(**context)
         else:
@@ -383,7 +391,6 @@ class Voter(models.Model):
         password = self.set_password()
         self.save()
         return self.get_access_code(self, password)
-
 
 
 def avatar_file_name(instance, filename):

@@ -83,9 +83,11 @@
           </div>
 
           <br>
-
-          <a class="btn btn-dark d-inline float-left ml-2"
-             href="{% url 'management:print_token' session.pk %}">Download Tokens</a>
+          <button type="button" class="btn btn-dark d-inline float-left ml-2" data-toggle="modal"
+                  data-target="#downloadToken"
+                  aria-label="download tokens">
+            <span aria-hidden="true">Download Tokens</span>
+          </button>
         </div>
       </div>
     </div>
@@ -112,8 +114,29 @@
       </div>
     </div>
   {% endfor %}
+  <div class="modal fade" id="downloadToken" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Download Token</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Downloading the tokens PDF will generate new tokens and thus invalidating any previously
+            generated tokens. Are you sure you want to download the tokens?</p>
+        </div>
+        <div class="modal-footer">
+          <a class="btn btn-warning d-inline float-left ml-2" id="downloadlink"
+             href="{% url 'management:print_token' session.pk %}">Download Tokens</a>
+
+          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="{% static "js/jquery-3.4.1.slim.min.js" %}"
           integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
   <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
           integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+  <script src="{% static "management/js/session.js" %}"></script>
 {% endblock %}

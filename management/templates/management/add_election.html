@@ -23,9 +23,9 @@
               <div
                   class="card-header mycard-header cursor-pointer{% if not form.remind_text.value %} collapsed{% endif %}"
                   data-toggle="collapse" href="#collapseOne">
-                <a class="card-title">
+                <span class="card-title">
                   Advanced Options
-                </a>
+                </span>
               </div>
               <div id="collapseOne" class="card-body collapse{% if form.remind_text.value %} show{% endif %}">
                 {{ form.disable_abstention|as_crispy_field }}
@@ -81,7 +81,6 @@
             </div>
             <br>
 
-
             <button type="submit" id="id_btn_start" class="btn btn-success" name="submit_type" value="commit">
               Submit
             </button>
@@ -90,8 +89,8 @@
       </div>
     </div>
   </div>
-  <script src="{% static "js/jquery-3.4.1.slim.min.js" %}"
-          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
-  <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
-          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+  <script src="{% static "js/jquery-3.5.1.slim.min.js" %}"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"></script>
+  <script src="{% static "bootstrap-4.5.3-dist/js/bootstrap.min.js" %}"
+          integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"></script>
 {% endblock %}

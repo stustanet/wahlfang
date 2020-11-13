@@ -22,9 +22,12 @@ def management_login_required(function=None, redirect_field_name=REDIRECT_FIELD_
 
 
 class ManagementBackend(BaseBackend):
-    def authenticate(self, request, username=None, password=None):
+    def authenticate(self, request, **kwargs):
+        username = kwargs.pop('username', None)
+        password = kwargs.pop('password', None)
+
         if username is None or password is None:
-            return
+            return None
 
         try:
             user = ElectionManager.objects.get(username=username)
@@ -36,6 +39,8 @@ class ManagementBackend(BaseBackend):
             if user.check_password(password):
                 user.backend = 'management.authentication.ManagementBackend'
                 return user
+
+        return None
 
     def get_user(self, user_id):
         return ElectionManager.objects.filter(pk=user_id).first()

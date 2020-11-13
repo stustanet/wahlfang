@@ -5,16 +5,16 @@ StuStaNet Online Wahl-Tool
 ## Setup
 
 ```bash
-$ cd Wahlfang
+$ cd wahlfang
 $ pip3 install -r requirements.txt
 $ python3 manage.py migrate
 ```
 
-### Admin Access
+### Management Access
 
-Creating a superuser (for testing):
+Creating a local election management user:
 ```bash
-$ python3 manage.py createsuperuser
+$ python3 manage.py 
 ```
 
 The admin interface is accessible at [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).

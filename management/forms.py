@@ -229,7 +229,7 @@ class AddVotersForm(forms.Form):
 
     def save(self) -> List[Tuple[Voter, str]]:
         voters = [
-            Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['email_list']
+            Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['voters_list']
         ]
 
         for voter, code in voters:
@@ -237,19 +237,27 @@ class AddVotersForm(forms.Form):
 
         return voters
 
-    def clean(self):
-        super().clean()
-        emails = self.cleaned_data['voters_list'].splitlines()
-        for email in emails:
-            validate_email(email)
-            if Voter.objects.filter(email=email, session=self.session).exists():
-                raise forms.ValidationError('voter with this email address already exists')
+    def clean_voters_list(self):
+        lines = self.cleaned_data['voters_list'].splitlines()
+        emails = []
+        for line in lines:
+            if line == '':
+                continue
+
+            try:
+                validate_email(line)
+            except forms.ValidationError:
+                self.add_error('voters_list', f'{line} is not a valid email address')
+
+            if Voter.objects.filter(email=line, session=self.session).exists():
+                self.add_error('voters_list', f'a voter with email address {line} already exists')
+
+            emails.append(line)
 
         if not len(emails) == len(set(emails)):
             raise forms.ValidationError('duplicate email address')
 
-        self.cleaned_data['email_list'] = emails
-        return self.cleaned_data
+        return emails
 
 
 class AddTokensForm(forms.Form):
@@ -268,15 +276,14 @@ class AddTokensForm(forms.Form):
 
 
 class CSVUploaderForm(forms.Form):
-    file = forms.FileField(label='CSV File')
+    csv_data = forms.FileField(label='CSV File')
 
     def __init__(self, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.session = session
 
-    def clean(self):
-        super().clean()
-        f = self.cleaned_data['file'].file
+    def clean_csv_data(self):
+        f = self.cleaned_data['csv_data'].file
         data = {}
         try:
             with io.TextIOWrapper(f, encoding='utf-8') as text_file:
@@ -285,22 +292,24 @@ class CSVUploaderForm(forms.Form):
                     raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
                 for row in csv_reader:
                     if row['email']:
-                        validate_email(row['email'])
+                        try:
+                            validate_email(row['email'])
+                        except forms.ValidationError:
+                            self.add_error('csv_data', f'Invalid email {row["email"]}')
                     else:
                         row['email'] = None
 
                     if Voter.objects.filter(session=self.session, email=row['email']).exists():
-                        raise forms.ValidationError(f'Voter with email address {row["email"]} already exists')
+                        self.add_error('csv_data', f'Voter with email address {row["email"]} already exists')
 
                     if row['email'] in data:
-                        raise forms.ValidationError(f'Duplicate email in csv: {row["email"]}')
+                        self.add_error('csv_data', f'Duplicate email in csv: {row["email"]}')
 
                     data[row['email']] = row['name']
         except UnicodeDecodeError:
-            raise forms.ValidationError('File seems to be not in CSV format.')
+            raise forms.ValidationError('File does not seem to be in CSV format.')
 
-        self.cleaned_data['csv_data'] = data
-        return self.cleaned_data
+        return data
 
     def save(self):
         for email, name in self.cleaned_data['csv_data'].items():

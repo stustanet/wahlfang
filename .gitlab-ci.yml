@@ -9,6 +9,7 @@ variables:
 all_tests:
   stage: test
   before_script:
+    - apt-get update && apt-get install -y build-essential python3-dev libldap2-dev libsasl2-dev
     - pip3 install virtualenv
     - virtualenv -q .venv
     - source .venv/bin/activate
@@ -30,6 +31,7 @@ bandit:
 mypy:
   stage: test
   before_script:
+    - apt-get update && apt-get install -y build-essential python3-dev libldap2-dev libsasl2-dev
     - pip3 install virtualenv
     - virtualenv -q .venv
     - source .venv/bin/activate
@@ -42,6 +44,7 @@ mypy:
 pylint:
   stage: test
   before_script:
+    - apt-get update && apt-get install -y build-essential python3-dev libldap2-dev libsasl2-dev
     - pip3 install virtualenv
     - virtualenv -q .venv
     - source .venv/bin/activate

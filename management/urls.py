@@ -7,10 +7,18 @@ app_name = 'management'
 
 urlpatterns = [
     path('', views.index, name='index'),
+
+    # Session
+    path('meeting/<int:pk>', views.session_detail, name='session'),
+    path('meeting/<int:pk>/settings', views.session_settings, name='session_settings'),
+    path('meeting/<int:pk>/delete_session', views.delete_session, name='delete_session'),
     path('meeting/<int:pk>/add_voters', views.add_voters, name='add_voters'),
     path('meeting/<int:pk>/add_tokens', views.add_tokens, name='add_tokens'),
     path('meeting/<int:pk>/add_election', views.add_election, name='add_election'),
-    path('meeting/<int:pk>', views.session_detail, name='session'),
+    path('meeting/<int:pk>/print_token', views.print_token, name='print_token'),
+    path('meeting/<int:pk>/import_csv', views.import_csv, name='import_csv'),
+
+    # Election
     path('election/<int:pk>/add_application', views.election_upload_application, name='add_application'),
     path('election/<int:pk>/edit/<int:application_id>', views.election_upload_application, name='edit_application'),
     path('election/<int:pk>/edit/<int:application_id>/delete_application', views.election_delete_application,
@@ -20,9 +28,6 @@ urlpatterns = [
     path('election/<int:pk>/delete_election', views.delete_election, name='delete_election'),
     path('election/<int:pk>/export_csv', views.export_csv, name='export_csv'),
     path('election/<int:pk>/export_json', views.export_json, name='export_json'),
-    path('meeting/<int:pk>/delete_session', views.delete_session, name='delete_session'),
-    path('meeting/<int:pk>/print_token', views.print_token, name='print_token'),
-    path('meeting/<int:pk>/import_csv', views.import_csv, name='import_csv'),
 
     # account management stuff
     path('login', views.LoginView.as_view(), name='login'),

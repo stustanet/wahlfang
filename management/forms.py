@@ -8,6 +8,7 @@ from django import forms
 from django.core.validators import validate_email
 from django.utils import timezone
 
+from management.models import ElectionManager
 from vote.models import Election, Application, Session, Voter, OpenVote
 
 
@@ -54,7 +55,7 @@ class ChangeElectionPublicStateForm(forms.ModelForm):
         }
 
 
-class TemplateStringForm(forms.ModelForm):
+class TemplateStringForm:
     def clean_email_text(self, test_data: List[str], field: str):
         """
         checks if the cleaned_text fails when formatted on the test_data.
@@ -62,7 +63,7 @@ class TemplateStringForm(forms.ModelForm):
         test_data_dict = {i: "" for i in test_data}
         cleaned_text = self.cleaned_data[field]
         try:
-            test = cleaned_text.format(**test_data_dict)
+            cleaned_text.format(**test_data_dict)
         except (KeyError, ValueError, IndexError):
             x = re.findall(r"\{\w*\}", cleaned_text)
             test_data = set(x) - set([f"{{{i}}}" for i in test_data])
@@ -70,7 +71,20 @@ class TemplateStringForm(forms.ModelForm):
         return cleaned_text
 
 
-class AddSessionForm(TemplateStringForm):
+class AddSessionForm(forms.ModelForm, TemplateStringForm):
+    variables = {
+        "{name}": "Voter's name if set",
+        "{title}": "Session's title",
+        "{access_code}": "Access code/token for the voter to login",
+        "{login_url}": "URL which instantly logs user in",
+        "{base_url}": "Basically vote.stusta.de",
+        "{start_time}": "Start time if datetime is set",
+        "{start_date}": "Start date if datetime is set",
+        "{start_time_en}": "Start time in english format e.g. 02:23 PM",
+        "{start_date_en}": "Start date in english format e.g. 12/12/2020",
+        "{meeting_link}": "Meeting link if set"
+    }
+
     email = forms.EmailField(required=False, label="",
                              widget=forms.EmailInput(attrs={"class": "emailinput form-control",
                                                             "placeholder": "your@email.de"}))
@@ -107,16 +121,73 @@ class AddSessionForm(TemplateStringForm):
                      "start_date", "meeting_link", "start_date_en", "start_time_en"]
         return self.clean_email_text(test_data, 'invite_text')
 
-    def save(self, commit=True):
-        instance = super().save(commit=commit)
-        self.user.sessions.add(instance)
-        if commit:
+    def _save_m2m(self):
+        super()._save_m2m()
+
+        if not self.user.sessions.filter(pk=self.instance.pk):
+            self.user.sessions.add(self.instance)
             self.user.save()
 
-        return instance
+    def save(self, commit=True):
+        self.instance = super().save(commit=False)
+
+        if commit:
+            self.instance.save()
+            self._save_m2m()
+        else:
+            self.save_m2m = self._save_m2m
+
+        return self.instance
 
 
-class AddElectionForm(TemplateStringForm):
+class SessionSettingsForm(AddSessionForm):
+    add_election_manager = forms.CharField(max_length=256, required=False, label='')
+
+    class Meta:
+        model = Session
+        fields = ('start_date', 'meeting_link', 'invite_text')
+        labels = {
+            'start_date': 'Meeting start (optional)',
+            'meeting_link': 'Link to meeting call platform (optional)',
+            # will be set by html
+            'invite_text': ''
+        }
+
+    def clean_add_election_manager(self):
+        value = self.data['add_election_manager']
+        if not ElectionManager.objects.filter(username=value).exists():
+            raise forms.ValidationError(f'Cannot find election manager with username {value}')
+
+        return ElectionManager.objects.get(username=value)
+
+    def _save_m2m(self):
+        super()._save_m2m()
+
+        self.cleaned_data['add_election_manager'].sessions.add(self.instance)
+        self.cleaned_data['add_election_manager'].save()
+
+    def save(self, commit=True):
+        self.instance = super().save(commit=False)
+        if commit:
+            self.instance.save()
+            self._save_m2m()
+        else:
+            self.save_m2m = self._save_m2m
+
+        return self.instance
+
+
+class AddElectionForm(forms.ModelForm, TemplateStringForm):
+    variables = {
+        "{name}": "Voter's name if set",
+        "{title}": "Session's title",
+        "{url}": "URL to the election",
+        "{end_time}": "End time if datetime is set",
+        "{end_date}": "End date if datetime is set",
+        "{end_time_en}": "End time in english format e.g. 02:23 PM",
+        "{end_date_en}": "End date in english format e.g. 12/12/2020",
+    }
+
     email = forms.EmailField(required=False, label="",
                              widget=forms.EmailInput(attrs={"class": "emailinput form-control",
                                                             "placeholder": "your@email.de"}))
@@ -296,8 +367,8 @@ class CSVUploaderForm(forms.Form):
                         raise forms.ValidationError(f'Duplicate email in csv: {row["email"]}')
 
                     data[row['email']] = row['name']
-        except UnicodeDecodeError:
-            raise forms.ValidationError('File seems to be not in CSV format.')
+        except UnicodeDecodeError as e:
+            raise forms.ValidationError('File seems to be not in CSV format.') from e
 
         self.cleaned_data['csv_data'] = data
         return self.cleaned_data

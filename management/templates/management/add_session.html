@@ -22,14 +22,12 @@
               <div
                   class="mycard-header card-header cursor-pointer{% if not form.invite_text.value %} collapsed{% endif %}"
                   data-toggle="collapse" href="#collapseOne">
-                <a class="card-title">
-                  Advanced Options
-                </a>
+                <span class="card-title">Advanced Options</span>
               </div>
               <div id="collapseOne" class="card-body collapse{% if form.invite_text.value %} show{% endif %}">
                 <h5>Invite email template text</h5>
                 The template has be written the python format string format. The following variables are available:<br>
-                <table class="table">
+                <table class="table table-responsive">
                   <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -37,7 +35,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                  {% for key, val in vars.items %}
+                  {% for key, val in variables.items %}
                     <tr>
                       <th scope="row" class="monospace">{{ key }}</th>
                       <td>{{ val }}</td>
@@ -82,8 +80,8 @@
       </div>
     </div>
   </div>
-  <script src="{% static "js/jquery-3.4.1.slim.min.js" %}"
-          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
-  <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
-          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+  <script src="{% static "js/jquery-3.5.1.slim.min.js" %}"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"></script>
+  <script src="{% static "bootstrap-4.5.3-dist/js/bootstrap.min.js" %}"
+          integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"></script>
 {% endblock %}

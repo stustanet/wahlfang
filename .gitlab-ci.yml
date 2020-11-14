@@ -3,9 +3,53 @@ image: python:3.8-buster
 stages:
   - test
 
+variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
 all_tests:
   stage: test
+  before_script:
+    - apt-get update && apt-get install -y build-essential libldap2-dev libsasl2-dev
+    - pip3 install virtualenv
+    - virtualenv -q .venv
+    - source .venv/bin/activate
+    - pip install -U -r requirements.txt
+    - pip install -U -r requirements_dev.txt
   script:
-    - apt-get update && apt-get install -y build-essential python3-dev libldap2-dev libsasl2-dev
-    - pip3 install -r requirements.txt
-    - python3 -Wa manage.py test --verbosity=2
+    - make test
+
+bandit:
+  stage: test
+  before_script:
+    - pip3 install virtualenv
+    - virtualenv -q .venv
+    - source .venv/bin/activate
+    - pip install -U bandit
+  script:
+    - make bandit
+
+mypy:
+  stage: test
+  before_script:
+    - apt-get update && apt-get install -y build-essential libldap2-dev libsasl2-dev
+    - pip3 install virtualenv
+    - virtualenv -q .venv
+    - source .venv/bin/activate
+    - pip install -U -r requirements.txt
+    - pip install -U -r requirements_dev.txt
+  script:
+    - make mypy
+  allow_failure: true
+
+pylint:
+  stage: test
+  before_script:
+    - apt-get update && apt-get install -y build-essential libldap2-dev libsasl2-dev
+    - pip3 install virtualenv
+    - virtualenv -q .venv
+    - source .venv/bin/activate
+    - pip install -U -r requirements.txt
+    - pip install -U pylint pylint-django
+  script:
+    - make pylint
+  allow_failure: true

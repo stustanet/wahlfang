@@ -178,6 +178,16 @@ class SessionSettingsForm(AddSessionForm):
 
 
 class AddElectionForm(forms.ModelForm, TemplateStringForm):
+    variables = {
+        "{name}": "Voter's name if set",
+        "{title}": "Session's title",
+        "{url}": "URL to the election",
+        "{end_time}": "End time if datetime is set",
+        "{end_date}": "End date if datetime is set",
+        "{end_time_en}": "End time in english format e.g. 02:23 PM",
+        "{end_date_en}": "End date in english format e.g. 12/12/2020",
+    }
+
     email = forms.EmailField(required=False, label="",
                              widget=forms.EmailInput(attrs={"class": "emailinput form-control",
                                                             "placeholder": "your@email.de"}))

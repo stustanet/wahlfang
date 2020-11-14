@@ -1,5 +1,4 @@
 import csv
-import json
 import logging
 import os
 from argparse import Namespace
@@ -135,19 +134,11 @@ def add_election(request, pk=None):
     session = manager.sessions.get(pk=pk)
     context = {
         'session': session,
-        'vars': {
-            "{name}": "Voter's name if set",
-            "{title}": "Session's title",
-            "{url}": "URL to the election",
-            "{end_time}": "End time if datetime is set",
-            "{end_date}": "End date if datetime is set",
-            "{end_time_en}": "End time in english format e.g. 02:23 PM",
-            "{end_date_en}": "End date in english format e.g. 12/12/2020",
-        }
     }
 
     form = AddElectionForm(session=session, request=request, user=manager, data=request.POST if request.POST else None)
     context['form'] = form
+    context['variables'] = form.variables
     if request.POST and form.is_valid():
         if request.POST.get("submit_type") == "test":
             messages.add_message(request, messages.INFO, 'Test email sent.')

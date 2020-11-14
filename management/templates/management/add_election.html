@@ -33,7 +33,7 @@
                 {{ form.send_emails_on_start|as_crispy_field }}
                 <h5>Remind email template text</h5>
                 The template has be written the python format string format. The following variables are available:<br>
-                <table class="table">
+                <table class="table table-responsive">
                   <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -41,7 +41,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                  {% for key, val in vars.items %}
+                  {% for key, val in variables.items %}
                     <tr>
                       <th scope="row" class="monospace">{{ key }}</th>
                       <td>{{ val }}</td>

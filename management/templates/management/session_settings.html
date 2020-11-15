@@ -6,6 +6,10 @@
   <link rel="stylesheet" href="{% static "management/css/DateTimePicker.css" %}"/>
 {% endblock %}
 
+{% block back_url %}
+  {% url 'management:session' pk=session.pk %}
+{% endblock %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-12">

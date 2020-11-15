@@ -91,7 +91,8 @@ class AddSessionForm(forms.ModelForm, TemplateStringForm):
 
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00',
+                                                                  'type': 'datetime'})
         self.fields['meeting_link'].widget = forms.TextInput(
             attrs={'placeholder': 'e.g. https://bbb.stusta.de/b/ssn-abc-123'})
         self.user = user
@@ -197,8 +198,10 @@ class AddElectionForm(forms.ModelForm, TemplateStringForm):
         self.fields['session'].disabled = True
         self.fields['session'].initial = session
         self.fields['session'].widget = forms.HiddenInput()
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
-        self.fields['end_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00', 'type': 'datetime'})
+        self.fields['end_date'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00', 'type': 'datetime'})
         # self.fields['start_date'].initial = timezone.now()
         self.fields['max_votes_yes'] = forms.IntegerField(min_value=1, required=False,
                                                           label='Maximum number of YES votes (optional)')

@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="{% static "bootstrap-4.5.3-dist/css/bootstrap.min.css" %}"/>
   <link rel="stylesheet" href="{% static "vote/css/style.css" %}"/>
   <link rel="stylesheet" href="{% static "management/css/style.css" %}"/>
+  {% block head %}
+  {% endblock %}
   <title>{% block title %}StuStaNet Wahlfang{% endblock %}</title>
 </head>
 <body>
@@ -67,11 +69,6 @@
   </article>
 
 </div>
-{% comment "Not needed :)" %}
-  <script src="{% static "js/jquery-3.5.1.slim.min.js" %}"
-          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"></script>
-<script src="{% static "bootstrap-4.5.3-dist/js/bootstrap.min.js" %}" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"></script>
-{% endcomment %}
 {% block footer_scripts %}
 {% endblock %}
 </body>

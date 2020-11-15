@@ -115,6 +115,8 @@ def session_settings(request, pk=None):
                 )
             else:
                 form.save()
+                messages.add_message(request, messages.INFO, 'Session updated successfully!')
+                return redirect('management:session', session.id)
 
     context = {
         'session': session,

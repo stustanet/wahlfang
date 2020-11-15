@@ -7,33 +7,39 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Create election</h4>
-          <form class="user" action="{% url 'management:add_election' pk=session.id %}" method="post">
+          <h4>Session Settings</h4>
+          <form class="user" action="{% url 'management:session_settings' session.pk %}" method="post">
             {% csrf_token %}
 
             {{ form|as_crispy_errors }}
-            {% for field in form %}
-              {% if field.html_name != "remind_text" and field.html_name != "send_emails_on_start" and field.html_name != "voters_self_apply" and field.html_name != "email" and field.html_name != 'disable_abstention' %}
-                {{ field|as_crispy_field }}
-              {% endif %}
-            {% endfor %}
 
-            {# collapse card example taken from https://www.codeply.com/p/cI2Pu6O5N5#}
+            {{ form.start_date|as_crispy_field }}
+            {{ form.meeting_link|as_crispy_field }}
+
             <div class="card mb-0">
               <div
-                  class="card-header mycard-header cursor-pointer{% if not form.remind_text.value %} collapsed{% endif %}"
+                  class="mycard-header card-header cursor-pointer{% if not form.invite_text.value and not form.add_election_manager.value %} collapsed{% endif %}"
                   data-toggle="collapse" href="#collapseOne">
-                <span class="card-title">
-                  Advanced Options
-                </span>
+                <span class="card-title">Advanced Options</span>
               </div>
-              <div id="collapseOne" class="card-body collapse{% if form.remind_text.value %} show{% endif %}">
-                {{ form.disable_abstention|as_crispy_field }}
-                {{ form.voters_self_apply|as_crispy_field }}
-                {{ form.send_emails_on_start|as_crispy_field }}
-                <h5>Remind email template text</h5>
+              <div id="collapseOne" class="card-body collapse{% if form.invite_text.value %} show{% endif %}">
+                <h5>Additional election managers</h5>
+                To add an additional election manager to this session enter his/her username in the following field.
+                This means he/she will also have full access to this session and be able to modify it, create new
+                elections as well as add new voters to it.<br>
+                Current election managers are:
+                <div class="list-group list-group-flush">
+                  {% for manager in session.managers.all %}
+                    <div class="list-group-item">
+                      {{ manager.username }}{% if manager.username == user.username %} (you){% endif %}</div>
+                  {% endfor %}
+                </div>
+                {{ form.add_election_manager|as_crispy_field }}
+                <hr>
+
+                <h5>Invite email template text</h5>
                 The template has be written the python format string format. The following variables are available:<br>
-                <table class="table table-responsive">
+                <table class="table">
                   <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -51,18 +57,17 @@
                 </table>
 
                 Here is an example:<br><br>
-                <p class="monospace">Dear,<br><br>This is a reminder that the {title} election has just began.
-                  So you can now start voting for your favourite candidates on
-                  &lt;a href="{url}"&gt;{url}&lt;/a&gt;.
-                  The access code can be found in the invitation email. Please be reminded that you can only vote until
-                  {end_time_en} on the {end_date_en}.
-                  <br><br>
+                <p class="monospace">Dear,<br><br>You have been invited to our awesome meeting {title}. We are meeting
+                  on {meeting_link}. It
+                  takes place on the {start_date_en} at {start_time_en}. You can login with the following link:
+                  &lt;a href="{login_url}"&gt;{login_url}&lt;/a&gt;.
+                  You can also use the following access code on {base_url}: {access_code}<br><br>
                   Best regards,<br>
                   Your awesome Organizers
                 </p>
 
                 <p>
-                  {{ form.remind_text|as_crispy_field }}
+                  {{ form.invite_text|as_crispy_field }}
                 </p>
                 <br>
                 <h6>Send test mail</h6>
@@ -79,11 +84,9 @@
                 </div>
               </div>
             </div>
-            <br>
 
-            <button type="submit" id="id_btn_start" class="btn btn-success" name="submit_type" value="commit">
-              Submit
-            </button>
+            <br>
+            <button type="submit" id="id_btn_start" class="btn btn-success">Save</button>
           </form>
         </div>
       </div>

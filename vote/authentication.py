@@ -19,7 +19,8 @@ def voter_login_required(function=None, redirect_field_name=None):
 
 
 class AccessCodeBackend(BaseBackend):
-    def authenticate(self, request, access_code=None):
+    def authenticate(self, request, **kwargs):
+        access_code = kwargs.pop('access_code', None)
         if access_code is None:
             return None
 
@@ -40,6 +41,8 @@ class AccessCodeBackend(BaseBackend):
                     voter.save()
                 voter.backend = 'vote.authentication.AccessCodeBackend'
                 return voter
+
+        return None
 
     def get_user(self, user_id):
         return Voter.objects.filter(pk=user_id).first()

@@ -153,9 +153,14 @@ class SessionSettingsForm(AddSessionForm):
             # will be set by html
             'invite_text': ''
         }
+        widgets = {
+            'start_date': forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00', 'type': 'datetime'})
+        }
 
     def clean_add_election_manager(self):
         value = self.data['add_election_manager']
+        if not value:
+            return value
         if not ElectionManager.objects.filter(username=value).exists():
             raise forms.ValidationError(f'Cannot find election manager with username {value}')
 
@@ -164,8 +169,9 @@ class SessionSettingsForm(AddSessionForm):
     def _save_m2m(self):
         super()._save_m2m()
 
-        self.cleaned_data['add_election_manager'].sessions.add(self.instance)
-        self.cleaned_data['add_election_manager'].save()
+        if self.cleaned_data['add_election_manager']:
+            self.cleaned_data['add_election_manager'].sessions.add(self.instance)
+            self.cleaned_data['add_election_manager'].save()
 
     def save(self, commit=True):
         self.instance = super().save(commit=False)

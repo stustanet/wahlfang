@@ -1,5 +1,5 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import include, path
 from django.views.generic.base import RedirectView
 
 from vote import views
@@ -9,6 +9,10 @@ app_name = 'vote'
 urlpatterns = [
     path('', views.index, name='index'),
     path('vote/<int:election_id>', views.vote, name='vote'),
+
+	# translation
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('setlang/<lang_code>', views.setlang, name='setlang'),
 
     # code login
     path('code', views.LoginView.as_view(), name='code_login'),

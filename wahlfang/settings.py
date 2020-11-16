@@ -141,6 +141,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+	('en', 'EN'),
+	('de', 'DE'),
+]
+
+LOCALE_PATHS = [
+	os.path.join(BASE_DIR, 'vote', 'locale'),
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 

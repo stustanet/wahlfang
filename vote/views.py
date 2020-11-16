@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.http.response import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
@@ -153,3 +154,26 @@ def delete_own_application(request, election_id):
 
 def help_page(request):
     return render(request, template_name='vote/help.html')
+
+
+def setlang(request, lang_code):
+    """Helper view which just sets the current language of the session
+
+    Takes the language code as an url argument e.g. /setlang/de and redirects back
+    to the last URL or to the index view if no HTTP_REFERRER is available
+    """
+    response = redirect(request.META.get('HTTP_REFERER', 'vote:index'))
+
+    if translation.check_for_language(lang_code):
+        translation.activate(lang_code)
+        response.set_cookie(
+            settings.LANGUAGE_COOKIE_NAME, lang_code,
+            max_age=settings.LANGUAGE_COOKIE_AGE,
+            path=settings.LANGUAGE_COOKIE_PATH,
+            domain=settings.LANGUAGE_COOKIE_DOMAIN,
+            secure=settings.LANGUAGE_COOKIE_SECURE,
+            httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+            samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+        )
+    return response
+

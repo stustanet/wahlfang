@@ -66,7 +66,7 @@ class TemplateStringForm:
             cleaned_text.format(**test_data_dict)
         except (KeyError, ValueError, IndexError):
             x = re.findall(r"\{\w*\}", cleaned_text)
-            test_data = set(x) - set([f"{{{i}}}" for i in test_data])
+            test_data = set(x) - {f"{{{i}}}" for i in test_data}
             self.add_error(field, "The following variables are not allowed: " + ", ".join(test_data))
         return cleaned_text
 
@@ -136,7 +136,7 @@ class AddSessionForm(forms.ModelForm, TemplateStringForm):
             self.instance.save()
             self._save_m2m()
         else:
-            self.save_m2m = self._save_m2m
+            self.save_m2m = self._save_m2m  # pylint: disable=attribute-defined-outside-init
 
         return self.instance
 
@@ -179,7 +179,7 @@ class SessionSettingsForm(AddSessionForm):
             self.instance.save()
             self._save_m2m()
         else:
-            self.save_m2m = self._save_m2m
+            self.save_m2m = self._save_m2m  # pylint: disable=attribute-defined-outside-init
 
         return self.instance
 
@@ -334,7 +334,7 @@ class AddVotersForm(forms.Form):
 
             emails.append(line)
 
-        if not len(emails) == len(set(emails)):
+        if len(emails) != len(set(emails)):
             raise forms.ValidationError('duplicate email address')
 
         return emails

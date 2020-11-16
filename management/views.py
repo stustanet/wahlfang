@@ -210,7 +210,7 @@ def _unpack(request, pk):
 
 @management_login_required
 def election_detail(request, pk):
-    manager, election, session = _unpack(request, pk)
+    _, election, session = _unpack(request, pk)
     context = {
         'election': election,
         'session': session,
@@ -248,7 +248,7 @@ def election_detail(request, pk):
 
 @management_login_required
 def election_upload_application(request, pk, application_id=None):
-    manager, election, meeting = _unpack(request, pk)
+    _, election, _ = _unpack(request, pk)
 
     if not election.can_apply:
         messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')

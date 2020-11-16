@@ -151,5 +151,5 @@ def delete_own_application(request, election_id):
     return HttpResponseNotFound('Application does not exist')
 
 
-def help(request):
+def help_page(request):
     return render(request, template_name='vote/help.html')

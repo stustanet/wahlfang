@@ -20,7 +20,7 @@
 <div id="content">
   <nav class="navbar navbar-expand navbar-dark bg-dark shadow">
     <div class="container-md">
-      <a class="navbar-brand" href="{% url 'management:index' %}">
+      <a class="navbar-brand" href="{% block back_url %}{% url 'management:index' %}{% endblock %}">
         <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
       </a>
       <div class="navbar-text">Wahlfang</div>

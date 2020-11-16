@@ -91,7 +91,8 @@ class AddSessionForm(forms.ModelForm, TemplateStringForm):
 
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00',
+                                                                  'type': 'datetime'})
         self.fields['meeting_link'].widget = forms.TextInput(
             attrs={'placeholder': 'e.g. https://bbb.stusta.de/b/ssn-abc-123'})
         self.user = user
@@ -152,9 +153,14 @@ class SessionSettingsForm(AddSessionForm):
             # will be set by html
             'invite_text': ''
         }
+        widgets = {
+            'start_date': forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00', 'type': 'datetime'})
+        }
 
     def clean_add_election_manager(self):
         value = self.data['add_election_manager']
+        if not value:
+            return value
         if not ElectionManager.objects.filter(username=value).exists():
             raise forms.ValidationError(f'Cannot find election manager with username {value}')
 
@@ -163,8 +169,9 @@ class SessionSettingsForm(AddSessionForm):
     def _save_m2m(self):
         super()._save_m2m()
 
-        self.cleaned_data['add_election_manager'].sessions.add(self.instance)
-        self.cleaned_data['add_election_manager'].save()
+        if self.cleaned_data['add_election_manager']:
+            self.cleaned_data['add_election_manager'].sessions.add(self.instance)
+            self.cleaned_data['add_election_manager'].save()
 
     def save(self, commit=True):
         self.instance = super().save(commit=False)
@@ -197,8 +204,10 @@ class AddElectionForm(forms.ModelForm, TemplateStringForm):
         self.fields['session'].disabled = True
         self.fields['session'].initial = session
         self.fields['session'].widget = forms.HiddenInput()
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
-        self.fields['end_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00', 'type': 'datetime'})
+        self.fields['end_date'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00', 'type': 'datetime'})
         # self.fields['start_date'].initial = timezone.now()
         self.fields['max_votes_yes'] = forms.IntegerField(min_value=1, required=False,
                                                           label='Maximum number of YES votes (optional)')

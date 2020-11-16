@@ -23,7 +23,7 @@ $ python manage.py runserver
 
 Creating a local election management user:
 ```bash
-$ python3 manage.py crreate_admin
+$ python3 manage.py create_admin
 ```
 
 The admin interface is accessible at [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).

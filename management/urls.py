@@ -27,7 +27,6 @@ urlpatterns = [
     path('election/<int:pk>/delete_voter', views.delete_voter, name='delete_voter'),
     path('election/<int:pk>/delete_election', views.delete_election, name='delete_election'),
     path('election/<int:pk>/export_csv', views.export_csv, name='export_csv'),
-    path('election/<int:pk>/export_json', views.export_json, name='export_json'),
 
     # account management stuff
     path('login', views.LoginView.as_view(), name='login'),

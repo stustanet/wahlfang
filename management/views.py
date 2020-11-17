@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.http import Http404, HttpResponse
-from django.http.response import HttpResponseNotFound, JsonResponse
+from django.http.response import HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.urls import reverse
@@ -345,6 +345,12 @@ def print_token(request, pk):
            for access_code in tokens]
     tmp_qr_path = '/tmp/wahlfang/qr_codes/session_{}'.format(session.pk)
     Path(tmp_qr_path).mkdir(parents=True, exist_ok=True)
+    if session.meeting_link:
+        meeting_qr_path = os.path.join(tmp_qr_path, 'qr_meeting.png')
+        qrcode.make(session.meeting_link).save(meeting_qr_path)
+    else:
+        meeting_qr_path = None
+
     paths = []
     for idx, i in enumerate(img):
         path_i = os.path.join(tmp_qr_path, 'qr_{}.png'.format(idx))
@@ -353,7 +359,8 @@ def print_token(request, pk):
     zipped = [{'path': path, 'token': token} for path, token in zip(paths, tokens)]
     context = {
         'session': session,
-        'tokens': zipped
+        'tokens': zipped,
+        'meeting_link_qr': meeting_qr_path
     }
 
     template_name = 'vote/tex/invitation.tex'
@@ -366,6 +373,8 @@ def print_token(request, pk):
 
 def generate_pdf(template_name: str, context: Dict, tex_path: str):
     template = get_template(template_name).render(context).encode('utf8')
+    with open("/tmp/template.tex", "wb") as f:
+        f.write(template)
     pdf = PdfLatexBuilder(pdflatex='pdflatex').build_pdf(template, texinputs=[tex_path, ''])
     return pdf
 
@@ -408,31 +417,5 @@ def export_csv(request, pk):
         if e.max_votes_yes is not None:
             row.append(i < e.max_votes_yes)
         writer.writerow(row)
-
-    return response
-
-
-@management_login_required
-def export_json(request, pk):
-    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
-    if not e.exists():
-        return HttpResponseNotFound('Election does not exist')
-    e = e.first()
-
-    json_data = []
-    for i, applicant in enumerate(e.election_summary):
-        appl_data = {
-            "applicant": applicant.get_display_name(),
-            "email": applicant.email,
-            "yes": applicant.votes_accept,
-            "no": applicant.votes_reject,
-            "abstention": applicant.votes_abstention
-        }
-        if e.max_votes_yes is not None:
-            appl_data["elected"] = i < e.max_votes_yes
-        json_data.append(appl_data)
-
-    response = JsonResponse(data=json_data)
-    response['Content-Disposition'] = 'attachment; filename=result.json'
 
     return response

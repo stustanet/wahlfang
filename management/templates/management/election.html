@@ -127,9 +127,8 @@
               <button type="submit" class="btn btn-info">Apply</button>
             </form>
             <hr>
-            <h5>Export result</h5>
-            <a href="{% url 'management:export_csv' election.pk %}" class="btn btn-primary mr-2">CSV</a>
-            <a href="{% url 'management:export_json' election.pk %}" class="btn btn-primary">JSON</a>
+            <a href="{% url 'management:export_csv' election.pk %}" class="btn btn-primary mr-2">Export result as
+              CSV</a>
           {% endif %}
         </div>
       </div>

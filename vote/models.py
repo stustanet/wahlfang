@@ -341,7 +341,7 @@ class Voter(models.Model):
             return
         subject = f'{election.title} is now open'
         if election.remind_text:
-            if self.session.start_date:
+            if election.end_date:
                 # cast to correct time zone
                 current_tz = timezone.get_current_timezone()
                 et = current_tz.normalize(election.end_date)

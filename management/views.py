@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.http import Http404, HttpResponse
 from django.http.response import HttpResponseNotFound, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
@@ -50,6 +50,10 @@ class LoginView(auth_views.LoginView):
         if ratelimited:
             return render(request, template_name='vote/ratelimited.html', status=429)
         return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        url = self.get_redirect_url()
+        return url or resolve_url('management:index')
 
 
 @management_login_required

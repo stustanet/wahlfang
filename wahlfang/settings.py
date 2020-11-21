@@ -162,7 +162,7 @@ CSP_IMG_SRC = ("'self'", "data:",)
 EMAIL_HOST = 'mail.stusta.de'
 EMAIL_SENDER = 'vorstand@stustanet.de'
 EMAIL_PORT = 25
-VALID_STUSTA_EMAIL_SUFFIXES = [
+VALID_MANAGER_EMAIL_DOMAINS = [
     'stusta.de', 'stustanet.de', 'stusta.mhn.de', 'stusta.net', 'stusta.sexy', 'stusta.party', 'stusta.io'
 ]
 

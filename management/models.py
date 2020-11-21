@@ -1,7 +1,7 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 
-from management.utils import is_valid_stusta_email
+from management.utils import is_valid_sender_email
 from vote.models import Session, Election
 
 
@@ -19,7 +19,7 @@ class ElectionManager(AbstractBaseUser):
 
     @property
     def stusta_email(self):
-        if self.email and is_valid_stusta_email(self.email):
+        if self.email and is_valid_sender_email(self.email):
             return self.email
 
         return f'{self.username}@stusta.de'

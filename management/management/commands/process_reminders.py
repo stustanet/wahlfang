@@ -18,4 +18,4 @@ class Command(BaseCommand):
             election.remind_text_sent = True
             election.save()
             for voter in election.session.participants.all():
-                voter.send_reminder(election.session.managers.all().first().stusta_email, election)
+                voter.send_reminder(election.session.managers.all().first().valid_email, election)

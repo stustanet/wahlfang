@@ -3,6 +3,7 @@ from django.db import models
 
 from management.utils import is_valid_sender_email
 from vote.models import Session, Election
+from wahlfang.settings import DEFAULT_SENDER_EMAIL
 
 
 class ElectionManager(AbstractBaseUser):
@@ -18,11 +19,11 @@ class ElectionManager(AbstractBaseUser):
         return f'{self.username}'
 
     @property
-    def stusta_email(self):
+    def valid_email(self):
         if self.email and is_valid_sender_email(self.email):
             return self.email
 
-        return f'{self.username}@stusta.de'
+        return DEFAULT_SENDER_EMAIL.format(username=self.username)
 
     def get_session(self, pk):
         return self.sessions.filter(pk=pk).first()

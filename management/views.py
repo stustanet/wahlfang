@@ -35,6 +35,7 @@ from management.forms import (
     SessionSettingsForm
 )
 from vote.models import Election, Application, Voter
+from wahlfang.settings import URL
 
 logger = logging.getLogger('management.view')
 
@@ -75,7 +76,7 @@ def index(request):
                 meeting_link=form.cleaned_data['meeting_link'],
                 invite_text=form.cleaned_data['invite_text'],
                 to_email=form.cleaned_data['email'],
-                from_email=manager.stusta_email
+                from_email=manager.valid_email
             )
 
         return render(request, template_name='management/add_session.html',
@@ -115,7 +116,7 @@ def session_settings(request, pk=None):
                     meeting_link=form.cleaned_data['meeting_link'],
                     invite_text=form.cleaned_data['invite_text'],
                     to_email=form.cleaned_data['email'],
-                    from_email=manager.stusta_email
+                    from_email=manager.valid_email
                 )
             else:
                 form.save()
@@ -161,7 +162,7 @@ def add_election(request, pk=None):
                 "end_date": form.cleaned_data['end_date'],
             })
 
-            Voter.send_reminder(test_voter, manager.stusta_email, test_election)
+            Voter.send_reminder(test_voter, manager.valid_email, test_election)
         else:
             form.save()
             return redirect('management:session', pk=session.pk)
@@ -237,7 +238,7 @@ def election_detail(request, pk):
             form.save()
             if election.send_emails_on_start:
                 for voter in session.participants.all():
-                    voter.send_reminder(session.managers.all().first().stusta_email, election)
+                    voter.send_reminder(session.managers.all().first().valid_email, election)
         else:
             context['start_election_form'] = form
 
@@ -345,7 +346,7 @@ def print_token(request, pk):
         messages.add_message(request, messages.ERROR, 'No tokens have yet been generated.')
         return redirect('management:session', pk=session.pk)
 
-    img = [qrcode.make('https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}))
+    img = [qrcode.make(f'https://{URL}' + reverse('vote:link_login', kwargs={'access_code': access_code}))
            for access_code in tokens]
     tmp_qr_path = '/tmp/wahlfang/qr_codes/session_{}'.format(session.pk)
     Path(tmp_qr_path).mkdir(parents=True, exist_ok=True)

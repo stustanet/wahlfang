@@ -25,5 +25,5 @@ class Command(BaseCommand):
             session=session,
         )
         if not options['no_invitation']:
-            voter.send_invitation(access_code, session.managers.all().first().stusta_email)
+            voter.send_invitation(access_code, session.managers.all().first().valid_email)
         self.stdout.write(self.style.SUCCESS('Successfully created voter "%s"\nAccess Code: %s' % (voter, access_code)))

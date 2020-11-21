@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from management.models import ElectionManager
 from vote.models import Election, Application, Session, Voter, OpenVote
+from wahlfang.settings import URL
 
 
 class StartElectionForm(forms.ModelForm):
@@ -77,7 +78,7 @@ class AddSessionForm(forms.ModelForm, TemplateStringForm):
         "{title}": "Session's title",
         "{access_code}": "Access code/token for the voter to login",
         "{login_url}": "URL which instantly logs user in",
-        "{base_url}": "Basically vote.stusta.de",
+        "{base_url}": f"Will render to: https://{URL}",
         "{start_time}": "Start time if datetime is set",
         "{start_date}": "Start date if datetime is set",
         "{start_time_en}": "Start time in english format e.g. 02:23 PM",
@@ -313,7 +314,7 @@ class AddVotersForm(forms.Form):
         ]
 
         for voter, code in voters:
-            voter.send_invitation(code, self.session.managers.all().first().stusta_email)
+            voter.send_invitation(code, self.session.managers.all().first().valid_email)
 
         return voters
 
@@ -394,4 +395,4 @@ class CSVUploaderForm(forms.Form):
     def save(self):
         for email, name in self.cleaned_data['csv_data'].items():
             voter, code = Voter.from_data(session=self.session, email=email, name=name)
-            voter.send_invitation(code, self.session.managers.all().first().stusta_email)
+            voter.send_invitation(code, self.session.managers.all().first().valid_email)

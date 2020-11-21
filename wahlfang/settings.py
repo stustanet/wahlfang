@@ -165,6 +165,12 @@ EMAIL_PORT = 25
 VALID_MANAGER_EMAIL_DOMAINS = [
     'stusta.de', 'stustanet.de', 'stusta.mhn.de', 'stusta.net', 'stusta.sexy', 'stusta.party', 'stusta.io'
 ]
+# username variable will be filled with the manager's username, this is optional so you can for
+# example also use no-reply@example.com
+DEFAULT_SENDER_EMAIL = '{username}@stusta.de'
+
+# Base URL for template links
+URL = 'vote.stusta.de'
 
 # File upload, etc...
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

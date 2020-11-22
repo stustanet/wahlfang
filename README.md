@@ -7,8 +7,7 @@ which aims at being an easy to use solution for online elections. From simple on
 votes about where to grab a coffee to large and long meetings with multiple different 
 votes and elections - Wahlfang does it all.
 
-If you would like a new feature or have a bug to report please open an issue over 
-at our [Gitlab](https://gitlab.stusta.de/stustanet/wahlfang/-/issues).
+If you would like a new feature or have a bug to report please open an [issue](https://github.com/stustanet/wahlfang/issues).
 
 ## Getting Started
 To just get the current version up and running simply
@@ -19,6 +18,8 @@ $ pip3 install -r requirements.txt
 $ python3 manage.py migrate
 $ python3 manage.py runserver localhost:8000
 ```
+
+For detailed instructions on how to setup your own wahlfang instance for productive use see [deploying](docs/deploying.md).
 
 ### Management Access
 

@@ -26,5 +26,5 @@ class Command(BaseCommand):
 
         access_code = Voter.get_access_code(voter_id, password)
         if options['send_invitation']:
-            voter.send_invitation(access_code, voter.session.managers.all().first().valid_email)
+            voter.send_invitation(access_code, voter.session.managers.all().first().sender_email)
         self.stdout.write(self.style.SUCCESS('Successfully reset voter "%s"\nAccess Code: %s' % (voter, access_code)))

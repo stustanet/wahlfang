@@ -35,7 +35,6 @@ from management.forms import (
     SessionSettingsForm
 )
 from vote.models import Election, Application, Voter
-from wahlfang.settings import URL
 
 logger = logging.getLogger('management.view')
 
@@ -238,7 +237,7 @@ def election_detail(request, pk):
             form.save()
             if election.send_emails_on_start:
                 for voter in session.participants.all():
-                    voter.send_reminder(session.managers.all().first().valid_email, election)
+                    voter.send_reminder(session.managers.all().first().sender_email, election)
         else:
             context['start_election_form'] = form
 
@@ -346,7 +345,7 @@ def print_token(request, pk):
         messages.add_message(request, messages.ERROR, 'No tokens have yet been generated.')
         return redirect('management:session', pk=session.pk)
 
-    img = [qrcode.make(f'https://{URL}' + reverse('vote:link_login', kwargs={'access_code': access_code}))
+    img = [qrcode.make(f'https://{settings.URL}' + reverse('vote:link_login', kwargs={'access_code': access_code}))
            for access_code in tokens]
     tmp_qr_path = '/tmp/wahlfang/qr_codes/session_{}'.format(session.pk)
     Path(tmp_qr_path).mkdir(parents=True, exist_ok=True)

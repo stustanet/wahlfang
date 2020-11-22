@@ -8,7 +8,6 @@ from django.core.validators import validate_email
 
 from management.models import ElectionManager
 from management.utils import is_valid_sender_email
-from wahlfang.settings import VALID_MANAGER_EMAIL_DOMAINS
 
 
 class Command(BaseCommand):
@@ -27,7 +26,7 @@ class Command(BaseCommand):
         if not is_valid_sender_email(email):
             self.stdout.write(
                 self.style.ERROR(
-                    f'Email must end with either of the following: {", ".join([f"@{i}" for i in VALID_MANAGER_EMAIL_DOMAINS])}'))
+                    f'Email must end with either of the following: {", ".join([f"@{i}" for i in settings.VALID_MANAGER_EMAIL_DOMAINS])}'))
             return
 
         if ElectionManager.objects.filter(email=email).exists():

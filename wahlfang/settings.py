@@ -145,6 +145,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/wahlfang/static'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -158,22 +159,18 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'", "data:",)
 
 # Mail
-
 EMAIL_HOST = 'mail.stusta.de'
-EMAIL_SENDER = 'vorstand@stustanet.de'
+EMAIL_SENDER = 'no-reply@stusta.de'
 EMAIL_PORT = 25
 VALID_MANAGER_EMAIL_DOMAINS = [
     'stusta.de', 'stustanet.de', 'stusta.mhn.de', 'stusta.net', 'stusta.sexy', 'stusta.party', 'stusta.io'
 ]
-# username variable will be filled with the manager's username, this is optional so you can for
-# example also use no-reply@example.com
-DEFAULT_SENDER_EMAIL = '{username}@stusta.de'
 
 # Base URL for template links
-URL = 'vote.stusta.de'
+URL = 'vote.stustanet.de'
 
 # File upload, etc...
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/var/www/wahlfang/media'
 MEDIA_URL = '/media/'
 
 # LDAP

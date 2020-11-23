@@ -7,17 +7,19 @@ which aims at being an easy to use solution for online elections. From simple on
 votes about where to grab a coffee to large and long meetings with multiple different 
 votes and elections - Wahlfang does it all.
 
-If you would like a new feature or have a bug to report please open an issue over 
-at our [Gitlab](https://gitlab.stusta.de/stustanet/wahlfang/-/issues).
+If you would like a new feature or have a bug to report please open an [issue](https://github.com/stustanet/wahlfang/issues).
 
 ## Getting Started
-
+To just get the current version up and running simply
 ```bash
+$ git clone https://gitlab.stusta.de/stustanet/wahlfang.git
 $ cd wahlfang
 $ pip3 install -r requirements.txt
 $ python3 manage.py migrate
-$ python manage.py runserver
+$ python3 manage.py runserver localhost:8000
 ```
+
+For detailed instructions on how to setup your own wahlfang instance for productive use see [deploying](docs/deploying.md).
 
 ### Management Access
 
@@ -26,32 +28,18 @@ Creating a local election management user:
 $ python3 manage.py create_admin
 ```
 
-The admin interface is accessible at [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).
-An admin account can also use the management interface 
-[http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
-
-
-### Generating Test Data
-
-Either via the [management interface](http://127.0.0.1:8000/management/) with the credential of the superuser created
-above or by using the following (old) method:
-
-Create an election:
-```bash
-$ python3 manage.py create_election --title "Hausadminwahl SS20 im Testhaus" --max-votes-yes 2
-```
-
-Create a voter:
-```bash
-$ python3 manage.py create_voter --election_id 1 --voter_id 1337
-```
-
-You can then login with the printed access code.
+Login to the management interface running at [http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
 
 ## Contributing
-Starting the server:
+Install the development requirements in addition to the standard dependencies:
 ```bash
-$ python3 manage.py runserver
+$ pip3 install -r requirements_dev.txt
+```
+
+Run the linting and test suite
+```bash
+$ make lint
+$ make test
 ```
 
 If some model changed, you might have to make and/or apply migrations again:

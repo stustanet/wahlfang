@@ -145,6 +145,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/wahlfang/static'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -158,19 +159,23 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'", "data:",)
 
 # Mail
-
 EMAIL_HOST = 'mail.stusta.de'
-EMAIL_SENDER = 'vorstand@stustanet.de'
+EMAIL_SENDER = 'no-reply@stusta.de'
 EMAIL_PORT = 25
-VALID_STUSTA_EMAIL_SUFFIXES = [
+VALID_MANAGER_EMAIL_DOMAINS = [
     'stusta.de', 'stustanet.de', 'stusta.mhn.de', 'stusta.net', 'stusta.sexy', 'stusta.party', 'stusta.io'
 ]
 
+# Base URL for template links
+URL = 'vote.stustanet.de'
+
 # File upload, etc...
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/var/www/wahlfang/media'
 MEDIA_URL = '/media/'
 
 # LDAP
 AUTH_LDAP_SERVER_URI = "ldap://ldap.stusta.de"
 AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=account,ou=pnyx,dc=stusta,dc=mhn,dc=de"
 AUTH_LDAP_START_TLS = True
+AUTH_LDAP_USER_ATTR_MAP = {'email': 'mail'}
+AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True

@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.http import Http404, HttpResponse
 from django.http.response import HttpResponseNotFound
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
@@ -51,6 +51,10 @@ class LoginView(auth_views.LoginView):
             return render(request, template_name='vote/ratelimited.html', status=429)
         return super().post(request, *args, **kwargs)
 
+    def get_success_url(self):
+        url = self.get_redirect_url()
+        return url or resolve_url('management:index')
+
 
 @management_login_required
 def index(request):
@@ -71,7 +75,7 @@ def index(request):
                 meeting_link=form.cleaned_data['meeting_link'],
                 invite_text=form.cleaned_data['invite_text'],
                 to_email=form.cleaned_data['email'],
-                from_email=manager.stusta_email
+                from_email=manager.sender_email
             )
 
         return render(request, template_name='management/add_session.html',
@@ -111,7 +115,7 @@ def session_settings(request, pk=None):
                     meeting_link=form.cleaned_data['meeting_link'],
                     invite_text=form.cleaned_data['invite_text'],
                     to_email=form.cleaned_data['email'],
-                    from_email=manager.stusta_email
+                    from_email=manager.sender_email
                 )
             else:
                 form.save()
@@ -157,7 +161,7 @@ def add_election(request, pk=None):
                 "end_date": form.cleaned_data['end_date'],
             })
 
-            Voter.send_reminder(test_voter, manager.stusta_email, test_election)
+            Voter.send_reminder(test_voter, manager.sender_email, test_election)
         else:
             form.save()
             return redirect('management:session', pk=session.pk)
@@ -233,7 +237,7 @@ def election_detail(request, pk):
             form.save()
             if election.send_emails_on_start:
                 for voter in session.participants.all():
-                    voter.send_reminder(session.managers.all().first().stusta_email, election)
+                    voter.send_reminder(session.managers.all().first().sender_email, election)
         else:
             context['start_election_form'] = form
 
@@ -341,7 +345,7 @@ def print_token(request, pk):
         messages.add_message(request, messages.ERROR, 'No tokens have yet been generated.')
         return redirect('management:session', pk=session.pk)
 
-    img = [qrcode.make('https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}))
+    img = [qrcode.make(f'https://{settings.URL}' + reverse('vote:link_login', kwargs={'access_code': access_code}))
            for access_code in tokens]
     tmp_qr_path = '/tmp/wahlfang/qr_codes/session_{}'.format(session.pk)
     Path(tmp_qr_path).mkdir(parents=True, exist_ok=True)

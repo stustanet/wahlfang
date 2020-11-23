@@ -1,12 +1,14 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
+import vote.views
 from management import views
 
 app_name = 'management'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('help', vote.views.help_page, name='help'),
 
     # Session
     path('meeting/<int:pk>', views.session_detail, name='session'),

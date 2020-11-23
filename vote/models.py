@@ -307,13 +307,13 @@ class Voter(models.Model):
                 'name': self.name,
                 'title': self.session.title,
                 'access_code': access_code,
-                'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login',
-                                                                   kwargs={'access_code': access_code}),
+                'login_url': f'https://{settings.URL}' + reverse('vote:link_login',
+                                                                 kwargs={'access_code': access_code}),
                 'start_date': st.strftime("%d.%m.%Y") if self.session.start_date else "",
                 'start_time': st.strftime("%H:%M") if self.session.start_date else "",
                 'start_date_en': st.strftime("%Y/%m/%d") if self.session.start_date else "",
                 'start_time_en': st.strftime("%I:%M %p") if self.session.start_date else "",
-                'base_url': 'https://vote.stustanet.de',
+                'base_url': f'https://{settings.URL}',
                 'meeting_link': self.session.meeting_link
             }
             body_html = self.session.invite_text.format(**context)
@@ -321,9 +321,9 @@ class Voter(models.Model):
             context = {
                 'voter': self,
                 'session': self.session,
-                'base_url': 'https://vote.stustanet.de',
-                'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login',
-                                                                   kwargs={'access_code': access_code}),
+                'base_url': f'https://{settings.URL}',
+                'login_url': f'https://{settings.URL}' + reverse('vote:link_login',
+                                                                 kwargs={'access_code': access_code}),
                 'access_code': access_code,
             }
             body_html = render_to_string('vote/mails/invitation.j2', context=context)
@@ -348,7 +348,7 @@ class Voter(models.Model):
             context = {
                 'name': self.name,
                 'title': election.title,
-                'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
+                'url': f'https://{settings.URL}' + reverse('vote:vote', kwargs={'election_id': election.pk}),
                 'end_date': et.strftime("%d.%m.%y") if election.end_date else "",
                 'end_time': et.strftime("%H:%M") if election.end_date else "",
                 'end_date_en': et.strftime("%Y/%m/%d") if election.end_date else "",
@@ -359,7 +359,7 @@ class Voter(models.Model):
             context = {
                 'voter': self,
                 'election': election,
-                'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
+                'url': f'https://{settings.URL}' + reverse('vote:vote', kwargs={'election_id': election.pk}),
             }
             body_html = render_to_string('vote/mails/start.j2', context=context)
 

@@ -52,4 +52,3 @@ pylint:
     - pip install -U pylint pylint-django
   script:
     - make pylint
-  allow_failure: true

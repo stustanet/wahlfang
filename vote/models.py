@@ -85,7 +85,7 @@ class Election(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
-    result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'fully published')],
+    result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'published')],
                                         default='0')
     disable_abstention = models.BooleanField(default=False)
     voters_self_apply = models.BooleanField(default=False)
@@ -341,7 +341,7 @@ class Voter(models.Model):
             return
         subject = f'{election.title} is now open'
         if election.remind_text:
-            if self.session.start_date:
+            if election.end_date:
                 # cast to correct time zone
                 current_tz = timezone.get_current_timezone()
                 et = current_tz.normalize(election.end_date)

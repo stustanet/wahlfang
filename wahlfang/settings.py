@@ -177,3 +177,5 @@ MEDIA_URL = '/media/'
 AUTH_LDAP_SERVER_URI = "ldap://ldap.stusta.de"
 AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=account,ou=pnyx,dc=stusta,dc=mhn,dc=de"
 AUTH_LDAP_START_TLS = True
+AUTH_LDAP_USER_ATTR_MAP = {'email': 'mail'}
+AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True

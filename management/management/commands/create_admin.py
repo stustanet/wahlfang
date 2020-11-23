@@ -8,6 +8,7 @@ from django.core.validators import validate_email
 
 from management.models import ElectionManager
 from management.utils import is_valid_sender_email
+from wahlfang.settings import URL
 
 
 class Command(BaseCommand):
@@ -47,12 +48,12 @@ class Command(BaseCommand):
 
         if options['send_login_infos']:
             send_mail(
-                'Wahlleiter Login vote.stustanet.de',
-                f'Für dich wurde ein Wahlleiterlogin auf vote.stustanet.de angelegt.\n'
-                f'Du kannst dich unter https://vote.stustanet.de/management mit den '
-                f'folgenden Daten einloggen:\n\n'
-                f'Benutzername: {username}\n'
-                f'Passwort: {password}',
+                f'Management login for {URL}',
+                f'A new management account on {URL} has been created.\n'
+                f'You can login under https://{URL}/management '
+                f'with the following data:\n\n'
+                f'Username: {username}\n'
+                f'Password: {password}',
                 settings.EMAIL_SENDER,
                 [email],
                 fail_silently=False,

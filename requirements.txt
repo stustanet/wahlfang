@@ -7,3 +7,4 @@ django-ratelimit==3.0.*
 django-auth-ldap==2.2.*
 qrcode==6.1
 latex==0.7.*
+django_prometheus==2.1.*

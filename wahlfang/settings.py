@@ -27,6 +27,10 @@ SECRET_KEY = '$rl7hy0b_$*7py@t0-!^%gdlqdv0f%1+h2s%rza@=2h#1$y1vw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# export application statistics such as http request duration / latency
+# will also export # of manager accounts, # of sessions, # of elections
+EXPORT_PROMETHEUS_METRICS = True
+
 if DEBUG:
     # will output to your console
     logging.basicConfig(
@@ -50,6 +54,9 @@ INSTALLED_APPS = [
     'management',
 ]
 
+if EXPORT_PROMETHEUS_METRICS:
+    INSTALLED_APPS += ['django_prometheus']
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,6 +67,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
 ]
+
+if EXPORT_PROMETHEUS_METRICS:
+    MIDDLEWARE = ['django_prometheus.middleware.PrometheusBeforeMiddleware'] + \
+                 MIDDLEWARE + \
+                 ['django_prometheus.middleware.PrometheusAfterMiddleware']
+
 
 ROOT_URLCONF = 'wahlfang.urls'
 

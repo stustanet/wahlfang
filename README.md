@@ -30,6 +30,14 @@ $ python3 manage.py create_admin
 
 Login to the management interface running at [http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
 
+### Metrics
+
+In the default configuration wahlfang exports some internal application statistics as [Prometheus](https://prometheus.io/) 
+metrics at the endpoint `/metrics`. This behaviour can be turned off by settings `EXPORT_PROMETHEUS_METRICS = False`
+in the application settings.
+
+We use the [django-prometheus](https://github.com/korfuri/django-prometheus) project to export our exports.
+
 ## Contributing
 Install the development requirements in addition to the standard dependencies:
 ```bash

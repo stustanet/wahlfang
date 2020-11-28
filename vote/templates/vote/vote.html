@@ -21,42 +21,45 @@
                 <div class="alert alert-block alert-danger">
                   <ul class="m-0">
                     {% for error in form.non_field_errors %}
-                      <li>{{ error|escape }}</li>
+                        <li>{{ error|escape }}</li>
                     {% endfor %}
                   </ul>
                 </div>
               {% endif %}
-              {% if form.visible_fields %}
-                <div class="card">
-                  <h5 class="card-header">Instruction</h5>
-                  <div class="card-body">
-                    {% if max_votes_yes > 1 %}You may give up to {{ max_votes_yes }} YES votes.<br>{% endif %}
-                    NO votes should only be used if you are explicitly against a candidate.<br>
-                    The display order of the applicants is randomized.<br>
-                    Your vote is anonymous.
-                  </div>
-                </div>
-                {% if max_votes_yes > 1 and max_votes_yes >= form.num_applications %}
-                  <div class="mt-4 text-right d-none">
-                    <button type="button" class="btn btn-success" id="all-yes">Select YES for
-                      all {{ form.num_applications }} applicants
-                    </button>
-                  </div>
-                {% endif %}
-                <table class="table table-sm vote-list" data-max-votes-yes="{{ max_votes_yes }}">
-                  <thead class="thead-light">
-                  <tr>
-                    <th>Applicant</th>
-                    {% if not election.disable_abstention %}
-                      <th class="choice text-center">Abstention</th>
+                {% if form.visible_fields %}
+                    <div class="card">
+                        <h5 class="card-header">Instruction</h5>
+                        <div class="card-body">
+                            {% if max_votes_yes > 1 %}You may give up to {{ max_votes_yes }} YES votes.<br>{% endif %}
+                            NO votes should only be used if you are explicitly against
+                            {% if election.voters_self_apply %}a candidate{% else %}an option{% endif %}.<br>
+                            The display order of the {% if election.voters_self_apply %}applicants{% else %}
+                            options{% endif %} is randomized.<br>
+                            Your vote is anonymous.
+                        </div>
+                    </div>
+                    {% if max_votes_yes > 1 and max_votes_yes >= form.num_applications %}
+                        <div class="mt-4 text-right d-none">
+                            <button type="button" class="btn btn-success" id="all-yes">Select YES for
+                                all {{ form.num_applications }} applicants
+                            </button>
+                        </div>
                     {% endif %}
-                    <th class="choice text-center text-success">YES</th>
-                    <th class="choice text-center text-muted"
-                        title="NO should only be selected if you want to vote EXPLICITLY AGAINST this applicant">NO*
-                    </th>
-                  </tr>
-                  </thead>
-                  <tbody>
+                    <table class="table table-sm vote-list" data-max-votes-yes="{{ max_votes_yes }}">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
+                            {% if not election.disable_abstention %}
+                                <th class="choice text-center">Abstention</th>
+                            {% endif %}
+                            <th class="choice text-center text-success">YES</th>
+                            <th class="choice text-center text-muted"
+                                title="NO should only be selected if you want to vote EXPLICITLY AGAINST this applicant">
+                                NO*
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
                   {% for field in form.visible_fields|shuffle %}
                     <tr>
                       <td class="applicant">

@@ -7,29 +7,29 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          {% if application_id %}
-            <form action="{% url 'management:edit_application' pk=election.pk  application_id=application_id %}"
-                  method="post" enctype="multipart/form-data">
-          {% else %}
-            <form action="{% url 'management:add_application' pk=election.pk %}" method="post"
-                  enctype="multipart/form-data">
-          {% endif %}
-          {% csrf_token %}
-          <div class="form-group">
             {% if application_id %}
-              <h4>Edit Application</h4>
+                <form action="{% url 'management:edit_application' pk=election.pk  application_id=application_id %}"
+                      method="post" enctype="multipart/form-data">
             {% else %}
-              <h4>New Application</h4>
+                <form action="{% url 'management:add_application' pk=election.pk %}" method="post"
+                      enctype="multipart/form-data">
             {% endif %}
-          </div>
-          <hr>
+            {% csrf_token %}
+            <div class="form-group">
+                {% if application_id %}
+                    <h4>Edit {% if election.voters_self_apply %}Application{% else %}Option{% endif %}</h4>
+                {% else %}
+                    <h4>New {% if election.voters_self_apply %}Application{% else %}Option{% endif %}</h4>
+                {% endif %}
+            </div>
+            <hr>
 
-          {{ form|as_crispy_errors }}
+            {{ form|as_crispy_errors }}
 
-          <div class="card mb-3">
-            <div class="card-body p-3">
-              <h5 class="card-title">Display Name</h5>
-              <div class="form-row">
+            <div class="card mb-3">
+                <div class="card-body p-3">
+                    <h5 class="card-title">Display Name</h5>
+                    <div class="form-row">
                 <div class="form-group col-md-12 mb-0">
                   {{ form.display_name|as_crispy_field:"bootstrap4" }}
                 </div>

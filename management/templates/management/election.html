@@ -10,11 +10,11 @@
           <a class="btn btn-light d-inline float-right" href="{% url "management:session"  pk=session.id %}">Back</a>
         </div>
         {% if not election.started %}
-          <div class="card-body">
+            <div class="card-body">
 
-            <div>Election not started yet.</div>
-            <div>
-              {% if election.end_date and election.start_date %}
+                <div>Election has not started yet.</div>
+                <div>
+                    {% if election.end_date and election.start_date %}
                 Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
                 {{ election.end_date|date:"l Y-m-d H:i:s" }}
               {% elif election.start_date %}
@@ -66,35 +66,35 @@
           </div>
         {% endif %}
       </div>
-      <div class="card shadow mt-4">
-        <div class="card-body">
-          {% if not election.closed %}
-            <h4>
-              Applicants
-              {% if election.can_apply %}
-                <a class="btn btn-success float-right" role="button"
-                   href="{% url 'management:add_application' election.pk %}">
-                  Add applicant
-                </a>
-              {% endif %}
-            </h4>
+        <div class="card shadow mt-4">
+            <div class="card-body">
+                {% if not election.closed %}
+                    <h4>
+                        {% if election.voters_self_apply %}Applicants{% else %}Options{% endif %}
+                        {% if election.can_apply %}
+                            <a class="btn btn-success float-right" role="button"
+                               href="{% url 'management:add_application' election.pk %}">
+                                {% if election.voters_self_apply %}Add applicant{% else %}Add option{% endif %}
+                            </a>
+                        {% endif %}
+                    </h4>
 
-            <hr>
-            <table class="table table-striped">
-              <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Applicant</th>
-                <th scope="col"></th>
-              </tr>
-              </thead>
-              <tbody>
-              {% for application in applications %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{ application.get_display_name }}</td>
-                  <td>
-                    {% if election.can_apply %}
+                    <hr>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for application in applications %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ application.get_display_name }}</td>
+                                <td>
+                                    {% if election.can_apply %}
                       <form
                           action="{% url 'management:delete_application' pk=election.pk application_id=application.pk %}"
                           method="post">

@@ -19,7 +19,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('vote.urls', namespace='vote')),
-    path('management/', include('management.urls', namespace='management'))
+    path('management/', include('management.urls', namespace='management')),
+
+    # prometheus metrics
+    path('', include('django_prometheus.urls')),
 ]
 
 if settings.DEBUG:

@@ -1,10 +1,22 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path, include
+from django.urls import path
+from prometheus_client import Gauge
 
 import vote.views
 from management import views
+from management.models import ElectionManager
+from vote.models import Election, Session
 
 app_name = 'management'
+
+election_gauge = Gauge('wahlfang_election_count', 'Wahlfang Number of Elections')
+election_gauge.set_function(lambda: Election.objects.all().count())
+
+election_manager_gauge = Gauge('wahlfang_election_manager_count', 'Wahlfang Number of Election Managers')
+election_manager_gauge.set_function(lambda: ElectionManager.objects.all().count())
+
+session_gauge = Gauge('wahlfang_session_count', 'Wahlfang Number of Sessions')
+session_gauge.set_function(lambda: Session.objects.all().count())
 
 urlpatterns = [
     path('', views.index, name='index'),

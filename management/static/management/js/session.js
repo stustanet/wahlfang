@@ -3,3 +3,7 @@ $(function () {
         $('#downloadToken').modal('hide');
     });
 });
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})

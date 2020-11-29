@@ -106,6 +106,10 @@
             {% if voters %}
               <div class="list-group-item">
                 <span class="w-25 font-weight-bold">E-Mail</span>
+                <span data-toggle="tooltip" data-placement="right"
+                      title="Mail addresses turn green, as soon as their invite link has been clicked.">
+                    <img class="pl-1 pb-1" src="{% static "img/question-circle.svg" %}" height="25pt" alt="[?]">
+                </span>
               </div>
               <div class="voter-table">
                 {% for voter in voters %}

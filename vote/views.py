@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
@@ -152,4 +153,8 @@ def delete_own_application(request, election_id):
 
 
 def help(request):
-    return render(request, template_name='vote/help.html')
+    management = request.GET.get('management', False)
+    return render(request, template_name='vote/help.html', context={'URL': settings.URL,
+                                                                    'back_url': (reverse(
+                                                                        'management:index') if management else reverse(
+                                                                        'vote:index'))})

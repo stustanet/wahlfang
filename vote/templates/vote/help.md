@@ -10,14 +10,14 @@ Furthermore, a code is provided that you can enter on visiting [vote.stustanet.d
 ### Vote Overview Page
 When there was already an election created, you will be greeted with a screen similar to this one:
 
-![](res/vote_waiting.png)
+![](../../../static/img/help_page/vote_waiting.png)
 
 If enabled by the session creator, you will be able to apply by clicking the grey **apply** button in the upper right corner of the image.
 
 Once the admin started the election, a blue *Vote Now!* button will appear (you might have to refresh the site) which you can click to open the voting page.
 
 ### Voting page
-![](res/vote_page.png)
+![](../../../static/img/help_page/vote_page.png)
 
 You can select all applicants that you want to give a *Yes* vote to.
 
@@ -28,7 +28,7 @@ Don't forget to click the **Submit** button once you are done to finalize castin
 ### Apply page
 If you want to apply for the election you and it's enabled, you can go to the overview page and click on the grey **Apply** button.
 
-![](res/vote_apply.png)
+![](../../../static/img/help_page/vote_apply.png)
 
 There will be a new page where you can choose a Display Name that will be shown to other people when they cast their votes.
 

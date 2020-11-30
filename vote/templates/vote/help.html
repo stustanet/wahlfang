@@ -2,6 +2,11 @@
 {% load static %}
 {% load crispy_forms_filters %}
 
+{% block back_url %}
+  {{ back_url }}
+{% endblock %}
+
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-12">
@@ -10,25 +15,85 @@
           <h3 class="d-inline">Help Page</h3>
         </div>
         <div class="card-body">
-          {# todo fill in help text #}
-          <h4>Voter</h4>
-          {# Fill in information on how to vote and how votes are counted (abstention)#}
-          <p>{% lorem %}</p>
 
-          <h4>Manager</h4>
-          {# Fill in information on how to use the management page #}
-          {# * Reverence with link to the management site #}
-          {# * Explain (maybe with screenshots) how stustanet members can generate a password for wahlfang on their #}
-          {#   accounts website #}
-          {# * Explain how one can create an election and what the fields mean #}
-          {# * Explain how one can add voters (email, anonymous and csv file) #}
-          <p>{% lorem %}</p>
-          <figure>
-            <img src="{% static 'img/example.png' %}" alt="Example" class="pic">
-            <figcaption>Example screenshot with caption.</figcaption>
-          </figure>
-          <p>{% lorem %}</p>
-
+          <h2 id="how-does-voting-work">How does voting work?</h2>
+          <p>Once you are part of an election session, you should have gotten an email to the mail address that the
+            session creator (usually the election/meeting leader) has entered for you. If you didn’t get the mail please
+            take a look in your Spam folder and if it’s not there talk to the session creator.</p>
+          <p>This mail contains a link that you can use to access the voting session. Furthermore, a code is provided
+            that you can enter on visiting <a href="{% url 'vote:index' %}">{{ URL }}</a>.</p>
+          <h3 id="vote-overview-page">Vote Overview Page</h3>
+          <p>When there was already an election created, you will be greeted with a screen similar to this one:</p>
+          <p><img src="{% static 'img/help_page/vote_waiting.png' %}" alt="vote waiting"/></p>
+          <p>If enabled by the session creator, you will be able to apply by clicking the grey <strong>apply</strong>
+            button in the upper right corner of the image.</p>
+          <p>Once the admin started the election, a blue <em>Vote Now!</em> button will appear (you might have to
+            refresh the site) which you can click to open the voting page.</p>
+          <h3 id="voting-page">Voting page</h3>
+          <p><img src="{% static 'img/help_page/vote_page.png' %}" alt="vote page"/></p>
+          <p>You can select all applicants that you want to give a <em>Yes</em> vote to.</p>
+          <p>The admin might have limited the number of <em>Yes</em> votes you are allowed to cast.</p>
+          <p>Don’t forget to click the <strong>Submit</strong> button once you are done to finalize casting your vote.
+          </p>
+          <h3 id="apply-page">Apply page</h3>
+          <p>If you want to apply for the election you and it’s enabled, you can go to the overview page and click on
+            the grey <strong>Apply</strong> button.</p>
+          <p><img src="{% static 'img/help_page/vote_apply.png' %}" alt="vote apply"/></p>
+          <p>There will be a new page where you can choose a Display Name that will be shown to other people when they
+            cast their votes.</p>
+          <p>Furthermore you can give a contact mail and a short description about yourself and also upload a
+            picture.</p>
+          <p>Press <strong>Submit</strong> once you are done to apply for the election.</p>
+          <p>You can always edit your application given that the election hasn’t started yet by clicking <strong>Edit
+            Application</strong> or <strong>Delete Application</strong> in the overview page.</p>
+          <h2 id="how-can-i-create-a-new-election">How can I create a new election?</h2>
+          <h3 id="getting-a-management-account">Getting a management account</h3>
+          <p>Before you are able to access the admin page, you will need a management account first.</p>
+          <p>Please send a mail to <a href="mailto:vorstand@stustanet.de">vorstand@stustanet.de</a> to get a management
+            account.</p>
+          <p>Now, visit <a href="{% url 'management:index' %}">{{ URL }}/management</a> and use your credentials
+            to log in.</p>
+          <h3 id="creating-a-new-session">Creating a new session</h3>
+          <p>On <a href="{% url 'management:index' %}">{{ URL }}/management</a> there should be a big green
+            <strong>Create Session</strong>. Click
+            it.</p>
+          <h3 id="create-an-election">Create an election</h3>
+          <h3 id="adding-applicants">Adding applicants</h3>
+          <h2 id="i-have-a-problemideawant-to-contribute">I have a problem/idea/want to contribute</h2>
+          <h2 id="what-is-this-all-about">What is this all about?</h2>
+          <p><a href="{% url 'vote:index' %}">{{ URL }}</a> is an application that allows creating and managing
+            secure elections and participate in them.</p>
+          <p>It was created and is maintained by the administrators of the <a href="https://stustanet.de">StuStaNet
+            e.V.</a></p>
+          <h3 id="why">Why?</h3>
+          <p>During the 2020 Covid-19 pandemic there was a big need for an online voting tool for having fair elections
+            in the Studentenstadt Freimann (there are many events where elections are necessary).</p>
+          <p>Because other online voting tools seem insescure (see below), the StuStaNet decided to implement its own
+            system.</p>
+          <h3 id="how">How?</h3>
+          <p>vote.stustanet.de uses emails to send personal links to each voter. These mails can then be used to
+            vote.</p>
+          <p>Usually, during a session (say a Hausvollversammlung) there will be votes on multiple things. Therefore
+            mutliple votes are brought together into a session. This has the big advantage that the voters stay the same
+            and only one email per voter per session is necessary.</p>
+          <h3 id="why-dont-you-just-use-strawpoll-doodle">Why don’t you just use strawpoll, doodle, …</h3>
+          <p>Creating secure online elections is a non-trivial task.</p>
+          <p><em>How can you be sure that only the people allowed to vote participate?</em></p>
+          <p><em>How can you be sure that no one votes twice (e.g. via a second account or by reloading the site)?</em>
+          </p>
+          <p>Most online voting tools consist of a single link that each voter can use to access a webpage where they
+            can cast their vote. Nothing stops voters to share the link with other people.</p>
+          <p>vote.stustanet.de solves this problem by sending each voter a personal access link where it’s only possible
+            to vote once for each election.</p>
+          <p><em>How can you be sure that the election host doesn’t access your data/keeps the data after the
+            election?</em></p>
+          <p>Many online election tools are based in foreign countries and often have an incentive to gain money by
+            tracing your activities online and placing ads.</p>
+          <p>The administrators of StuStaNet e.V. are volunteers that you might know in person. All election data is
+            deleted once a session is removed. The source code of <a href="{% url 'vote:index' %}">{{ URL }}</a> is open
+            and
+            available on <a
+                href="https://github.com/stustanet/wahlfang">https://github.com/stustanet/wahlfang</a>.</p>
         </div>
       </div>
     </div>

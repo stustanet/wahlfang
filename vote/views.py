@@ -152,8 +152,7 @@ def delete_own_application(request, election_id):
     return HttpResponseNotFound('Application does not exist')
 
 
-def help_page(request):
-    management = request.GET.get('management', False)
+def help_page(request, management=False):
     return render(request, template_name='vote/help.html', context={'URL': settings.URL,
                                                                     'back_url': (reverse(
                                                                         'management:index') if management else reverse(

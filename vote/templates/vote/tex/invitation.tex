@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \usepackage{pifont}
 \usepackage[a4paper, left=3cm, right=3cm, bottom=2.5cm, top=3cm]{geometry}
+\usepackage{subfig}
 
 \pagenumbering{gobble}
 \newcommand{\cuthere}{%
@@ -41,20 +42,25 @@
 
     \noindent Access to the election session can be gained by either entering the access token
     in \url{https://vote.stustanet.de} or by scanning the following QR-Code:
-    \begin{center}
-        \includegraphics[scale=0.3]{{'{'}}{{token.path}}{{'}'}}
-    \end{center}
+
+    \begin{figure}[h]%
+        \centering
+        {% if meeting_link_qr %}%
+        \subfloat[Meeting Link]{{'{'}}\includegraphics[width=3.4cm]{{'{'}}{{meeting_link_qr}}{{'}'}} {{'}'}}%
+        \qquad%
+        {% endif %}%
+        \subfloat[Voting Link]{{'{'}}\includegraphics[width=3.4cm]{{'{'}}{{token.path}}{{'}'}} {{'}'}}%
+    \end{figure}%
 
     \noindent Wahlfang is an open source online voting system developed and hosted by StuStaNet. If you have any questions
     or want to help expanding the feature set feel free to contact us: \texttt{admins@stusta.de}\\
 
-    {% if forloop.counter0|divisibleby:2 == 0 %}
-        \pagebreak
-    {% else %}
-        \vspace{0.5cm}
-    {% endif %}
-
-{% endfor %}
+    {% if forloop.counter0|divisibleby:2 == 0 %}%
+    \pagebreak
+    {% else %}%
+    \vspace{0.5cm}
+    {% endif %}%
+    {% endfor %}%
 
 
 \end{document}

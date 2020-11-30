@@ -1,5 +1,4 @@
 import csv
-import json
 import logging
 import os
 from argparse import Namespace
@@ -12,7 +11,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.http import Http404, HttpResponse
-from django.shortcuts import render, redirect
+from django.http.response import HttpResponseNotFound
+from django.shortcuts import render, redirect, resolve_url
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
@@ -22,8 +22,18 @@ from latex.build import PdfLatexBuilder
 from ratelimit.decorators import ratelimit
 
 from management.authentication import management_login_required
-from management.forms import StartElectionForm, AddElectionForm, AddSessionForm, AddVotersForm, ApplicationUploadForm, \
-    StopElectionForm, ChangeElectionPublicStateForm, AddTokensForm, CSVUploaderForm
+from management.forms import (
+    StartElectionForm,
+    AddElectionForm,
+    AddSessionForm,
+    AddVotersForm,
+    ApplicationUploadForm,
+    StopElectionForm,
+    ChangeElectionPublicStateForm,
+    AddTokensForm,
+    CSVUploaderForm,
+    SessionSettingsForm
+)
 from vote.models import Election, Application, Voter
 
 logger = logging.getLogger('management.view')
@@ -41,6 +51,10 @@ class LoginView(auth_views.LoginView):
             return render(request, template_name='vote/ratelimited.html', status=429)
         return super().post(request, *args, **kwargs)
 
+    def get_success_url(self):
+        url = self.get_redirect_url()
+        return url or resolve_url('management:index')
+
 
 @management_login_required
 def index(request):
@@ -53,39 +67,19 @@ def index(request):
             if request.POST.get("submit_type") != "test":
                 ses = form.save()
                 return redirect('management:session', ses.id)
-            else:
-                messages.add_message(request, messages.INFO, 'Test email sent.')
 
-                test_session = Namespace(**{
-                    "title": form.cleaned_data['title'],
-                    "invite_text": form.cleaned_data['invite_text'],
-                    "start_date": form.cleaned_data['start_date'] if form.data[
-                        'start_date'] else timezone.now(),
-                    'meeting_link': form.cleaned_data['meeting_link'],
-                })
+            messages.add_message(request, messages.INFO, 'Test email sent.')
+            Voter.send_test_invitation(
+                title=form.cleaned_data['title'],
+                start_date=form.cleaned_data['start_date'] if form.cleaned_data['start_date'] else timezone.now(),
+                meeting_link=form.cleaned_data['meeting_link'],
+                invite_text=form.cleaned_data['invite_text'],
+                to_email=form.cleaned_data['email'],
+                from_email=manager.sender_email
+            )
 
-                test_voter = Namespace(**{
-                    "name": "Testname",
-                    "email": form.cleaned_data['email'],
-                    "session": test_session,
-                })
-                test_voter.email_user = partial(Voter.email_user, test_voter)
-
-                Voter.send_invitation(test_voter, "mock-up-access-token", manager.stusta_email)
-
-        variables = {
-            "{name}": "Voter's name if set",
-            "{title}": "Session's title",
-            "{access_code}": "Access code/token for the voter to login",
-            "{login_url}": "URL which instantly logs user in",
-            "{base_url}": "Basically vote.stusta.de",
-            "{start_time}": "Start time if datetime is set",
-            "{start_date}": "Start date if datetime is set",
-            "{start_time_en}": "Start time in english format e.g. 02:23 PM",
-            "{start_date_en}": "Start date in english format e.g. 12/12/2020",
-            "{meeting_link}": "Meeting link if set"
-        }
-        return render(request, template_name='management/add_session.html', context={'form': form, 'vars': variables})
+        return render(request, template_name='management/add_session.html',
+                      context={'form': form, 'variables': form.variables})
 
     context = {
         'sessions': manager.sessions.order_by('-pk')
@@ -106,26 +100,51 @@ def session_detail(request, pk=None):
 
 
 @management_login_required
+def session_settings(request, pk=None):
+    manager = request.user
+    session = manager.sessions.get(pk=pk)
+
+    form = SessionSettingsForm(instance=session, request=request, user=request.user, data=request.POST or None)
+    if request.POST:
+        if form.is_valid():
+            if request.POST.get("submit_type") == "test":
+                messages.add_message(request, messages.INFO, 'Test email sent.')
+                Voter.send_test_invitation(
+                    title=form.cleaned_data['title'],
+                    start_date=form.cleaned_data['start_date'] if form.cleaned_data['start_date'] else timezone.now(),
+                    meeting_link=form.cleaned_data['meeting_link'],
+                    invite_text=form.cleaned_data['invite_text'],
+                    to_email=form.cleaned_data['email'],
+                    from_email=manager.sender_email
+                )
+            else:
+                form.save()
+                messages.add_message(request, messages.INFO, 'Session updated successfully!')
+                return redirect('management:session', session.id)
+
+    context = {
+        'session': session,
+        'elections': session.elections.order_by('pk'),
+        'voters': session.participants.all(),
+        'variables': form.variables,
+        'form': form
+    }
+    return render(request, template_name='management/session_settings.html', context=context)
+
+
+@management_login_required
 def add_election(request, pk=None):
     # todo add chron job script that sends emails
     # todo apply changes to session
     manager = request.user
-    session = manager.sessions.get(id=pk)
+    session = manager.sessions.get(pk=pk)
     context = {
         'session': session,
-        'vars': {
-            "{name}": "Voter's name if set",
-            "{title}": "Session's title",
-            "{url}": "URL to the election",
-            "{end_time}": "End time if datetime is set",
-            "{end_date}": "End date if datetime is set",
-            "{end_time_en}": "End time in english format e.g. 02:23 PM",
-            "{end_date_en}": "End date in english format e.g. 12/12/2020",
-        }
     }
 
     form = AddElectionForm(session=session, request=request, user=manager, data=request.POST if request.POST else None)
     context['form'] = form
+    context['variables'] = form.variables
     if request.POST and form.is_valid():
         if request.POST.get("submit_type") == "test":
             messages.add_message(request, messages.INFO, 'Test email sent.')
@@ -142,7 +161,7 @@ def add_election(request, pk=None):
                 "end_date": form.cleaned_data['end_date'],
             })
 
-            Voter.send_reminder(test_voter, manager.stusta_email, test_election)
+            Voter.send_reminder(test_voter, manager.sender_email, test_election)
         else:
             form.save()
             return redirect('management:session', pk=session.pk)
@@ -195,7 +214,7 @@ def _unpack(request, pk):
 
 @management_login_required
 def election_detail(request, pk):
-    manager, election, session = _unpack(request, pk)
+    _, election, session = _unpack(request, pk)
     context = {
         'election': election,
         'session': session,
@@ -218,7 +237,7 @@ def election_detail(request, pk):
             form.save()
             if election.send_emails_on_start:
                 for voter in session.participants.all():
-                    voter.send_reminder(session.managers.all().first().stusta_email, election)
+                    voter.send_reminder(session.managers.all().first().sender_email, election)
         else:
             context['start_election_form'] = form
 
@@ -233,7 +252,7 @@ def election_detail(request, pk):
 
 @management_login_required
 def election_upload_application(request, pk, application_id=None):
-    manager, election, meeting = _unpack(request, pk)
+    _, election, _ = _unpack(request, pk)
 
     if not election.can_apply:
         messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
@@ -243,7 +262,7 @@ def election_upload_application(request, pk, application_id=None):
         try:
             instance = election.applications.get(pk=application_id)
         except Application.DoesNotExist:
-            raise Http404('Application does not exist')
+            return HttpResponseNotFound('Application does not exist')
     else:
         instance = None
 
@@ -269,12 +288,12 @@ def election_upload_application(request, pk, application_id=None):
 def election_delete_application(request, pk, application_id):
     e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
     if not e.exists():
-        raise Http404('Election does not exist')
+        return HttpResponseNotFound('Election does not exist')
     e = e.first()
     try:
         a = e.applications.get(pk=application_id)
     except Application.DoesNotExist:
-        raise Http404('Application does not exist')
+        return HttpResponseNotFound('Application does not exist')
     a.delete()
     return redirect('management:election', pk=pk)
 
@@ -296,7 +315,7 @@ def delete_voter(request, pk):
 def delete_election(request, pk):
     e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
     if not e.exists():
-        raise Http404('Election does not exist')
+        return HttpResponseNotFound('Election does not exist')
     e = e.first()
     session = e.session
     e.delete()
@@ -308,7 +327,7 @@ def delete_election(request, pk):
 def delete_session(request, pk):
     s = request.user.sessions.filter(pk=pk)
     if not s.exists():
-        raise Http404('Session does not exist')
+        return HttpResponseNotFound('Session does not exist')
     s = s.first()
     s.delete()
     return redirect('management:index')
@@ -318,7 +337,7 @@ def delete_session(request, pk):
 def print_token(request, pk):
     session = request.user.sessions.filter(pk=pk)
     if not session.exists():
-        raise Http404('Session does not exist')
+        return HttpResponseNotFound('Session does not exist')
     session = session.first()
     participants = session.participants
     tokens = [participant.new_access_token() for participant in participants.all() if participant.is_anonymous]
@@ -326,10 +345,16 @@ def print_token(request, pk):
         messages.add_message(request, messages.ERROR, 'No tokens have yet been generated.')
         return redirect('management:session', pk=session.pk)
 
-    img = [qrcode.make('https://vote.stustanet.de' + reverse('vote:link_login', kwargs={'access_code': access_code}))
+    img = [qrcode.make(f'https://{settings.URL}' + reverse('vote:link_login', kwargs={'access_code': access_code}))
            for access_code in tokens]
     tmp_qr_path = '/tmp/wahlfang/qr_codes/session_{}'.format(session.pk)
     Path(tmp_qr_path).mkdir(parents=True, exist_ok=True)
+    if session.meeting_link:
+        meeting_qr_path = os.path.join(tmp_qr_path, 'qr_meeting.png')
+        qrcode.make(session.meeting_link).save(meeting_qr_path)
+    else:
+        meeting_qr_path = None
+
     paths = []
     for idx, i in enumerate(img):
         path_i = os.path.join(tmp_qr_path, 'qr_{}.png'.format(idx))
@@ -338,7 +363,8 @@ def print_token(request, pk):
     zipped = [{'path': path, 'token': token} for path, token in zip(paths, tokens)]
     context = {
         'session': session,
-        'tokens': zipped
+        'tokens': zipped,
+        'meeting_link_qr': meeting_qr_path
     }
 
     template_name = 'vote/tex/invitation.tex'
@@ -351,6 +377,8 @@ def print_token(request, pk):
 
 def generate_pdf(template_name: str, context: Dict, tex_path: str):
     template = get_template(template_name).render(context).encode('utf8')
+    with open("/tmp/template.tex", "wb") as f:
+        f.write(template)
     pdf = PdfLatexBuilder(pdflatex='pdflatex').build_pdf(template, texinputs=[tex_path, ''])
     return pdf
 
@@ -359,7 +387,7 @@ def generate_pdf(template_name: str, context: Dict, tex_path: str):
 def import_csv(request, pk):
     session = request.user.sessions.filter(pk=pk)
     if not session.exists():
-        raise Http404('Session does not exist')
+        return HttpResponseNotFound('Session does not exist')
     session = session.first()
 
     if request.method == 'POST':
@@ -376,7 +404,7 @@ def import_csv(request, pk):
 def export_csv(request, pk):
     e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
     if not e.exists():
-        raise Http404('Election does not exist')
+        return HttpResponseNotFound('Election does not exist')
     e = e.first()
 
     response = HttpResponse(content_type='text/csv')
@@ -393,33 +421,5 @@ def export_csv(request, pk):
         if e.max_votes_yes is not None:
             row.append(i < e.max_votes_yes)
         writer.writerow(row)
-
-    return response
-
-
-@management_login_required
-def export_json(request, pk):
-    e = Election.objects.filter(session__in=request.user.sessions.all(), pk=pk)
-    if not e.exists():
-        raise Http404('Election does not exist')
-    e = e.first()
-
-    json_data = []
-    for i, applicant in enumerate(e.election_summary):
-        appl_data = {
-            "applicant": applicant.get_display_name(),
-            "email": applicant.email,
-            "yes": applicant.votes_accept,
-            "no": applicant.votes_reject,
-            "abstention": applicant.votes_abstention
-        }
-        if e.max_votes_yes is not None:
-            appl_data["elected"] = i < e.max_votes_yes
-        json_data.append(appl_data)
-
-    json_str = json.dumps(json_data)
-
-    response = HttpResponse(json_str, content_type='application/json')
-    response['Content-Disposition'] = 'attachment; filename=result.json'
 
     return response

@@ -2,6 +2,9 @@ import os
 import sys
 import textwrap
 import uuid
+from argparse import Namespace
+from datetime import datetime
+from functools import partial
 from io import BytesIO
 
 import PIL
@@ -82,7 +85,7 @@ class Election(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
-    result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'fully published')],
+    result_published = models.CharField(max_length=1, choices=[('0', 'unpublished'), ('1', 'published')],
                                         default='0')
     disable_abstention = models.BooleanField(default=False)
     voters_self_apply = models.BooleanField(default=False)
@@ -94,31 +97,32 @@ class Election(models.Model):
     def started(self):
         if self.start_date is not None:
             return timezone.now() > self.start_date
-        else:
-            return False
+
+        return False
 
     @property
     def closed(self):
         if self.end_date:
             return self.end_date < timezone.now()
-        else:
-            return False
+
+        return False
 
     @property
     def is_open(self):
         if self.start_date and self.end_date:
             return self.start_date < timezone.now() < self.end_date
-        elif self.start_date:
+
+        if self.start_date:
             return self.start_date < timezone.now()
-        else:
-            return False
+
+        return False
 
     @property
     def can_apply(self):
         if self.start_date:
             return timezone.now() < self.start_date
-        else:
-            return True
+
+        return True
 
     @property
     def applications(self):
@@ -176,14 +180,15 @@ class Voter(models.Model):
     def __str__(self):
         if self.email is None:
             return f'anonymous-{self.pk}'
-        else:
-            return self.email
 
-    def save(self, *args, **kwargs):
-        fields = kwargs.pop('update_fields', [])
-        if fields == ['last_login']:
+        return self.email
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if update_fields == ['last_login']:
             return
-        super().save(*args, **kwargs)
+
+        super().save(force_insert, force_update, using, update_fields)
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
@@ -270,6 +275,25 @@ class Voter(models.Model):
     def get_username(self):
         return str(self)
 
+    @classmethod
+    def send_test_invitation(cls, title: str, invite_text: str, start_date: datetime, meeting_link: str, to_email: str,
+                             from_email: str):
+        test_session = Namespace(**{
+            "title": title,
+            "invite_text": invite_text,
+            "start_date": start_date,
+            'meeting_link': meeting_link,
+        })
+
+        test_voter = Namespace(**{
+            "name": "Testname",
+            "email": to_email,
+            "session": test_session,
+        })
+        test_voter.email_user = partial(Voter.email_user, test_voter)
+
+        Voter.send_invitation(test_voter, "mock-up-access-token", from_email)
+
     def send_invitation(self, access_code: str, from_email: str):
         if not self.email:
             return
@@ -283,13 +307,13 @@ class Voter(models.Model):
                 'name': self.name,
                 'title': self.session.title,
                 'access_code': access_code,
-                'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login',
-                                                                   kwargs={'access_code': access_code}),
+                'login_url': f'https://{settings.URL}' + reverse('vote:link_login',
+                                                                 kwargs={'access_code': access_code}),
                 'start_date': st.strftime("%d.%m.%Y") if self.session.start_date else "",
                 'start_time': st.strftime("%H:%M") if self.session.start_date else "",
                 'start_date_en': st.strftime("%Y/%m/%d") if self.session.start_date else "",
                 'start_time_en': st.strftime("%I:%M %p") if self.session.start_date else "",
-                'base_url': 'https://vote.stustanet.de',
+                'base_url': f'https://{settings.URL}',
                 'meeting_link': self.session.meeting_link
             }
             body_html = self.session.invite_text.format(**context)
@@ -297,9 +321,9 @@ class Voter(models.Model):
             context = {
                 'voter': self,
                 'session': self.session,
-                'base_url': 'https://vote.stustanet.de',
-                'login_url': 'https://vote.stustanet.de' + reverse('vote:link_login',
-                                                                   kwargs={'access_code': access_code}),
+                'base_url': f'https://{settings.URL}',
+                'login_url': f'https://{settings.URL}' + reverse('vote:link_login',
+                                                                 kwargs={'access_code': access_code}),
                 'access_code': access_code,
             }
             body_html = render_to_string('vote/mails/invitation.j2', context=context)
@@ -317,14 +341,14 @@ class Voter(models.Model):
             return
         subject = f'{election.title} is now open'
         if election.remind_text:
-            if self.session.start_date:
+            if election.end_date:
                 # cast to correct time zone
                 current_tz = timezone.get_current_timezone()
                 et = current_tz.normalize(election.end_date)
             context = {
                 'name': self.name,
                 'title': election.title,
-                'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
+                'url': f'https://{settings.URL}' + reverse('vote:vote', kwargs={'election_id': election.pk}),
                 'end_date': et.strftime("%d.%m.%y") if election.end_date else "",
                 'end_time': et.strftime("%H:%M") if election.end_date else "",
                 'end_date_en': et.strftime("%Y/%m/%d") if election.end_date else "",
@@ -335,7 +359,7 @@ class Voter(models.Model):
             context = {
                 'voter': self,
                 'election': election,
-                'url': 'https://vote.stustanet.de' + reverse('vote:vote', kwargs={'election_id': election.pk}),
+                'url': f'https://{settings.URL}' + reverse('vote:vote', kwargs={'election_id': election.pk}),
             }
             body_html = render_to_string('vote/mails/start.j2', context=context)
 
@@ -412,7 +436,7 @@ class Application(models.Model):
         unique_together = ('voter', 'election')
 
     def __init__(self, *args, **kwargs):
-        super(Application, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._old_avatar = self.avatar
 
     def __str__(self):
@@ -421,7 +445,8 @@ class Application(models.Model):
     def get_display_name(self):
         return f'{self.display_name}'
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         if self.avatar and self._old_avatar != self.avatar:
             # remove old file
             if self._old_avatar and os.path.isfile(self._old_avatar.path):
@@ -457,7 +482,7 @@ class Application(models.Model):
                                                'image/jpeg', sys.getsizeof(output), None)
             self._old_avatar = self.avatar
 
-        super(Application, self).save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
 
 class OpenVote(models.Model):

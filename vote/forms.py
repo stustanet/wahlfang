@@ -17,7 +17,7 @@ class AccessCodeAuthenticationForm(forms.Form):
 
     access_code = forms.CharField(label='access code')
 
-    def __init__(self, request=None, *args, **kwargs):
+    def __init__(self, *args, request=None, **kwargs):
         """
         The 'request' parameter is set for custom auth use by subclasses.
         The form data comes in via the standard 'data' kwarg.
@@ -98,7 +98,7 @@ class VoteForm(forms.Form):
 
         votes_yes = 0
 
-        for application_pk, vote in self.cleaned_data.items():
+        for _, vote in self.cleaned_data.items():
             if vote == VOTE_ACCEPT:
                 votes_yes += 1
 

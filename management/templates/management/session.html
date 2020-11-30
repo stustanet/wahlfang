@@ -7,69 +7,115 @@
   <div class="row justify-content-center">
     <div class="col-12">
       <div class="card shadow ">
-        <div class="card-header  bg-dark text-light">
+        <div class="card-header bg-dark text-light">
           <h4 class="d-inline">{{ session.title }}</h4>
-          <a class="btn btn-success d-inline float-right ml-2"
-             href="{% url 'management:add_election' pk=session.id %}">Add Election</a>
+          <div class="d-inline float-right dropdown ml-2">
+            <button
+                class="btn btn-outline-secondary dropdown-toggle"
+                type="button"
+                id="dropdown-session-options"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+              <i class="hamburger"></i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdown-session-options">
+              <a class="dropdown-item" href="{% url 'management:session_settings' pk=session.pk %}">Session Settings</a>
+            </div>
+          </div>
+          <a class="btn btn-success d-inline float-right"
+             href="{% url 'management:add_election' pk=session.pk %}">Add Election</a>
           {% if session.meeting_link %}
             <br/>
             <small>Meeting on <a href="{{ session.meeting_link }}">{{ session.meeting_link }}</a></small>
           {% endif %}
+          {% if session.start_date %}
+            <br/>
+            <small>Starts on {{ session.start_date }}</small>
+          {% endif %}
         </div>
         <div class="card-body">
           <div class="list-group">
-            {% for election in elections %}
-              <div class="list-group-item list-group-item-action">
+            {% if not elections %}
+              <div class="list-group-item">
+                <span>There are no elections for this session</span>
+              </div>
+            {% else %}
+              {% for election in elections %}
+                <div class="list-group-item list-group-item-action">
 
-                <a class="main-link" href="{% url 'management:election' pk=election.id %}"></a>
-                <span><b>{{ election.title }}</b></span>
-                <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
-                        data-target="#deleteModel{{ election.pk }}"
-                        aria-label="remove election from session">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+                  <a class="main-link" href="{% url 'management:election' pk=election.pk %}"></a>
+                  <span><b>{{ election.title }}</b></span>
+                  <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
+                          data-target="#deleteModel{{ election.pk }}"
+                          aria-label="remove election from session">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
 
-                <small class="float-right">
-                  {% if not election.started and election.start_date %}
-                    <span class="right-margin">Starts at {{ election.start_date|date:"Y-m-d H:i:s" }}</span>
-                  {% elif not election.started %}
-                    <span class="right-margin">Needs to be started manually</span>
-                  {% elif election.is_open and election.end_date %}
-                    <span class="right-margin">
+                  <small class="float-right">
+                    {% if not election.started and election.start_date %}
+                      <span class="right-margin">Starts at {{ election.start_date|date:"Y-m-d H:i:s" }}</span>
+                    {% elif not election.started %}
+                      <span class="right-margin">Needs to be started manually</span>
+                    {% elif election.is_open and election.end_date %}
+                      <span class="right-margin">
                       Open until {{ election.end_date|date:"Y-m-d H:i:s" }}
                     </span>
-                  {% elif election.closed %}
-                    <span class="right-margin">Closed</span>
-                  {% else %}
-                    <span class="right-margin">Open, needs to be closed manually</span>
-                  {% endif %}
-                </small>
-              </div>
-            {% endfor %}
+                    {% elif election.closed %}
+                      <span class="right-margin">Closed</span>
+                    {% else %}
+                      <span class="right-margin">Open, needs to be closed manually</span>
+                    {% endif %}
+                  </small>
+                </div>
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
       </div>
       <div class="card shadow my-4">
-        <div class="card-body">
-          <h4>Voters
-            <a class="btn btn-success d-inline float-right ml-2"
-               href="{% url 'management:import_csv' pk=session.id %}">Import from CSV</a>
-            <a class="btn btn-success d-inline float-right ml-2"
-               href="{% url 'management:add_tokens' pk=session.id %}">Add Tokens</a>
-            <a class="btn btn-success d-inline float-right ml-2"
-               href="{% url 'management:add_voters' pk=session.id %}">Add Voters</a>
-          </h4>
-          <br>
-
-          <div class="list-group list-group-flush">
-            <div class="list-group-item">
-              <span class="w-25 font-weight-bold">E-Mail</span>
+        <div class="card-header bg-white">
+          <h4 class="d-inline">Voters</h4>
+          <div class="d-inline float-right dropdown">
+            <button
+                class="btn btn-success dropdown-toggle"
+                type="button"
+                id="dropdown-voter-options"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+              <i class="hamburger"></i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdown-voter-options">
+              <a class="dropdown-item"
+                 href="{% url 'management:add_voters' pk=session.pk %}">Add Voters</a>
+              <a class="dropdown-item"
+                 href="{% url 'management:import_csv' pk=session.pk %}">Import from CSV</a>
+              <a class="dropdown-item"
+                 href="{% url 'management:add_tokens' pk=session.pk %}">Add Tokens</a>
+              <button type="button" class="dropdown-item" data-toggle="modal"
+                      data-target="#downloadToken"
+                      aria-label="download tokens">
+                <span aria-hidden="true">Download Tokens</span>
+              </button>
             </div>
-            <div class="voter-table">
-              {% for voter in voters %}
-                <div class="list-group-item">
-                  <span class="w-25 {% if voter.logged_in %}text-success{% endif %}"> {{ voter }}</span>
-                  <span class="float-right">
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            {% if voters %}
+              <div class="list-group-item">
+                <span class="w-25 font-weight-bold">E-Mail</span>
+                <span data-toggle="tooltip" data-placement="right"
+                      title="Mail addresses turn green, as soon as their invite link has been clicked.">
+                    <img class="pl-1 pb-1" src="{% static "img/question-circle.svg" %}" height="25pt" alt="[?]">
+                </span>
+              </div>
+              <div class="voter-table">
+                {% for voter in voters %}
+                  <div class="list-group-item">
+                    <span class="w-25 {% if voter.logged_in %}text-success{% endif %}"> {{ voter }}</span>
+                    <span class="float-right">
                   <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="close btn btn-danger" aria-label="remove voter">
@@ -77,21 +123,20 @@
                     </button>
                   </form>
                 </span>
-                </div>
-              {% endfor %}
-            </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="list-group-item">
+                <span>No voters were added yet</span>
+              </div>
+            {% endif %}
           </div>
-
-          <br>
-          <button type="button" class="btn btn-dark d-inline float-left ml-2" data-toggle="modal"
-                  data-target="#downloadToken"
-                  aria-label="download tokens">
-            <span aria-hidden="true">Download Tokens</span>
-          </button>
         </div>
       </div>
     </div>
   </div>
+
   {% for election in elections %}
     <div class="modal fade" id="deleteModel{{ election.pk }}" role="dialog">
       <div class="modal-dialog">
@@ -114,6 +159,7 @@
       </div>
     </div>
   {% endfor %}
+
   <div class="modal fade" id="downloadToken" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -134,9 +180,12 @@
       </div>
     </div>
   </div>
-  <script src="{% static "js/jquery-3.4.1.slim.min.js" %}"
-          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
-  <script src="{% static "bootstrap-4.4.1-dist/js/bootstrap.min.js" %}"
-          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+
+  <script src="{% static "js/jquery-3.5.1.slim.min.js" %}"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"></script>
+  <script src="{% static "js/popper-1.16.1.min.js" %}"
+          integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"></script>
+  <script src="{% static "bootstrap-4.5.3-dist/js/bootstrap.min.js" %}"
+          integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"></script>
   <script src="{% static "management/js/session.js" %}"></script>
 {% endblock %}

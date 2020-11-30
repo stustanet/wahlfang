@@ -1,51 +1,56 @@
 # Wahlfang
+> A self-hostable online voting tool developed to include all the 
+> features you would need to hold any online election you can dream of
 
-StuStaNet Online Wahl-Tool
+Developed by [StuStaNet](https://stustanet.de) Wahlfang is a small-ish Django project
+which aims at being an easy to use solution for online elections. From simple one-time
+votes about where to grab a coffee to large and long meetings with multiple different 
+votes and elections - Wahlfang does it all.
 
-## Setup
+If you would like a new feature or have a bug to report please open an [issue](https://github.com/stustanet/wahlfang/issues).
 
+## Getting Started
+To just get the current version up and running simply
 ```bash
-$ cd Wahlfang
+$ git clone https://gitlab.stusta.de/stustanet/wahlfang.git
+$ cd wahlfang
 $ pip3 install -r requirements.txt
 $ python3 manage.py migrate
+$ python3 manage.py runserver localhost:8000
 ```
 
-### Admin Access
+For detailed instructions on how to setup your own wahlfang instance for productive use see [deploying](docs/deploying.md).
 
-Creating a superuser (for testing):
+### Management Access
+
+Creating a local election management user:
 ```bash
-$ python3 manage.py createsuperuser
+$ python3 manage.py create_admin
 ```
 
-The admin interface is accessible at [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).
-An admin account can also use the management interface 
-[http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
+Login to the management interface running at [http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
 
+### Metrics
 
-### Generating Test Data
+In the default configuration wahlfang exports some internal application statistics as [Prometheus](https://prometheus.io/) 
+metrics at the endpoint `/metrics`. This behaviour can be turned off by settings `EXPORT_PROMETHEUS_METRICS = False`
+in the application settings.
 
-Either via the [management interface](http://127.0.0.1:8000/management/) with the credential of the superuser created
-above or by using the following (old) method:
+We use the [django-prometheus](https://github.com/korfuri/django-prometheus) project to export our exports.
 
-Create an election:
+## Contributing
+Install the development requirements in addition to the standard dependencies:
 ```bash
-$ python3 manage.py create_election --title "Hausadminwahl SS20 im Testhaus" --max-votes-yes 2
+$ pip3 install -r requirements_dev.txt
 ```
 
-Create a voter:
+Run the linting and test suite
 ```bash
-$ python3 manage.py create_voter --election_id 1 --voter_id 1337
+$ make lint
+$ make test
 ```
 
-You can then login with the printed access code.
-
-## Run Development Server
-Starting the server:
-```bash
-$ python3 manage.py runserver
-```
-
-If some model changed, you might have make and/or apply migrations again:
+If some model changed, you might have to make and/or apply migrations again:
 ```bash
 $ python3 manage.py makemigrations
 $ python3 manage.py migrate

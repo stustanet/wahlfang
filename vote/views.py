@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
-from django.http import Http404
+from django.http.response import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -77,7 +77,7 @@ def vote(request, election_id):
     try:
         election = voter.session.elections.get(pk=election_id)
     except Election.DoesNotExist:
-        raise Http404('election does not exists')
+        return HttpResponseNotFound('Election does not exists')
 
     can_vote = voter.can_vote(election)
     if election.max_votes_yes is not None:
@@ -148,11 +148,11 @@ def delete_own_application(request, election_id):
         instance = application.first()
         instance.delete()
         return redirect('vote:index')
-    else:
-        raise Http404('Application does not exist')
+
+    return HttpResponseNotFound('Application does not exist')
 
 
-def help(request):
+def help_page(request):
     management = request.GET.get('management', False)
     return render(request, template_name='vote/help.html', context={'URL': settings.URL,
                                                                     'back_url': (reverse(

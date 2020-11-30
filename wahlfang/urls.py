@@ -19,12 +19,15 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('vote.urls', namespace='vote')),
-    path('management/', include('management.urls', namespace='management'))
+    path('management/', include('management.urls', namespace='management')),
+
+    # prometheus metrics
+    path('', include('django_prometheus.urls')),
 ]
 
 if settings.DEBUG:
     from django.contrib import admin
 
-    urlpatterns += path('admin/', admin.site.urls),
+    urlpatterns += [path('admin/', admin.site.urls)]
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

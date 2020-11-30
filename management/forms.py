@@ -5,9 +5,11 @@ from datetime import timedelta
 from typing import Tuple, List
 
 from django import forms
+from django.conf import settings
 from django.core.validators import validate_email
 from django.utils import timezone
 
+from management.models import ElectionManager
 from vote.models import Election, Application, Session, Voter, OpenVote
 
 
@@ -54,7 +56,7 @@ class ChangeElectionPublicStateForm(forms.ModelForm):
         }
 
 
-class TemplateStringForm(forms.ModelForm):
+class TemplateStringForm:
     def clean_email_text(self, test_data: List[str], field: str):
         """
         checks if the cleaned_text fails when formatted on the test_data.
@@ -62,22 +64,36 @@ class TemplateStringForm(forms.ModelForm):
         test_data_dict = {i: "" for i in test_data}
         cleaned_text = self.cleaned_data[field]
         try:
-            test = cleaned_text.format(**test_data_dict)
+            cleaned_text.format(**test_data_dict)
         except (KeyError, ValueError, IndexError):
             x = re.findall(r"\{\w*\}", cleaned_text)
-            test_data = set(x) - set([f"{{{i}}}" for i in test_data])
+            test_data = set(x) - {f"{{{i}}}" for i in test_data}
             self.add_error(field, "The following variables are not allowed: " + ", ".join(test_data))
         return cleaned_text
 
 
-class AddSessionForm(TemplateStringForm):
+class AddSessionForm(forms.ModelForm, TemplateStringForm):
+    variables = {
+        "{name}": "Voter's name if set",
+        "{title}": "Session's title",
+        "{access_code}": "Access code/token for the voter to login",
+        "{login_url}": "URL which instantly logs user in",
+        "{base_url}": f"Will render to: https://{settings.URL}",
+        "{start_time}": "Start time if datetime is set",
+        "{start_date}": "Start date if datetime is set",
+        "{start_time_en}": "Start time in english format e.g. 02:23 PM",
+        "{start_date_en}": "Start date in english format e.g. 12/12/2020",
+        "{meeting_link}": "Meeting link if set"
+    }
+
     email = forms.EmailField(required=False, label="",
                              widget=forms.EmailInput(attrs={"class": "emailinput form-control",
                                                             "placeholder": "your@email.de"}))
 
     def __init__(self, request, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00',
+                                                                  'type': 'datetime'})
         self.fields['meeting_link'].widget = forms.TextInput(
             attrs={'placeholder': 'e.g. https://bbb.stusta.de/b/ssn-abc-123'})
         self.user = user
@@ -107,16 +123,79 @@ class AddSessionForm(TemplateStringForm):
                      "start_date", "meeting_link", "start_date_en", "start_time_en"]
         return self.clean_email_text(test_data, 'invite_text')
 
-    def save(self, commit=True):
-        instance = super().save(commit=commit)
-        self.user.sessions.add(instance)
-        if commit:
+    def _save_m2m(self):
+        super()._save_m2m()
+
+        if not self.user.sessions.filter(pk=self.instance.pk):
+            self.user.sessions.add(self.instance)
             self.user.save()
 
-        return instance
+    def save(self, commit=True):
+        self.instance = super().save(commit=False)
+
+        if commit:
+            self.instance.save()
+            self._save_m2m()
+        else:
+            self.save_m2m = self._save_m2m  # pylint: disable=attribute-defined-outside-init
+
+        return self.instance
 
 
-class AddElectionForm(TemplateStringForm):
+class SessionSettingsForm(AddSessionForm):
+    add_election_manager = forms.CharField(max_length=256, required=False, label='')
+
+    class Meta:
+        model = Session
+        fields = ('start_date', 'meeting_link', 'invite_text')
+        labels = {
+            'start_date': 'Meeting start (optional)',
+            'meeting_link': 'Link to meeting call platform (optional)',
+            # will be set by html
+            'invite_text': ''
+        }
+        widgets = {
+            'start_date': forms.TextInput(attrs={'placeholder': 'e.g. 2020-05-12 13:00:00', 'type': 'datetime'})
+        }
+
+    def clean_add_election_manager(self):
+        value = self.data['add_election_manager']
+        if not value:
+            return value
+        if not ElectionManager.objects.filter(username=value).exists():
+            raise forms.ValidationError(f'Cannot find election manager with username {value}')
+
+        return ElectionManager.objects.get(username=value)
+
+    def _save_m2m(self):
+        super()._save_m2m()
+
+        if self.cleaned_data['add_election_manager']:
+            self.cleaned_data['add_election_manager'].sessions.add(self.instance)
+            self.cleaned_data['add_election_manager'].save()
+
+    def save(self, commit=True):
+        self.instance = super().save(commit=False)
+        if commit:
+            self.instance.save()
+            self._save_m2m()
+        else:
+            self.save_m2m = self._save_m2m  # pylint: disable=attribute-defined-outside-init
+
+        return self.instance
+
+
+class AddElectionForm(forms.ModelForm, TemplateStringForm):
+    variables = {
+        "{name}": "Voter's name if set",
+        "{title}": "Session's title",
+        "{url}": "URL to the election",
+        "{end_time}": "End time if datetime is set",
+        "{end_date}": "End date if datetime is set",
+        "{end_time_en}": "End time in english format e.g. 02:23 PM",
+        "{end_date_en}": "End date in english format e.g. 12/12/2020",
+    }
+
     email = forms.EmailField(required=False, label="",
                              widget=forms.EmailInput(attrs={"class": "emailinput form-control",
                                                             "placeholder": "your@email.de"}))
@@ -126,8 +205,10 @@ class AddElectionForm(TemplateStringForm):
         self.fields['session'].disabled = True
         self.fields['session'].initial = session
         self.fields['session'].widget = forms.HiddenInput()
-        self.fields['start_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
-        self.fields['end_date'].widget = forms.TextInput(attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00'})
+        self.fields['start_date'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00', 'type': 'datetime'})
+        self.fields['end_date'].widget = forms.TextInput(
+            attrs={'placeholder': 'e.g.: 2020-05-12 13:00:00', 'type': 'datetime'})
         # self.fields['start_date'].initial = timezone.now()
         self.fields['max_votes_yes'] = forms.IntegerField(min_value=1, required=False,
                                                           label='Maximum number of YES votes (optional)')
@@ -229,27 +310,35 @@ class AddVotersForm(forms.Form):
 
     def save(self) -> List[Tuple[Voter, str]]:
         voters = [
-            Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['email_list']
+            Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['voters_list']
         ]
 
         for voter, code in voters:
-            voter.send_invitation(code, self.session.managers.all().first().stusta_email)
+            voter.send_invitation(code, self.session.managers.all().first().sender_email)
 
         return voters
 
-    def clean(self):
-        super().clean()
-        emails = self.cleaned_data['voters_list'].splitlines()
-        for email in emails:
-            validate_email(email)
-            if Voter.objects.filter(email=email, session=self.session).exists():
-                raise forms.ValidationError('voter with this email address already exists')
+    def clean_voters_list(self):
+        lines = self.cleaned_data['voters_list'].splitlines()
+        emails = []
+        for line in lines:
+            if line == '':
+                continue
 
-        if not len(emails) == len(set(emails)):
+            try:
+                validate_email(line)
+            except forms.ValidationError:
+                self.add_error('voters_list', f'{line} is not a valid email address')
+
+            if Voter.objects.filter(email=line, session=self.session).exists():
+                self.add_error('voters_list', f'a voter with email address {line} already exists')
+
+            emails.append(line)
+
+        if len(emails) != len(set(emails)):
             raise forms.ValidationError('duplicate email address')
 
-        self.cleaned_data['email_list'] = emails
-        return self.cleaned_data
+        return emails
 
 
 class AddTokensForm(forms.Form):
@@ -268,15 +357,14 @@ class AddTokensForm(forms.Form):
 
 
 class CSVUploaderForm(forms.Form):
-    file = forms.FileField(label='CSV File')
+    csv_data = forms.FileField(label='CSV File')
 
     def __init__(self, session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.session = session
 
-    def clean(self):
-        super().clean()
-        f = self.cleaned_data['file'].file
+    def clean_csv_data(self):
+        f = self.cleaned_data['csv_data'].file
         data = {}
         try:
             with io.TextIOWrapper(f, encoding='utf-8') as text_file:
@@ -285,24 +373,26 @@ class CSVUploaderForm(forms.Form):
                     raise forms.ValidationError('CSV file needs to have columns "email" and "name".')
                 for row in csv_reader:
                     if row['email']:
-                        validate_email(row['email'])
+                        try:
+                            validate_email(row['email'])
+                        except forms.ValidationError:
+                            self.add_error('csv_data', f'Invalid email {row["email"]}')
                     else:
                         row['email'] = None
 
                     if Voter.objects.filter(session=self.session, email=row['email']).exists():
-                        raise forms.ValidationError(f'Voter with email address {row["email"]} already exists')
+                        self.add_error('csv_data', f'Voter with email address {row["email"]} already exists')
 
                     if row['email'] in data:
-                        raise forms.ValidationError(f'Duplicate email in csv: {row["email"]}')
+                        self.add_error('csv_data', f'Duplicate email in csv: {row["email"]}')
 
                     data[row['email']] = row['name']
-        except UnicodeDecodeError:
-            raise forms.ValidationError('File seems to be not in CSV format.')
+        except UnicodeDecodeError as e:
+            raise forms.ValidationError('File does not seem to be in CSV format.') from e
 
-        self.cleaned_data['csv_data'] = data
-        return self.cleaned_data
+        return data
 
     def save(self):
         for email, name in self.cleaned_data['csv_data'].items():
             voter, code = Voter.from_data(session=self.session, email=email, name=name)
-            voter.send_invitation(code, self.session.managers.all().first().stusta_email)
+            voter.send_invitation(code, self.session.managers.all().first().sender_email)

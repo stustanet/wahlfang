@@ -1,0 +1,34 @@
+{% extends 'management/base.html' %}
+{% load static %}
+
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-light">
+          <h4 class="d-inline">Spectator Settings</h4>
+          <a class="btn btn-light d-inline float-right" href="{% url "management:session"  pk=pk %}">Back</a>
+        </div>
+        <div class="card-body">
+          {% if token_url %}
+            <p>Public spectator URL:</p>
+            <p>{{ token_url }}</p>
+            <form action="{% url 'management:spectator' pk %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="do-type" value="delete">
+              <input type="submit" value="Remove Access" class="btn btn-danger">
+            </form>
+          {% else %}
+            <p>No public spectator access has been created yet.</p>
+            <form action="{% url 'management:spectator' pk %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="do-type" value="create">
+              <input type="submit" value="Create Access" class="btn btn-primary">
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

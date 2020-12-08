@@ -423,3 +423,24 @@ def export_csv(request, pk):
         writer.writerow(row)
 
     return response
+
+
+@management_login_required
+def spectator(request, pk):
+    session = request.user.sessions.filter(pk=pk)
+    if not session.exists():
+        return HttpResponseNotFound('Session does not exist')
+    session = session.first()
+    if request.POST:
+        do = request.POST.get("do-type")
+        if do == "create":
+            session.create_spectator_token()
+        elif do == "delete":
+            session.spectator_token = None
+            session.save()
+    context = {
+        'token_url': request.build_absolute_uri(
+            reverse('vote:spectator', kwargs={'uuid': session.spectator_token})) if session.spectator_token else None,
+        'pk': session.pk,
+    }
+    return render(request, template_name='management/spectator_settings.html', context=context)

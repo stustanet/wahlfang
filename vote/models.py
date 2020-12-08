@@ -77,6 +77,15 @@ class Session(models.Model):
     meeting_link = models.CharField(max_length=512, blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
     invite_text = models.TextField(max_length=8000, blank=True, null=True)
+    spectator_token = models.UUIDField(unique=True, null=True, blank=True)
+
+    def create_spectator_token(self):
+        myid = uuid.uuid4()
+        while Session.objects.filter(spectator_token=myid).exists():
+            myid = uuid.uuid4()
+        self.spectator_token = myid
+        self.save()
+        return myid
 
 
 class Election(models.Model):

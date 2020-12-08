@@ -24,7 +24,7 @@ bandit:
     - pip3 install virtualenv
     - virtualenv -q .venv
     - source .venv/bin/activate
-    - pip install -U bandit
+    - pip install bandit==1.6.2
   script:
     - make bandit
 

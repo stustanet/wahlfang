@@ -1,4 +1,4 @@
-bandit
+bandit==1.6.2
 pylint
 pylint-django~=2.3.0
 django-stubs

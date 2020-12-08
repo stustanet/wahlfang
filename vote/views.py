@@ -8,7 +8,7 @@ from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, VoteForm, ApplicationUploadFormUser
-from vote.models import Election, Voter
+from vote.models import Election, Voter, Session
 
 
 class LoginView(auth_views.LoginView):
@@ -153,3 +153,13 @@ def delete_own_application(request, election_id):
 
 def help_page(request):
     return render(request, template_name='vote/help.html')
+
+
+def spectator(request, uuid):
+    session = get_object_or_404(Session.objects, spectator_token=uuid)
+    context = {
+        'title': session.title,
+        'meeting_link': session.meeting_link,
+        'elections': session.elections.all()
+    }
+    return render(request, template_name='vote/spectator.html', context=context)

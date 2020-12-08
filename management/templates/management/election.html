@@ -7,14 +7,14 @@
       <div class="card shadow">
         <div class="card-header bg-dark text-light">
           <h4 class="d-inline">{{ election.title }}</h4>
-          <a class="btn btn-light d-inline float-right" href="{% url "management:session"  pk=session.id %}">Back</a>
+          <a class="btn btn-light d-inline float-right" href="{% url "management:session"  pk=session.pk %}">Back</a>
         </div>
         {% if not election.started %}
-            <div class="card-body">
+          <div class="card-body">
 
-                <div>Election has not started yet.</div>
-                <div>
-                    {% if election.end_date and election.start_date %}
+            <div>Election has not started yet.</div>
+            <div>
+              {% if election.end_date and election.start_date %}
                 Election period: {{ election.start_date|date:"l Y-m-d H:i:s" }} -
                 {{ election.end_date|date:"l Y-m-d H:i:s" }}
               {% elif election.start_date %}

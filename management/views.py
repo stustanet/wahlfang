@@ -439,8 +439,8 @@ def spectator(request, pk):
             session.spectator_token = None
             session.save()
     context = {
-        'token_url': "https://{}/spectator/{}".format(settings.URL,
-                                                      session.spectator_token) if session.spectator_token else None,
+        'token_url': request.build_absolute_uri(
+            reverse('vote:spectator', kwargs={'uuid': session.spectator_token})) if session.spectator_token else None,
         'pk': session.pk,
     }
     return render(request, template_name='management/spectator_settings.html', context=context)

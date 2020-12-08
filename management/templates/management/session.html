@@ -21,6 +21,7 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdown-session-options">
               <a class="dropdown-item" href="{% url 'management:session_settings' pk=session.pk %}">Session Settings</a>
+              <a class="dropdown-item" href="{% url 'management:spectator' pk=session.pk %}">Public Spectator Link</a>
             </div>
           </div>
           <a class="btn btn-success d-inline float-right"

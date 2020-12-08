@@ -31,6 +31,7 @@ urlpatterns = [
     path('meeting/<int:pk>/add_election', views.add_election, name='add_election'),
     path('meeting/<int:pk>/print_token', views.print_token, name='print_token'),
     path('meeting/<int:pk>/import_csv', views.import_csv, name='import_csv'),
+    path('meeting/<int:pk>/spectator', views.spectator, name='spectator'),
 
     # Election
     path('election/<int:pk>/add_application', views.election_upload_application, name='add_application'),

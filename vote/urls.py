@@ -20,4 +20,5 @@ urlpatterns = [
     path('vote/<int:election_id>/apply', views.apply, name='apply'),
     path('vote/<int:election_id>/delete-own-application', views.delete_own_application, name='delete_own_application'),
     path('help', views.help_page, name='help'),
+    path('spectator/<str:uuid>', views.spectator, name='spectator')
 ]

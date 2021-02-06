@@ -91,9 +91,22 @@ def index(request):
 def session_detail(request, pk=None):
     manager = request.user
     session = manager.sessions.get(id=pk)
+    elections = session.elections.order_by('pk')
+    if not elections:
+        existing_elections = False
+    else:
+        existing_elections = True
+    open_elections = [e for e in elections if e.is_open]
+    upcoming_elections = [e for e in elections if not e.started]
+    published_elections = [e for e in elections if e.closed and int(e.result_published)]
+    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
     context = {
         'session': session,
-        'elections': session.elections.order_by('pk'),
+        'existing_elections': existing_elections,
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
         'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)

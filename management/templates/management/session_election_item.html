@@ -1,0 +1,25 @@
+<div class="list-group-item list-group-item-action">
+  <a class="main-link" href="{% url 'management:election' pk=election.pk %}"></a>
+  <span><b>{{ election.title }}</b></span>
+  <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
+          data-target="#deleteModel{{ election.pk }}"
+          aria-label="remove election from session">
+    <span aria-hidden="true">&times;</span>
+  </button>
+
+  <small class="float-right">
+    {% if not election.started and election.start_date %}
+      <span class="right-margin">Starts at {{ election.start_date|date:"Y-m-d H:i:s" }}</span>
+    {% elif not election.started %}
+      <span class="right-margin">Needs to be started manually</span>
+    {% elif election.is_open and election.end_date %}
+      <span class="right-margin">
+      Open until {{ election.end_date|date:"Y-m-d H:i:s" }}
+    </span>
+    {% elif election.closed %}
+      <span class="right-margin">Closed</span>
+    {% else %}
+      <span class="right-margin">Open, needs to be closed manually</span>
+    {% endif %}
+  </small>
+</div>

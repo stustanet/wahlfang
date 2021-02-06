@@ -35,41 +35,37 @@
             <small>Starts on {{ session.start_date }}</small>
           {% endif %}
         </div>
-        <div class="card-body">
+        <div class="card-body pt-0">
           <div class="list-group">
-            {% if not elections %}
+            {% if not existing_elections %}
               <div class="list-group-item">
                 <span>There are no elections for this session</span>
               </div>
             {% else %}
-              {% for election in elections %}
-                <div class="list-group-item list-group-item-action">
-
-                  <a class="main-link" href="{% url 'management:election' pk=election.pk %}"></a>
-                  <span><b>{{ election.title }}</b></span>
-                  <button type="button" class="close btn btn-danger btn-lg float-right" data-toggle="modal"
-                          data-target="#deleteModel{{ election.pk }}"
-                          aria-label="remove election from session">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-
-                  <small class="float-right">
-                    {% if not election.started and election.start_date %}
-                      <span class="right-margin">Starts at {{ election.start_date|date:"Y-m-d H:i:s" }}</span>
-                    {% elif not election.started %}
-                      <span class="right-margin">Needs to be started manually</span>
-                    {% elif election.is_open and election.end_date %}
-                      <span class="right-margin">
-                      Open until {{ election.end_date|date:"Y-m-d H:i:s" }}
-                    </span>
-                    {% elif election.closed %}
-                      <span class="right-margin">Closed</span>
-                    {% else %}
-                      <span class="right-margin">Open, needs to be closed manually</span>
-                    {% endif %}
-                  </small>
-                </div>
-              {% endfor %}
+              {% if open_elections %}
+                <h5 class="mt-3">Open elections</h5>
+                {% for election in open_elections %}
+                  {% include 'management/session_election_item.html' %}
+                {% endfor %}
+              {% endif %}
+              {% if upcoming_elections %}
+                <h5 class="mt-3">Upcoming elections</h5>
+                {% for election in upcoming_elections %}
+                  {% include 'management/session_election_item.html' %}
+                {% endfor %}
+              {% endif %}
+              {% if published_elections %}
+                <h5 class="mt-3">Published Results</h5>
+                {% for election in published_elections %}
+                  {% include 'management/session_election_item.html' %}
+                {% endfor %}
+              {% endif %}
+              {% if closed_elections %}
+                <h5 class="mt-3">Closed elections</h5>
+                {% for election in closed_elections %}
+                  {% include 'management/session_election_item.html' %}
+                {% endfor %}
+              {% endif %}
             {% endif %}
           </div>
         </div>

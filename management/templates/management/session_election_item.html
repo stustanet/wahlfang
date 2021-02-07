@@ -23,3 +23,24 @@
     {% endif %}
   </small>
 </div>
+
+<div class="modal fade" id="deleteModel{{ election.pk }}" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Delete Election</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete {{ election.title }}?</p>
+        </div>
+        <div class="modal-footer">
+          <form action="{% url 'management:delete_election' pk=election.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>

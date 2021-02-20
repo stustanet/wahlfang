@@ -165,9 +165,17 @@ def help_page(request):
 
 def spectator(request, uuid):
     session = get_object_or_404(Session.objects, spectator_token=uuid)
+    elections = session.elections.all()
+    open_elections = [e for e in elections if e.is_open]
+    upcoming_elections = [e for e in elections if not e.started]
+    published_elections = [e for e in elections if e.closed and int(e.result_published)]
+    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
     context = {
         'title': session.title,
         'meeting_link': session.meeting_link,
-        'elections': session.elections.all()
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
     }
     return render(request, template_name='vote/spectator.html', context=context)

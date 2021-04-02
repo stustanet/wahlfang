@@ -91,9 +91,19 @@ def index(request):
 def session_detail(request, pk=None):
     manager = request.user
     session = manager.sessions.get(id=pk)
+    elections = session.elections.order_by('pk')
+    existing_elections = bool(elections)
+    open_elections = [e for e in elections if e.is_open]
+    upcoming_elections = [e for e in elections if not e.started]
+    published_elections = [e for e in elections if e.closed and int(e.result_published)]
+    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
     context = {
         'session': session,
-        'elections': session.elections.order_by('pk'),
+        'existing_elections': existing_elections,
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
         'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)
@@ -134,8 +144,6 @@ def session_settings(request, pk=None):
 
 @management_login_required
 def add_election(request, pk=None):
-    # todo add chron job script that sends emails
-    # todo apply changes to session
     manager = request.user
     session = manager.sessions.get(pk=pk)
     context = {

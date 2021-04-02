@@ -3,7 +3,6 @@ from django.core.management.base import BaseCommand
 from vote.models import Voter
 
 
-# FIXME: TODO: THIS IS NOT WORKING ANYMORE, FIX
 class Command(BaseCommand):
     help = 'Reset Voter and resend invitation'
 

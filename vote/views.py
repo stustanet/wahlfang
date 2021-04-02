@@ -56,14 +56,22 @@ def code_login(request, access_code=None):
 @voter_login_required
 def index(request):
     voter = request.user
+    elections = [
+        (e, voter.can_vote(e), voter.application.filter(election=e).exists())
+        for e in voter.session.elections.order_by('pk')
+    ]
+    open_elections = [e for e in elections if e[0].is_open]
+    upcoming_elections = [e for e in elections if not e[0].started]
+    published_elections = [e for e in elections if e[0].closed and int(e[0].result_published)]
+    closed_elections = [e for e in elections if e[0].closed and not int(e[0].result_published)]
     context = {
         'title': voter.session.title,
         'meeting_link': voter.session.meeting_link,
         'voter': voter,
-        'elections': [
-            (e, voter.can_vote(e), voter.application.filter(election=e).exists())
-            for e in voter.session.elections.order_by('pk')
-        ]
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
     }
 
     # overview
@@ -157,9 +165,17 @@ def help_page(request):
 
 def spectator(request, uuid):
     session = get_object_or_404(Session.objects, spectator_token=uuid)
+    elections = session.elections.all()
+    open_elections = [e for e in elections if e.is_open]
+    upcoming_elections = [e for e in elections if not e.started]
+    published_elections = [e for e in elections if e.closed and int(e.result_published)]
+    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
     context = {
         'title': session.title,
         'meeting_link': session.meeting_link,
-        'elections': session.elections.all()
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
     }
     return render(request, template_name='vote/spectator.html', context=context)

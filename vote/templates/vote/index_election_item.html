@@ -1,6 +1,6 @@
 {% load vote_extras %}
 
-<div class="card shadow mb-2">
+<div class="card mb-2">
   <div class="card-body">
     <h4 class="mb-0">{{ election.title }}
       {% if not electon.started and not election.is_open and not election.closed and election.voters_self_apply %}

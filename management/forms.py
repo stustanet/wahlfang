@@ -14,7 +14,7 @@ from vote.models import Election, Application, Session, Voter, OpenVote
 
 
 class StartElectionForm(forms.ModelForm):
-    run_time = forms.IntegerField(label="run time")
+    run_time = forms.IntegerField(label="run time", min_value=1)
 
     class Meta:
         model = Election

@@ -92,10 +92,7 @@ def session_detail(request, pk=None):
     manager = request.user
     session = manager.sessions.get(id=pk)
     elections = session.elections.order_by('pk')
-    if not elections:
-        existing_elections = False
-    else:
-        existing_elections = True
+    existing_elections = bool(elections)
     open_elections = [e for e in elections if e.is_open]
     upcoming_elections = [e for e in elections if not e.started]
     published_elections = [e for e in elections if e.closed and int(e.result_published)]
@@ -147,8 +144,6 @@ def session_settings(request, pk=None):
 
 @management_login_required
 def add_election(request, pk=None):
-    # todo add chron job script that sends emails
-    # todo apply changes to session
     manager = request.user
     session = manager.sessions.get(pk=pk)
     context = {

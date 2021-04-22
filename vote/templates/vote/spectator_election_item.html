@@ -4,6 +4,9 @@
     {% if election.end_date %}
       <small class="text-muted">Voting Period: {{ election.start_date|date:"D Y-m-d H:i:s" }}
         - {{ election.end_date|date:"D Y-m-d H:i:s" }} (UTC{{ election.end_date|date:"O" }})</small>
+      <!-- hidden start and end time for javascript  | is used to delimit values-->
+      <div class="d-none time">{{ election.start_date|date:"U" }}|</div>
+      <div class="d-none time">{{ election.end_date|date:"U" }}|</div>
     {% endif %}
     <hr>
     <div class="list-group mt-3">

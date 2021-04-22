@@ -119,6 +119,7 @@ class VoteForm(forms.Form):
         can_vote = OpenVote.objects.get(election_id=self.election.pk, voter_id=self.voter.pk)
 
         if commit:
+            # TODO notify managers (websockets)
             with transaction.atomic():
                 Vote.objects.bulk_create(votes)
                 can_vote.delete()

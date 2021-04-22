@@ -165,6 +165,10 @@ class Election(models.Model):
             return 0
         return int(self.votes.count() / self.applications.count())
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        # TODO notify voters and spectators (websockets)
+        super().save(force_insert, force_update, using, update_fields)
+
     def __str__(self):
         return self.title
 
@@ -506,3 +510,5 @@ class Vote(models.Model):
     election = models.ForeignKey(Election, related_name='votes', on_delete=models.CASCADE)
     candidate = models.ForeignKey(Application, related_name='votes', on_delete=models.CASCADE)
     vote = models.CharField(choices=VOTE_CHOICES, max_length=max(len(x[0]) for x in VOTE_CHOICES))
+    # save method is not called on bulk_create in forms.VoteForm.
+    # The model update listener for websockets is implemented in the form.

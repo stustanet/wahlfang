@@ -9,6 +9,8 @@ from io import BytesIO
 
 import PIL
 from PIL import Image
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
@@ -166,8 +168,13 @@ class Election(models.Model):
         return int(self.votes.count() / self.applications.count())
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        # TODO notify voters and spectators (websockets)
         super().save(force_insert, force_update, using, update_fields)
+        # notify users to reload their page
+        group = str(self.session.pk)
+        async_to_sync(get_channel_layer().group_send)(
+            group,
+            {'type': 'send_reload'}
+        )
 
     def __str__(self):
         return self.title

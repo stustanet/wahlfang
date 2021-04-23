@@ -1,5 +1,6 @@
 {% extends 'management/base.html' %}
 {% load crispy_forms_filters %}
+{% load static %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -156,4 +157,14 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block footer_scripts %}
+  {#  Automatic reload of the page: #}
+  {#    - if another vote was cast#}
+
+  {#  use jquery ajax to reload the page#}
+  <script src="{% static "js/jquery-3.5.1.min.js" %}"></script>
+  <script src="{% static "vote/js/reload.js" %}"></script>
+
 {% endblock %}

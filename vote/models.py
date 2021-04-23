@@ -170,7 +170,7 @@ class Election(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(force_insert, force_update, using, update_fields)
         # notify users to reload their page
-        group = str(self.session.pk)
+        group = "Session-" + str(self.session.pk)
         async_to_sync(get_channel_layer().group_send)(
             group,
             {'type': 'send_reload'}
@@ -212,6 +212,7 @@ class Voter(models.Model):
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
+        # TODO notify manager, that user logged in
 
     def set_password(self, raw_password=None):
         if not raw_password:

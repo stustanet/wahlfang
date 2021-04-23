@@ -9,7 +9,7 @@ from vote.models import Session
 class VoteConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        self.group = await database_sync_to_async(self.get_session_key)()
+        self.group = await database_sync_to_async(self.get_session_key)()  # pylint: disable=W0201
         await self.channel_layer.group_add(self.group, self.channel_name)
         await self.accept()
 
@@ -27,4 +27,4 @@ class VoteConsumer(AsyncWebsocketConsumer):
             session = Session.objects.get(spectator_token=uuid)
         else:
             session = self.scope['user'].session
-        return str(session.pk)
+        return "Session-" + str(session.pk)

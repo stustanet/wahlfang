@@ -3,7 +3,6 @@ $(document).ready(() => {
 
   function reload_callback() {
     setup_date_reload();
-    //TODO show a message to the user?
   }
 
 
@@ -18,7 +17,7 @@ $(document).ready(() => {
     clearTimeout(timeout);
     const now_ms = new Date().getTime();
     const times = $(".time").text().split('|').map(u_time => parseInt(u_time));
-    const wait_ms = times.map(time => (time + 5) * 1000 - now_ms).filter(t => t > 10);
+    const wait_ms = times.map(time => (time + 5) * 1000 - now_ms).filter(t => t > 10 * 1000);
     const min_ms = Math.min(...wait_ms);
     if (min_ms < 24 * 60 * 60 * 1000) {
       console.log("Reloading in " + (min_ms / 1000) + "s");

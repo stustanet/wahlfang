@@ -64,3 +64,12 @@
     </div>
   </div>
 {% endblock %}
+
+{% block footer_scripts %}
+  {#  Automatic reload of the page: #}
+  {#    - either if the start date / end date of a election is due#}
+  {#    - or if the admin started / stopped one election and the page is notified with a websocket#}
+  <script src="{% static "js/jquery-3.5.1.slim.min.js" %}"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"></script>
+  <script src="{% static "js/reload.js" %}"></script>
+{% endblock %}

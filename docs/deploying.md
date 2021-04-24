@@ -14,6 +14,11 @@ source venv/bin/activate
 pip install repo/requirements.txt
 ```
 
+### TODO channels integration
+
+- redis layer
+- asgi webserver, like guvicorn, daphne, ...
+
 ### Configuration
 TODO
 
@@ -29,7 +34,7 @@ Create a systemd service to run periodic tasks such as sending reminder e-mails 
 been enabled.
 
 #### `wahlfang-reminders.timer`
-```
+```ini
 [Unit]
 Description=Wahlfang Election Reminders Timer
 
@@ -41,7 +46,7 @@ WantedBy=timers.target
 ```
 
 #### `wahlfang-reminders.service`
-```
+```ini
 [Unit]
 Description=Wahlfang Election reminders
 
@@ -61,7 +66,7 @@ Example gunicorn systemd service. Assumes wahlfang has been cloned to `/srv/wahl
 all requirements and gunicorn in `/srv/wahlfang/venv`.
 
 #### `gunicorn.service`
-```
+```ini
 [Unit]
 Description=gunicorn daemon
 Requires=gunicorn.socket
@@ -87,7 +92,7 @@ WantedBy=multi-user.target
 #### `gunicorn.socket`
 A corresponding systemd.socket file for socket activation.
 
-```
+```ini
 [Unit]
 Description=gunicorn socket
 

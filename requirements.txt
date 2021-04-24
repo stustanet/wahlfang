@@ -8,3 +8,4 @@ django-auth-ldap==2.2.*
 qrcode==6.1
 latex==0.7.*
 django_prometheus==2.1.*
+channels==3.0.*

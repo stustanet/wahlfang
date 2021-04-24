@@ -1,3 +1,5 @@
+import sys
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
@@ -60,10 +62,19 @@ def index(request):
         (e, voter.can_vote(e), voter.application.filter(election=e).exists())
         for e in voter.session.elections.order_by('pk')
     ]
-    open_elections = [e for e in elections if e[0].is_open]
-    upcoming_elections = [e for e in elections if not e[0].started]
-    published_elections = [e for e in elections if e[0].closed and int(e[0].result_published)]
-    closed_elections = [e for e in elections if e[0].closed and not int(e[0].result_published)]
+
+    def date_asc(e):
+        date = e[0].start_date
+        return date.timestamp() if date else sys.maxsize
+
+    def date_desc(e):
+        date = e[0].start_date
+        return -date.timestamp() if date else -sys.maxsize
+
+    open_elections = sorted([e for e in elections if e[0].is_open], key=date_desc)
+    upcoming_elections = sorted([e for e in elections if not e[0].started], key=date_asc)
+    published_elections = sorted([e for e in elections if e[0].closed and int(e[0].result_published)], key=date_desc)
+    closed_elections = sorted([e for e in elections if e[0].closed and not int(e[0].result_published)], key=date_desc)
     context = {
         'title': voter.session.title,
         'meeting_link': voter.session.meeting_link,
@@ -166,10 +177,19 @@ def help_page(request):
 def spectator(request, uuid):
     session = get_object_or_404(Session.objects, spectator_token=uuid)
     elections = session.elections.all()
-    open_elections = [e for e in elections if e.is_open]
-    upcoming_elections = [e for e in elections if not e.started]
-    published_elections = [e for e in elections if e.closed and int(e.result_published)]
-    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
+
+    def date_asc(e):
+        date = e.start_date
+        return date.timestamp() if date else sys.maxsize
+
+    def date_desc(e):
+        date = e.start_date
+        return -date.timestamp() if date else -sys.maxsize
+
+    open_elections = sorted([e for e in elections if e.is_open], key=date_desc)
+    upcoming_elections = sorted([e for e in elections if not e.started], key=date_asc)
+    published_elections = sorted([e for e in elections if e.closed and int(e.result_published)], key=date_desc)
+    closed_elections = sorted([e for e in elections if e.closed and not int(e.result_published)], key=date_desc)
     context = {
         'title': session.title,
         'meeting_link': session.meeting_link,

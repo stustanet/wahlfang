@@ -5,7 +5,6 @@ $(document).ready(() => {
     setup_date_reload();
   }
 
-
   function reload() {
     console.log("Reloading")
     //wait a random time, to not overload the server if everyone reloads at the same time
@@ -32,6 +31,9 @@ $(document).ready(() => {
       if (message.reload) {
         reload();
       }
+    }
+    ws.onopen = function (e) {
+      console.log("Websocket connected");
     }
     ws.onerror = function (e) {
       console.error("Websocket ERROR. Site will not reload automatically");

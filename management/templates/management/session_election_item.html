@@ -10,12 +10,14 @@
   <small class="float-right">
     {% if not election.started and election.start_date %}
       <span class="right-margin">Starts at {{ election.start_date|date:"Y-m-d H:i:s" }}</span>
+      {# Time for automatic reload #}
+      <div class="d-none time">{{ election.start_date|date:"U" }}|</div>
     {% elif not election.started %}
       <span class="right-margin">Needs to be started manually</span>
     {% elif election.is_open and election.end_date %}
-      <span class="right-margin">
-      Open until {{ election.end_date|date:"Y-m-d H:i:s" }}
-    </span>
+      <span class="right-margin">Open until {{ election.end_date|date:"Y-m-d H:i:s" }}</span>
+      {# Time for automatic reload #}
+      <div class="d-none time">{{ election.end_date|date:"U" }}|</div>
     {% elif election.closed %}
       <span class="right-margin">Closed</span>
     {% else %}

@@ -3,6 +3,6 @@ from django.urls import re_path
 from . import consumers
 
 websocket_urlpatterns = URLRouter([
-    re_path(r'election/(?P<pk>\d+)$', consumers.CastVotesConsumer.as_asgi()),
-    # TODO update voters logged in
+    re_path(r'election/(?P<pk>\d+)$', consumers.ElectionConsumer.as_asgi()),
+    re_path(r'meeting/(?P<pk>\d+)$', consumers.SessionConsumer.as_asgi()),
 ])

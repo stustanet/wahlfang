@@ -212,7 +212,12 @@ class Voter(models.Model):
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
-        # TODO notify manager, that user logged in
+        # notify manager to reload their page, if the user logged in
+        group = "Login-Session-" + str(self.session.pk)
+        async_to_sync(get_channel_layer().group_send)(
+            group,
+            {'type': 'send_reload'}
+        )
 
     def set_password(self, raw_password=None):
         if not raw_password:

@@ -14,6 +14,11 @@ source venv/bin/activate
 pip install repo/requirements.txt
 ```
 
+### TODO channels integration
+
+- redis layer
+- asgi webserver, like guvicorn, daphne, ...
+
 ### Configuration
 TODO
 

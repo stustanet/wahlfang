@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'vote',
     'management',
+    'channels',
 ]
 
 if EXPORT_PROMETHEUS_METRICS:
@@ -99,7 +100,13 @@ AUTHENTICATION_BACKENDS = {
     'django.contrib.auth.backends.ModelBackend'
 }
 
-WSGI_APPLICATION = 'wahlfang.wsgi.application'
+ASGI_APPLICATION = 'wahlfang.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -179,7 +186,7 @@ VALID_MANAGER_EMAIL_DOMAINS = [
     'stusta.de', 'stustanet.de', 'stusta.mhn.de', 'stusta.net', 'stusta.sexy', 'stusta.party', 'stusta.io'
 ]
 
-# Base URL for template links
+# Base URL for template links (without 'https://')
 URL = 'vote.stustanet.de'
 
 # File upload, etc...

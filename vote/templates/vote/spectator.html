@@ -1,5 +1,6 @@
 {% extends 'vote/base.html' %}
 {% load static %}
+{% load vote_extras %}
 
 {% block content %}
   <div class="row justify-content-center">
@@ -7,7 +8,7 @@
     <div class="col-12">
       <div class="card bg-dark text-light shadow mb-2 py-2">
         <div class="card-body">
-          <h4 class="text-center d-inline">{{ title }}</h4>
+          <h4 class="text-center d-inline">{{ title }} - Spectator View</h4>
           {% if meeting_link %}
             <div><small>Meeting at <a href="{{ meeting_link }}">{{ meeting_link }}</a></small></div>
           {% endif %}
@@ -19,8 +20,8 @@
             <h4>Open Elections</h4>
           </div>
           <div class="card-body">
-            {% for election, can_vote, edit in open_elections %}
-              {% include 'vote/index_election_item.html' %}
+            {% for election in open_elections %}
+              {% include 'vote/spectator_election_item.html' %}
             {% endfor %}
           </div>
         </div>
@@ -31,8 +32,8 @@
             <h4>Upcoming Elections</h4>
           </div>
           <div class="card-body">
-            {% for election, can_vote, edit in upcoming_elections %}
-              {% include 'vote/index_election_item.html' %}
+            {% for election in upcoming_elections %}
+              {% include 'vote/spectator_election_item.html' %}
             {% endfor %}
           </div>
         </div>
@@ -43,8 +44,8 @@
             <h4>Published Results</h4>
           </div>
           <div class="card-body">
-            {% for election, can_vote, edit in published_elections %}
-              {% include 'vote/index_election_item.html' %}
+            {% for election in published_elections %}
+              {% include 'vote/spectator_election_item.html' %}
             {% endfor %}
           </div>
         </div>
@@ -55,8 +56,8 @@
             <h4>Closed Elections</h4>
           </div>
           <div class="card-body">
-            {% for election, can_vote, edit in closed_elections %}
-              {% include 'vote/index_election_item.html' %}
+            {% for election in closed_elections %}
+              {% include 'vote/spectator_election_item.html' %}
             {% endfor %}
           </div>
         </div>

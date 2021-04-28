@@ -91,9 +91,19 @@ def index(request):
 def session_detail(request, pk=None):
     manager = request.user
     session = manager.sessions.get(id=pk)
+    elections = session.elections.order_by('pk')
+    existing_elections = bool(elections)
+    open_elections = [e for e in elections if e.is_open]
+    upcoming_elections = [e for e in elections if not e.started]
+    published_elections = [e for e in elections if e.closed and int(e.result_published)]
+    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
     context = {
         'session': session,
-        'elections': session.elections.order_by('pk'),
+        'existing_elections': existing_elections,
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
         'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)
@@ -134,8 +144,6 @@ def session_settings(request, pk=None):
 
 @management_login_required
 def add_election(request, pk=None):
-    # todo add chron job script that sends emails
-    # todo apply changes to session
     manager = request.user
     session = manager.sessions.get(pk=pk)
     context = {
@@ -423,3 +431,24 @@ def export_csv(request, pk):
         writer.writerow(row)
 
     return response
+
+
+@management_login_required
+def spectator(request, pk):
+    session = request.user.sessions.filter(pk=pk)
+    if not session.exists():
+        return HttpResponseNotFound('Session does not exist')
+    session = session.first()
+    if request.POST:
+        do = request.POST.get("do-type")
+        if do == "create":
+            session.create_spectator_token()
+        elif do == "delete":
+            session.spectator_token = None
+            session.save()
+    context = {
+        'token_url': request.build_absolute_uri(
+            reverse('vote:spectator', kwargs={'uuid': session.spectator_token})) if session.spectator_token else None,
+        'pk': session.pk,
+    }
+    return render(request, template_name='management/spectator_settings.html', context=context)

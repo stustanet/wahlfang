@@ -9,6 +9,8 @@ from io import BytesIO
 
 import PIL
 from PIL import Image
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
@@ -77,6 +79,15 @@ class Session(models.Model):
     meeting_link = models.CharField(max_length=512, blank=True, null=True)
     start_date = models.DateTimeField(blank=True, null=True)
     invite_text = models.TextField(max_length=8000, blank=True, null=True)
+    spectator_token = models.UUIDField(unique=True, null=True, blank=True)
+
+    def create_spectator_token(self):
+        myid = uuid.uuid4()
+        while Session.objects.filter(spectator_token=myid).exists():
+            myid = uuid.uuid4()
+        self.spectator_token = myid
+        self.save()
+        return myid
 
 
 class Election(models.Model):
@@ -156,6 +167,15 @@ class Election(models.Model):
             return 0
         return int(self.votes.count() / self.applications.count())
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert, force_update, using, update_fields)
+        # notify users to reload their page
+        group = "Session-" + str(self.session.pk)
+        async_to_sync(get_channel_layer().group_send)(
+            group,
+            {'type': 'send_reload'}
+        )
+
     def __str__(self):
         return self.title
 
@@ -192,6 +212,12 @@ class Voter(models.Model):
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
+        # notify manager to reload their page, if the user logged in
+        group = "Login-Session-" + str(self.session.pk)
+        async_to_sync(get_channel_layer().group_send)(
+            group,
+            {'type': 'send_reload'}
+        )
 
     def set_password(self, raw_password=None):
         if not raw_password:
@@ -497,3 +523,5 @@ class Vote(models.Model):
     election = models.ForeignKey(Election, related_name='votes', on_delete=models.CASCADE)
     candidate = models.ForeignKey(Application, related_name='votes', on_delete=models.CASCADE)
     vote = models.CharField(choices=VOTE_CHOICES, max_length=max(len(x[0]) for x in VOTE_CHOICES))
+    # save method is not called on bulk_create in forms.VoteForm.
+    # The model update listener for websockets is implemented in the form.

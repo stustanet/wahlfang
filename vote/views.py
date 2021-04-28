@@ -1,15 +1,16 @@
+import sys
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.http.response import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, VoteForm, ApplicationUploadFormUser
-from vote.models import Election, Voter
+from vote.models import Election, Voter, Session
 
 
 class LoginView(auth_views.LoginView):
@@ -57,14 +58,31 @@ def code_login(request, access_code=None):
 @voter_login_required
 def index(request):
     voter = request.user
+    elections = [
+        (e, voter.can_vote(e), voter.application.filter(election=e).exists())
+        for e in voter.session.elections.order_by('pk')
+    ]
+
+    def date_asc(e):
+        date = e[0].start_date
+        return date.timestamp() if date else sys.maxsize
+
+    def date_desc(e):
+        date = e[0].start_date
+        return -date.timestamp() if date else -sys.maxsize
+
+    open_elections = sorted([e for e in elections if e[0].is_open], key=date_desc)
+    upcoming_elections = sorted([e for e in elections if not e[0].started], key=date_asc)
+    published_elections = sorted([e for e in elections if e[0].closed and int(e[0].result_published)], key=date_desc)
+    closed_elections = sorted([e for e in elections if e[0].closed and not int(e[0].result_published)], key=date_desc)
     context = {
         'title': voter.session.title,
         'meeting_link': voter.session.meeting_link,
         'voter': voter,
-        'elections': [
-            (e, voter.can_vote(e), voter.application.filter(election=e).exists())
-            for e in voter.session.elections.order_by('pk')
-        ]
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
     }
 
     # overview
@@ -152,8 +170,32 @@ def delete_own_application(request, election_id):
     return HttpResponseNotFound('Application does not exist')
 
 
-def help_page(request, management=False):
-    return render(request, template_name='vote/help.html', context={'URL': settings.URL,
-                                                                    'back_url': (reverse(
-                                                                        'management:index') if management else reverse(
-                                                                        'vote:index'))})
+def help_page(request):
+    return render(request, template_name='vote/help.html')
+
+
+def spectator(request, uuid):
+    session = get_object_or_404(Session.objects, spectator_token=uuid)
+    elections = session.elections.all()
+
+    def date_asc(e):
+        date = e.start_date
+        return date.timestamp() if date else sys.maxsize
+
+    def date_desc(e):
+        date = e.start_date
+        return -date.timestamp() if date else -sys.maxsize
+
+    open_elections = sorted([e for e in elections if e.is_open], key=date_desc)
+    upcoming_elections = sorted([e for e in elections if not e.started], key=date_asc)
+    published_elections = sorted([e for e in elections if e.closed and int(e.result_published)], key=date_desc)
+    closed_elections = sorted([e for e in elections if e.closed and not int(e.result_published)], key=date_desc)
+    context = {
+        'title': session.title,
+        'meeting_link': session.meeting_link,
+        'open_elections': open_elections,
+        'upcoming_elections': upcoming_elections,
+        'published_elections': published_elections,
+        'closed_elections': closed_elections,
+    }
+    return render(request, template_name='vote/spectator.html', context=context)

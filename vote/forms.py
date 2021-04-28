@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django import forms
 from django.contrib.auth import authenticate
 from django.db import transaction
@@ -122,6 +124,12 @@ class VoteForm(forms.Form):
             with transaction.atomic():
                 Vote.objects.bulk_create(votes)
                 can_vote.delete()
+            # notify manager that new votes were cast
+            group = "Election-" + str(self.election.pk)
+            async_to_sync(get_channel_layer().group_send)(
+                group,
+                {'type': 'send_reload'}
+            )
 
         return votes
 

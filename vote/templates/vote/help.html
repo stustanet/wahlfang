@@ -12,88 +12,145 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-header  bg-dark text-light">
-          <h3 class="d-inline">Help Page</h3>
+          <h3 class="d-inline">Help Page - Voters</h3>
         </div>
         <div class="card-body">
 
-          <h2 id="how-does-voting-work">How does voting work?</h2>
-          <p>Once you are part of an election session, you should have gotten an email to the mail address that the
-            session creator (usually the election/meeting leader) has entered for you. If you didn’t get the mail please
-            take a look in your Spam folder and if it’s not there talk to the session creator.</p>
-          <p>This mail contains a link that you can use to access the voting session. Furthermore, a code is provided
-            that you can enter on visiting <a href="{% url 'vote:index' %}">{{ URL }}</a>.</p>
-          <h3 id="vote-overview-page">Vote Overview Page</h3>
-          <p>When there was already an election created, you will be greeted with a screen similar to this one:</p>
-          <p><img src="{% static 'img/help_page/vote_waiting.png' %}" alt="vote waiting" class="pic"/></p>
-          <p>If enabled by the session creator, you will be able to apply by clicking the grey <strong>apply</strong>
-            button in the upper right corner of the image.</p>
-          <p>Once the admin started the election, a blue <em>Vote Now!</em> button will appear (you might have to
-            refresh the site) which you can click to open the voting page.</p>
-          <h3 id="voting-page">Voting page</h3>
-          <p><img src="{% static 'img/help_page/vote_page.png' %}" alt="vote page" class="pic"/></p>
-          <p>You can select all applicants that you want to give a <em>Yes</em> vote to.</p>
-          <p>The admin might have limited the number of <em>Yes</em> votes you are allowed to cast.</p>
-          <p>Don’t forget to click the <strong>Submit</strong> button once you are done to finalize casting your vote.
+          <h3>Contents</h3>
+          <ol>
+            <li>Manual for the Vote Frontend
+              <ul>
+                <li>Ways to Get Invited to an Election</li>
+                <li>Election Overview Page
+                  <ul>
+                    <li>Election Results</li>
+                    <li>Apply as Candidate</li>
+                  </ul>
+                </li>
+                <li>Apply Page</li>
+                <li>Vote Page</li>
+              </ul>
+            </li>
+            <li>FAQ</li>
+          </ol>
+
+          <p class="just">The first part of this help page is a manual on how to navigate and operate the vote frontend.
+            (If you are
+            an election manager and want to have a manual on the management backend, visit
+            <a href="{% url 'vote:index' %}">the management help page</a>). The second part in form of an FAQ will
+            answer questions on how the voting mechanism works and why you should prefer this tool instead of let's say
+            doodle.
           </p>
-          <h3 id="apply-page">Apply page</h3>
-          <p>If you want to apply for the election you and it’s enabled, you can go to the overview page and click on
-            the grey <strong>Apply</strong> button.</p>
-          <p><img src="{% static 'img/help_page/vote_apply.png' %}" alt="vote apply" class="pic"/></p>
-          <p>There will be a new page where you can choose a Display Name that will be shown to other people when they
-            cast their votes.</p>
-          <p>Furthermore you can give a contact mail and a short description about yourself and also upload a
-            picture.</p>
-          <p>Press <strong>Submit</strong> once you are done to apply for the election.</p>
-          <p>You can always edit your application given that the election hasn’t started yet by clicking <strong>Edit
-            Application</strong> or <strong>Delete Application</strong> in the overview page.</p>
-          <h2 id="how-can-i-create-a-new-election">How can I create a new election?</h2>
-          <h3 id="getting-a-management-account">Getting a management account</h3>
-          <p>Before you are able to access the admin page, you will need a management account first.</p>
-          <p>Please send a mail to <a href="mailto:vorstand@stustanet.de">vorstand@stustanet.de</a> to get a management
-            account.</p>
-          <p>Now, visit <a href="{% url 'management:index' %}">{{ URL }}/management</a> and use your credentials
-            to log in.</p>
-          <h3 id="creating-a-new-session">Creating a new session</h3>
-          <p>On <a href="{% url 'management:index' %}">{{ URL }}/management</a> there should be a big green
-            <strong>Create Session</strong>. Click
-            it.</p>
-          <h3 id="create-an-election">Create an election</h3>
-          <h3 id="adding-applicants">Adding applicants</h3>
-          <h2 id="i-have-a-problemideawant-to-contribute">I have a problem/idea/want to contribute</h2>
-          <h2 id="what-is-this-all-about">What is this all about?</h2>
-          <p><a href="{% url 'vote:index' %}">{{ URL }}</a> is an application that allows creating and managing
-            secure elections and participate in them.</p>
-          <p>It was created and is maintained by the administrators of the <a href="https://stustanet.de">StuStaNet
-            e.V.</a></p>
-          <h3 id="why">Why?</h3>
-          <p>During the 2020 Covid-19 pandemic there was a big need for an online voting tool for having fair elections
-            in the Studentenstadt Freimann (there are many events where elections are necessary).</p>
-          <p>Because other online voting tools seem insescure (see below), the StuStaNet decided to implement its own
-            system.</p>
-          <h3 id="how">How?</h3>
-          <p>vote.stustanet.de uses emails to send personal links to each voter. These mails can then be used to
-            vote.</p>
-          <p>Usually, during a session (say a Hausvollversammlung) there will be votes on multiple things. Therefore
-            mutliple votes are brought together into a session. This has the big advantage that the voters stay the same
-            and only one email per voter per session is necessary.</p>
-          <h3 id="why-dont-you-just-use-strawpoll-doodle">Why don’t you just use strawpoll, doodle, …</h3>
-          <p>Creating secure online elections is a non-trivial task.</p>
-          <p><em>How can you be sure that only the people allowed to vote participate?</em></p>
-          <p><em>How can you be sure that no one votes twice (e.g. via a second account or by reloading the site)?</em>
+          <h2>Manual for the Vote Frontend</h2>
+          <h3>Ways to Get Invited to an Election</h3>
+          <p>There are three different ways to get invited to an election</p>
+          <ul class="just">
+            <li>Via E-Mail: You have to tell our election manager (the one who is hosting the election
+              e.g. your house representative) your email address. Our system will then send you an invitation
+              via email which contains a participation link. Upon opening that link you will directly be forwarded
+              to the voting interface. If you are not able to open the link then you can also enter the code in the
+              email into the text filed on <a href="{% url 'vote:index' %}">the voting website</a></li>
+            <li>
+              Via a personal letter: Your election manager will choose this open when he or she is too lazy to gather
+              all
+              email addresses and has too much money to spend on printing stuff.
+              The letter should be handed to you in paper form. It contains a QR code which
+              forwards you directly to the the voting interface. Alternatively, you can also open
+              <a href="{% url 'vote:index' %}">the voting website</a> and enter the code which is stated as "Access
+              token"
+              into input field.
+            </li>
+            <li>
+              Private access token: Last but not least, the election manager can also just download the access token and
+              spread them via a medium of hers or his choice. In that case you have to enter the token manually on
+              <a href="{% url 'vote:index' %}">the voting website</a>.
+            </li>
+          </ul>
+
+          <h3>Election Overview Page</h3>
+          <p class="just">
+            Once you are successfully logged in with your unique token you should see an overview page of all elections
+            categorized in "Open Elections", "Upcoming Elections", "Published Results" and "Closed Elections". Elections
+            are part of an election session e.g. some a general assembly of some association.
+            All elections in your session will be displayed in this overview page. Note, that
+            the election manager can at any time add new or delete old elections. An example screenshot is shown in the
+            following figure. Note that meeting links will be displayed in the header if the election manager enters
+            them.
           </p>
-          <p>Most online voting tools consist of a single link that each voter can use to access a webpage where they
-            can cast their vote. Nothing stops voters to share the link with other people.</p>
-          <p>vote.stustanet.de solves this problem by sending each voter a personal access link where it’s only possible
-            to vote once for each election.</p>
-          <p><em>How can you be sure that the election host doesn’t access your data/keeps the data after the
-            election?</em></p>
-          <p>Many online election tools are based in foreign countries and often have an incentive to gain money by
-            tracing your activities online and placing ads.</p>
-          <p>The administrators of StuStaNet e.V. are volunteers that you might know in person. All election data is
-            deleted once a session is removed. The source code of <a href="{% url 'vote:index' %}">{{ URL }}</a> is open
-            and
-            available on <a
-                href="https://github.com/stustanet/wahlfang">https://github.com/stustanet/wahlfang</a>.</p>
+
+          <figure>
+            <img src="{% static 'img/help_page/overview_page.png' %}" alt="Example" class="pic">
+          </figure>
+          <p class="just">
+            Open elections will have a blue button which forwards you to the election page. Page updates like the
+            activation
+            of an election should be done automatically, however, you can also just refresh the page in the browser.
+          </p>
+          <h4>Election Results</h4>
+          <p class="just">
+            When an election is over and the results are published the voting outcome will be shown in the overview page
+            under the section "Published Results".
+            Note that the election manager first needs to actively publish the results once the election is over.
+          </p>
+          <figure>
+            <img src="{% static 'img/help_page/overview_results.png' %}" alt="Example" class="pic">
+          </figure>
+
+          <h4>Apply as Candidate</h4>
+          <p class="just">If the election is configured accordingly it might be possible to apply as a candidate. If so
+            a black button
+            will appear on the right side of the card before the election starts (You can check the election period in
+            the upper part of the card when configured by the manager). Furthermore, you can see all applicants with
+            their
+            name, a photo and a short description why they want to be elected.
+            Check the next section to find out how to apply at an election and set those attributes for yourself.
+          </p>
+          <figure>
+            <img src="{% static 'img/help_page/overview_app.png' %}" alt="Example" class="pic">
+          </figure>
+
+          <h3>Apply Page</h3>
+          <p class="just">Once you clicked on the "Apply" button you will see the following page.</p>
+          <figure>
+            <img src="{% static 'img/help_page/apply_page_numbered.png' %}" alt="Example" class="pic">
+          </figure>
+          <ol class="just">
+            <li>Display name: The name that is displayed in the overview page along with the other candidate's names.
+              This must be provided to identify you.
+            </li>
+            <li>Email: You contact email, so that the election manager can contact you once you have been elected. In
+              case of the Houseadmin elections from StuStaNet we will use this email to put you onto an admin mail list.
+              Note that this email can be different from the one you received for the invitation link.
+            </li>
+            <li>Description: You can write a little description about why you want to apply for the position. However,
+              this is optional.
+            </li>
+            <li>Choose File: You can, if you want, upload a profile picture.</li>
+            <li>The submit button concludes your application. However, you can at any time until the election start
+              edit your application from the election overview.
+            </li>
+          </ol>
+          <p class="just">If you choose to add a description and picture they will be displayed in the election
+            overview.
+            You can always edit or delete your application in the election overview page once submitted.</p>
+
+          <h3>Vote Page</h3>
+          <figure>
+            <img src="{% static 'img/help_page/vote_page_bernd.png' %}" alt="Example" class="pic">
+          </figure>
+
+          <p class="just"> Once the election period started you can click on the <strong>Vote Now!</strong> button to
+            enter the vote page. An example election is shown above. You can select all applicants that you want
+            to give a <em>Yes</em> vote to. The admin might have limited the number of <em>Yes</em> votes you are
+            allowed to cast. <em>No</em> means that you are explicitly voting against the candidate. <em>Abstention</em>
+            means that you are not intended to participate in the votes for that candidate. Thus, an abstention vote
+            will not be counted for any side. Don’t forget to click the <strong>Submit</strong> button once you are done
+            to finalize casting your vote.
+          </p>
+
+
+          <h2>FAQ</h2>
+
         </div>
       </div>
     </div>

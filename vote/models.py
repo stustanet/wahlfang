@@ -185,6 +185,7 @@ class Voter(models.Model):
     voter_id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=256)
     email = models.EmailField(null=True, blank=True)
+    invalid_email = models.BooleanField(default=False)
     session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
     logged_in = models.BooleanField(default=False)
     name = models.CharField(max_length=256, blank=True, null=True)
@@ -445,6 +446,7 @@ class Voter(models.Model):
 
     def new_access_token(self):
         password = self.set_password()
+        self.logged_in = False
         self.save()
         return self.get_access_code(self, password)
 

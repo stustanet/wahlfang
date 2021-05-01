@@ -67,7 +67,8 @@ class ElectionManager(AbstractBaseUser):
 
             # delete voters where the email could not be sent
             for voter, _ in failed_voters:
-                voter.delete()
+                voter.invalid_email = True
+                voter.save()  # may trigger a lot of automatic reloads
             wait_heuristic()
             async_to_sync(get_channel_layer().group_send)(
                 group,

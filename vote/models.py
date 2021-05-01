@@ -174,7 +174,7 @@ class Election(models.Model):
         group = "Session-" + str(self.session.pk)
         async_to_sync(get_channel_layer().group_send)(
             group,
-            {'type': 'send_reload'}
+            {'type': 'send_reload', 'id': '#electionCard'}
         )
 
     def __str__(self):
@@ -217,7 +217,7 @@ class Voter(models.Model):
         group = "Login-Session-" + str(self.session.pk)
         async_to_sync(get_channel_layer().group_send)(
             group,
-            {'type': 'send_reload'}
+            {'type': 'send_reload', 'id': '#voterCard'}
         )
 
     def set_password(self, raw_password=None):

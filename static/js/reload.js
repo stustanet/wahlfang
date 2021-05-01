@@ -6,9 +6,8 @@ $(document).ready(() => {
   }
 
   function reload(reload_id="#content") {
-    console.log("Reloading")
-    //wait a random time, to not overload the server if everyone reloads at the same time
-    window.setTimeout(() => $(reload_id).load(location.pathname + " " + reload_id, reload_callback), Math.random() * 1000)
+    console.log("Reloading " + reload_id)
+    $(reload_id).load(location.pathname + " " + reload_id, reload_callback)
   }
 
   function setup_date_reload() {
@@ -16,11 +15,11 @@ $(document).ready(() => {
     clearTimeout(timeout);
     const now_ms = new Date().getTime();
     const times = $(".time").text().split('|').map(u_time => parseInt(u_time));
-    const wait_ms = times.map(time => (time + 5) * 1000 - now_ms).filter(t => t > 10 * 1000);
+    const wait_ms = times.map(time => (time + 1) * 1000 - now_ms).filter(t => t > 1000);
     const min_ms = Math.min(...wait_ms);
     if (min_ms < 24 * 60 * 60 * 1000) {
       console.log("Reloading in " + (min_ms / 1000) + "s");
-      timeout = setTimeout(reload, min_ms);
+      timeout = setTimeout(reload.bind(this, '#electionCard'), min_ms);
     }
   }
 
@@ -29,7 +28,7 @@ $(document).ready(() => {
     ws.onmessage = function (e) {
       const message = JSON.parse(e.data)
       if (message.reload) {
-        reload();
+        reload(message.reload);
       }else if (message.alert){
         if (message.alert.reload)
           // we want to reload the voters because the list might be outdated due to the deletion of

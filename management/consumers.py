@@ -15,7 +15,7 @@ class ElectionConsumer(AsyncWebsocketConsumer):
 
     async def send_reload(self, event):
         await self.send(text_data=json.dumps({
-            'reload': True,
+            'reload': event['id'],
         }))
 
 
@@ -36,7 +36,7 @@ class SessionConsumer(AsyncWebsocketConsumer):
 
     async def send_reload(self, event):
         await self.send(text_data=json.dumps({
-            'reload': True,
+            'reload': event['id'],
         }))
 
     async def send_alert(self, event):

@@ -6,6 +6,7 @@ from argparse import Namespace
 from datetime import datetime
 from functools import partial
 from io import BytesIO
+from typing import Tuple, Optional
 
 import PIL
 from PIL import Image
@@ -267,10 +268,15 @@ class Voter(models.Model):
             email = email_name + '@' + domain_part.lower()
         return email
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
+    def email_user(self, subject, message, from_email=None, **kwargs) -> Tuple[Optional['Voter'], Optional[str]]:
         """Send an email to this user."""
         if self.email is not None:
-            send_mail(subject, message, from_email, [self.email], **kwargs)
+            try:
+                send_mail(subject, message, from_email, [self.email], **kwargs)
+            except Exception as e:
+                return self, str(e)
+        # None means everything is ok
+        return None, None
 
     @property
     def is_authenticated(self):
@@ -301,8 +307,8 @@ class Voter(models.Model):
     def get_username(self):
         return str(self)
 
-    @classmethod
-    def send_test_invitation(cls, title: str, invite_text: str, start_date: datetime, meeting_link: str, to_email: str,
+    @staticmethod
+    def send_test_invitation(title: str, invite_text: str, start_date: datetime, meeting_link: str, to_email: str,
                              from_email: str):
         test_session = Namespace(**{
             "title": title,
@@ -320,9 +326,9 @@ class Voter(models.Model):
 
         Voter.send_invitation(test_voter, "mock-up-access-token", from_email)
 
-    def send_invitation(self, access_code: str, from_email: str):
+    def send_invitation(self, access_code: str, from_email: str) -> Tuple[Optional['Voter'], Optional[str]]:
         if not self.email:
-            return
+            return None, None
         subject = f'Invitation for {self.session.title}'
         if self.session.invite_text:
             if self.session.start_date:
@@ -354,12 +360,12 @@ class Voter(models.Model):
             }
             body_html = render_to_string('vote/mails/invitation.j2', context=context)
 
-        self.email_user(
+        return self.email_user(
             subject=subject,
             message=strip_tags(body_html),
             from_email=from_email,
             html_message=body_html.replace('\n', '<br/>'),
-            fail_silently=True
+            fail_silently=False
         )
 
     def send_reminder(self, from_email: str, election):
@@ -421,7 +427,7 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, session, email=None, name=None):
+    def from_data(cls, session, email=None, name=None) -> Tuple['Voter', str]:
         voter = Voter(
             session=session,
             email=email,

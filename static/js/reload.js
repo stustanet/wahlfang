@@ -5,10 +5,10 @@ $(document).ready(() => {
     setup_date_reload();
   }
 
-  function reload() {
+  function reload(reload_id="#content") {
     console.log("Reloading")
     //wait a random time, to not overload the server if everyone reloads at the same time
-    window.setTimeout(() => $("#content").load(location.pathname + " #content", reload_callback), Math.random() * 1000)
+    window.setTimeout(() => $(reload_id).load(location.pathname + " " + reload_id, reload_callback), Math.random() * 1000)
   }
 
   function setup_date_reload() {
@@ -30,6 +30,18 @@ $(document).ready(() => {
       const message = JSON.parse(e.data)
       if (message.reload) {
         reload();
+      }else if (message.alert){
+        if (message.alert.reload)
+          // we want to reload the voters because the list might be outdated due to the deletion of
+          // voters (optional idea: mark the invalid voters red)
+          reload(message.alert.reload);
+        $('#alertModalBody').find('p').html(message.alert.msg);
+        $('#alertModalTitle').html(message.alert.title);
+        $('#alertModal').modal('show');
+      }else if (message.succ){
+        let succ_div = $('#message-success');
+        succ_div.find('div').html(message.succ);
+        succ_div.toggleClass('hide');
       }
     }
     ws.onopen = function (e) {
@@ -42,7 +54,9 @@ $(document).ready(() => {
       console.error("Websocket Closed. Site will not reload automatically");
     }
   }
-
+  //$('#alertModal').on('hidden.bs.modal', function (e) {
+  //  reload();
+  //});
   setup_date_reload();
   setup_websocket();
 })

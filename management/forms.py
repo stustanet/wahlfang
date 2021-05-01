@@ -309,14 +309,11 @@ class AddVotersForm(forms.Form):
         self.session = session
 
     def save(self) -> List[Tuple[Voter, str]]:
-        voters = [
+        voters_codes = [
             Voter.from_data(email=email, session=self.session) for email in self.cleaned_data['voters_list']
         ]
-
-        for voter, code in voters:
-            voter.send_invitation(code, self.session.managers.all().first().sender_email)
-
-        return voters
+        self.session.managers.all().first().send_invite_bulk_threaded(voters_codes)
+        return voters_codes
 
     def clean_voters_list(self):
         lines = self.cleaned_data['voters_list'].splitlines()
@@ -393,6 +390,8 @@ class CSVUploaderForm(forms.Form):
         return data
 
     def save(self):
-        for email, name in self.cleaned_data['csv_data'].items():
-            voter, code = Voter.from_data(session=self.session, email=email, name=name)
-            voter.send_invitation(code, self.session.managers.all().first().sender_email)
+        voters_codes = [
+            Voter.from_data(session=self.session, email=email, name=name)
+            for email, name in self.cleaned_data['csv_data'].items()
+        ]
+        self.session.managers.all().first().send_invite_bulk_threaded(voters_codes)

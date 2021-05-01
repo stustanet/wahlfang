@@ -18,7 +18,7 @@ class VoteConsumer(AsyncWebsocketConsumer):
 
     async def send_reload(self, event):
         await self.send(text_data=json.dumps({
-            'reload': True,
+            'reload': event['id'],
         }))
 
     def get_session_key(self):

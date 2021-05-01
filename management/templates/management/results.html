@@ -3,7 +3,7 @@
   <thead>
   <tr>
     <th scope="col">#</th>
-    <th scope="col">Applicant</th>
+    <th scope="col">{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
     <th scope="col">Yes</th>
     <th scope="col">No</th>
     {% if not election.disable_abstention %}

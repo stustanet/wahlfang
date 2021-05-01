@@ -14,20 +14,48 @@ source venv/bin/activate
 pip install repo/requirements.txt
 ```
 
-### TODO channels integration
+### Non-Python Requirements
 
-- redis layer
-- asgi webserver, like guvicorn, daphne, ...
+* Nginx
+* Daphne
+* Redis
+* PDFLatex (only needed when you want to print invite lists for elections)
+
+### Channels integration
+
+In settings.py change the django channels' backend to redis in order to have self refreshing pages and other dynamic
+frontend features
+
+```python
+CHANNEL_LAYERS = {
+  "default": {
+    "BACKEND": "channels_redis.core.RedisChannelLayer",
+    "CONFIG": {
+      "hosts": [("127.0.0.1", 6379)],
+    },
+  },
+}
+```
 
 ### Configuration
-TODO
+
+* `EXPORT_PROMETHEUS_METRICS`: Export application statistics such as http request duration / latency. This will also
+  export the amount of manager accounts, the amount of sessions and the amount of elections. The metrics will be
+  reported in /metrics.
+* `URL`: Base URL address such as `vote.stusta.de`
+* `AUTHENTICATION_BACKENDS`: Comment out `management.authentication.ManagementBackendLDAP` if you do not want to use
+  LDAP as authentication backend for management account. Otherwise have a look at the `LDAP_*` options in the
+  configuration.
 
 ### Database
 We recommend setting up a postgresql database for production use, although django allows mysql and sqlite 
 (please do not use this one for production use, please) as well.
 
 ### E-Mail
-TODO
+
+In order to send out session invitation you need to configure a SMTP sever. Have a look at the
+[django doku](https://docs.djangoproject.com/en/3.2/topics/email/) for reference on how to configure your SMTP server in
+the django doku.
 
 ### Periodic tasks
 Create a systemd service to run periodic tasks such as sending reminder e-mails for elections where this feature has
@@ -52,35 +80,35 @@ Description=Wahlfang Election reminders
 
 [Service]
 # the specific user that our service will run as
-User=wahlfang
-Group=wahlfang
-Environment=DJANGO_SETTINGS_MODULE=wahlfang.settings
-WorkingDirectory=/srv/wahlfang/repo/
-ExecStart=/srv/wahlfang/venv/bin/python manage.py process_reminders
-TimeoutStopSec=5
-PrivateTmp=true
+User = wahlfang
+Group = wahlfang
+Environment = DJANGO_SETTINGS_MODULE=wahlfang.settings
+WorkingDirectory = /srv/wahlfang/repo/
+ExecStart = /srv/wahlfang/venv/bin/python manage.py process_reminders
+TimeoutStopSec = 5
+PrivateTmp = true
 ```
 
-### Nginx + Gunicorn
-Example gunicorn systemd service. Assumes wahlfang has been cloned to `/srv/wahlfang/repo` with a virtualenv containing
-all requirements and gunicorn in `/srv/wahlfang/venv`.
+### Nginx + Daphne
 
-#### `gunicorn.service`
+Example daphne systemd service. Assumes wahlfang has been cloned to `/srv/wahlfang/repo` with a virtualenv containing
+all requirements and daphne in `/srv/wahlfang/venv`.
+
+#### `daphne.service`
+
 ```ini
 [Unit]
-Description=gunicorn daemon
-Requires=gunicorn.socket
-After=network.target
+Description = daphne daemon
+After = network.target
 
 [Service]
-Type=notify
-User=wahlfang
-Group=wahlfang
-Environment=DJANGO_SETTINGS_MODULE=wahlfang.settings
-RuntimeDirectory=gunicorn
-WorkingDirectory=/srv/wahlfang/repo/
-ExecStart=/srv/wahlfang/venv/bin/gunicorn wahlfang.wsgi
-ExecReload=/bin/kill -s HUP $MAINPID
+User = wahlfang
+Group = wahlfang
+Environment = DJANGO_SETTINGS_MODULE=wahlfang.settings
+RuntimeDirectory = daphne
+WorkingDirectory = /srv/wahlfang/repo/
+ExecStart = /srv/wahlfang/venv/bin/daphne wahlfang.asgi:application
+ExecReload = /bin/kill -s HUP $MAINPID
 KillMode=mixed
 TimeoutStopSec=5
 PrivateTmp=true
@@ -89,31 +117,19 @@ PrivateTmp=true
 WantedBy=multi-user.target
 ```
 
-#### `gunicorn.socket`
-A corresponding systemd.socket file for socket activation.
-
-```ini
-[Unit]
-Description=gunicorn socket
-
-[Socket]
-ListenStream=/run/gunicorn.sock
-# Our service won't need permissions for the socket, since it
-# inherits the file descriptor by socket activation
-# only the nginx daemon will need access to the socket
-User=www-data
-
-[Install]
-WantedBy=sockets.target
-```
-
 Example nginx config.
 
 #### `nginx`
+
 ```
+upstream daphne_server {
+    server localhost:8000;
+}
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
+    
+    server_name _;
     
     return 301 https://$host$request_uri;
 }
@@ -126,15 +142,20 @@ server {
     charset utf-8;
 
     location /static {
-        alias /var/www/wahlfang/static;
+        alias /srv/wahlfang/static;
     }
 
     location /media {
-        alias /var/www/wahlfang/media;
+        alias /srv/wahlfang/media;
     }
 
     location / {
-        proxy_pass http://unix:/run/gunicorn.sock;
+        proxy_pass http://daphne_server;
+        
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
 	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

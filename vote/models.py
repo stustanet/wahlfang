@@ -273,7 +273,7 @@ class Voter(models.Model):
         if self.email is not None:
             try:
                 send_mail(subject, message, from_email, [self.email], **kwargs)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=W0703
                 return self, str(e)
         # None means everything is ok
         return None, None

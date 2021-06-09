@@ -1,0 +1,30 @@
+{
+  "short_name": "Wahlfang",
+  "name": "StuStaNet Online Voting System",
+  "icons": [
+    {
+      "src": "favicon16.png",
+      "type": "image/png",
+      "sizes": "16x16"
+    },
+    {
+      "src": "favicon32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "favicon64.png",
+      "type": "image/png",
+      "sizes": "64x64"
+    },
+    {
+      "src": "favicon128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

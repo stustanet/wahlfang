@@ -15,10 +15,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wahlfang.settings')
 django_asgi_application = get_asgi_application()
 
 from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter
 import wahlfang.routing
+from rest_api.channelsmiddleware import WebsocketJWTAuthMiddleware
 
 application = ProtocolTypeRouter({
     "https": django_asgi_application,
-    "websocket": AuthMiddlewareStack(wahlfang.routing.websocket_urlpatterns),
+    "websocket": WebsocketJWTAuthMiddleware(AuthMiddlewareStack(wahlfang.routing.websocket_urlpatterns)),
 })

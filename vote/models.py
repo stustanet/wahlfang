@@ -137,13 +137,9 @@ class Election(models.Model):
         return True
 
     @property
-    def applications(self):
-        return Application.objects.filter(election=self)
-
-    @property
     def election_summary(self):
         if not self.closed:
-            return self.objects.none()
+            return Application.objects.none()
 
         votes_accept = Count('votes', filter=Q(votes__vote=VOTE_ACCEPT))
         votes_reject = Count('votes', filter=Q(votes__vote=VOTE_REJECT))
@@ -156,6 +152,12 @@ class Election(models.Model):
         ).order_by('-votes_accept')
 
         return applications
+
+    def public_election_summary(self):
+        if not self.result_published == '1':
+            return Application.objects.none()
+
+        return self.election_summary
 
     def number_voters(self):
         return self.session.participants.count()
@@ -171,7 +173,7 @@ class Election(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(force_insert, force_update, using, update_fields)
         # notify users to reload their page
-        group = "Session-" + str(self.session.pk)
+        group = f'Session-{self.session.pk}'
         async_to_sync(get_channel_layer().group_send)(
             group,
             {'type': 'send_reload', 'id': '#electionCard'}
@@ -459,7 +461,7 @@ def avatar_file_name(instance, filename):
 class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)
     avatar = models.ImageField(upload_to=avatar_file_name, null=True, blank=True)
-    election = models.ForeignKey(Election, related_name='application', on_delete=models.CASCADE)
+    election = models.ForeignKey(Election, related_name='applications', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=256)
     email = models.EmailField(null=True, blank=True)
     voter = models.ForeignKey(Voter, related_name="application", null=True, blank=True, on_delete=models.CASCADE)

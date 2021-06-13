@@ -1,4 +1,5 @@
 import os
+
 from django.urls import reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,7 +13,6 @@ DEBUG = False
 # export application statistics such as http request duration / latency
 # will also export # of manager accounts, # of sessions, # of elections
 EXPORT_PROMETHEUS_METRICS = True
-
 
 ALLOWED_HOSTS = ['*']
 
@@ -49,7 +49,6 @@ if EXPORT_PROMETHEUS_METRICS:
     MIDDLEWARE = ['django_prometheus.middleware.PrometheusBeforeMiddleware'] + \
                  MIDDLEWARE + \
                  ['django_prometheus.middleware.PrometheusAfterMiddleware']
-
 
 ROOT_URLCONF = 'wahlfang.urls'
 
@@ -142,10 +141,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'", "data:",)
 
-
 # File upload, etc...
 MEDIA_URL = '/media/'
-
 
 #: Default Logging configuration.
 LOGGING = {
@@ -162,9 +159,8 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'file':{
+        'file': {
             'level': 'INFO',
-            #'class': 'logging.handlers.RotatingFileHandler',
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'mailmanweb.log'),
             'formatter': 'verbose',
@@ -185,15 +181,6 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'hyperkitty': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'postorius': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
     },
     'formatters': {
         'verbose': {
@@ -203,8 +190,4 @@ LOGGING = {
             'format': '%(levelname)s %(message)s'
         },
     },
-    #'root': {
-    #    'handlers': ['file'],
-    #    'level': 'INFO',
-    #},
 }

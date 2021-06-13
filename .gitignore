@@ -3,3 +3,6 @@
 .idea
 *.sqlite3
 /media
+/build
+/dist
+wahlfang.egg-info

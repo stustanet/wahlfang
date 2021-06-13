@@ -2,6 +2,7 @@ image: python:3.8-buster
 
 stages:
   - test
+  - package
 
 variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -52,3 +53,13 @@ pylint:
     - pip install -U -r requirements_dev.txt
   script:
     - make pylint
+
+package:
+  stage: package
+  script:
+    - make package
+  artifacts:
+    paths:
+    - dist/*.whl
+    - dist/*.tar.gz
+    expire_in: 1 week

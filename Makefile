@@ -16,3 +16,7 @@ bandit:
 .PHONY: test
 test:
 	python3 manage.py test
+
+.PHONY: package
+package:
+	python3 -m build

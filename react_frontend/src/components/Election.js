@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 import {Link} from "react-router-dom";
 import {deleteApplication} from "../api";
 
@@ -26,10 +27,8 @@ export default function Election({election}) {
                 </h4>
                 {election.end_date ? (
                     <>
-                        <small className="text-muted">Voting Period: {election.start_date}
-                            - {election.end_date} (UTC {election.end_date})</small>
-                        <div className="d-none time">{election.start_date}|</div>
-                        <div className="d-none time">{election.end_date}|</div>
+                        <small className="text-muted">Voting Period: {moment(election.start_date).format('llll')}
+                            - {moment(election.end_date).format('llll')}</small>
                     </>
                 ) : null}
                 <hr/>
@@ -66,14 +65,14 @@ export default function Election({election}) {
                     ) : election.start_date === null || new Date(election.start_date) > new Date() ? (
                         <button className="btn btn-outline-dark disabled">
                             {election.start_date !== null ?
-                                `Voting starts ${election.start_date}`
+                                `Voting starts ${moment(election.start_date).format('llll')}`
                                 : "Wait for the admin to start the election"}
                         </button>
                     ) : (
                         <div className="alert alert-success" role="alert">
                             <h4 className="alert-heading">Thank You For Your Vote!</h4>
                             <hr/>
-                            <p className="mb-0">This election will end {election.end_date}</p>
+                            <p className="mb-0">This election will end {moment(election.end_date).format('llll')}</p>
                         </div>
                     )}
                     {!election.start_date || new Date(election.start_date) > new Date() ? (
@@ -94,7 +93,7 @@ export default function Election({election}) {
                                                 <div className="applicant">
                                                     {application.avatar ? (
                                                         <img src={application.avatar.url} className="applicant-picture"
-                                                             alt="applicant-picture"/>
+                                                             alt="applicant"/>
                                                         // <img src="{% static 'img/blank_avatar.png' %}" className="applicant-picture"
                                                         //      alt = "applicant-picture" />
                                                     ) : null}

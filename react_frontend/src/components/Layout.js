@@ -7,7 +7,11 @@ export default function Layout({title, children}) {
         <div id="content">
             <Header/>
             <article className="container mt-4" role="main">
-                {children}
+                <div className="row justify-content-center">
+                    <div className="col-lg-6 col-md-9 col-sm-12">
+                        {children}
+                    </div>
+                </div>
             </article>
         </div>
     )

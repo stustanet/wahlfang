@@ -162,7 +162,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'mailmanweb.log'),
+            'filename': os.path.join(BASE_DIR, 'wahlfang.log'),
             'formatter': 'verbose',
         },
         'console': {

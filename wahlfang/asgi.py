@@ -14,9 +14,9 @@ from wahlfang.manage import setup
 setup()
 django_asgi_application = get_asgi_application()
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter
-import wahlfang.routing
+from channels.auth import AuthMiddlewareStack  # pylint: disable=wrong-import-order
+from channels.routing import ProtocolTypeRouter  # pylint: disable=wrong-import-order
+import wahlfang.routing  # pylint: disable=wrong-import-order
 
 application = ProtocolTypeRouter({
     "https": django_asgi_application,

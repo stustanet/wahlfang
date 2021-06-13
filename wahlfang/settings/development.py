@@ -22,3 +22,18 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Mail
+EMAIL_HOST = 'mail.stusta.de'
+EMAIL_SENDER = 'no-reply@stusta.de'
+EMAIL_PORT = 25
+
+# LDAP
+AUTH_LDAP_SERVER_URI = "ldap://ldap.stusta.de"
+AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=account,ou=pnyx,dc=stusta,dc=mhn,dc=de"
+AUTH_LDAP_START_TLS = True
+AUTH_LDAP_USER_ATTR_MAP = {'email': 'mail'}
+AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True

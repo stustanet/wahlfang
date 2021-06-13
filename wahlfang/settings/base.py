@@ -1,8 +1,7 @@
 import os
 from django.urls import reverse_lazy
 
-# BASE_DIR = Path('/opt/wahlfang')
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ADMINS = (
     ('Wahlfang Admins', 'root@localhost')
@@ -73,7 +72,6 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = {
     'vote.authentication.AccessCodeBackend',
     'management.authentication.ManagementBackend',
-    'management.authentication.ManagementBackendLDAP',
     'django.contrib.auth.backends.ModelBackend'
 }
 
@@ -132,7 +130,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/wahlfang/static'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -145,18 +142,69 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'", "data:",)
 
-# Mail
-EMAIL_HOST = 'mail.stusta.de'
-EMAIL_SENDER = 'no-reply@stusta.de'
-EMAIL_PORT = 25
 
 # File upload, etc...
-MEDIA_ROOT = '/var/www/wahlfang/media'
 MEDIA_URL = '/media/'
 
-# LDAP
-AUTH_LDAP_SERVER_URI = "ldap://ldap.stusta.de"
-AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=account,ou=pnyx,dc=stusta,dc=mhn,dc=de"
-AUTH_LDAP_START_TLS = True
-AUTH_LDAP_USER_ATTR_MAP = {'email': 'mail'}
-AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True
+
+#: Default Logging configuration.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'file':{
+            'level': 'INFO',
+            #'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'mailmanweb.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins', 'file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'hyperkitty': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'postorius': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(process)d %(name)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    #'root': {
+    #    'handlers': ['file'],
+    #    'level': 'INFO',
+    #},
+}

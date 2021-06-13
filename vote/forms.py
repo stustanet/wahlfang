@@ -87,11 +87,11 @@ class VoteForm(forms.Form):
             self.max_votes_yes = self.election.applications.count()
 
         # dynamically construct form fields
-        for application in self.election.applications:
+        for application in self.election.applications.all():
             self.fields[f'{application.pk}'] = VoteField(application=application,
                                                          disable_abstention=self.election.disable_abstention)
 
-        self.num_applications = len(self.election.applications)
+        self.num_applications = self.election.applications.count()
 
     def clean(self):
         super().clean()

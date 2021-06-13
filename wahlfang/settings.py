@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import logging
 import os
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from datetime import timedelta
+
 from django.urls import reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -49,11 +50,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'crispy_forms',
     'vote',
     'management',
+    'rest_api',
     'channels',
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ['corsheaders']
 
 if EXPORT_PROMETHEUS_METRICS:
     INSTALLED_APPS += ['django_prometheus']
@@ -69,11 +75,16 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
 ]
 
+if DEBUG:
+    MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
+
 if EXPORT_PROMETHEUS_METRICS:
     MIDDLEWARE = ['django_prometheus.middleware.PrometheusBeforeMiddleware'] + \
                  MIDDLEWARE + \
                  ['django_prometheus.middleware.PrometheusAfterMiddleware']
 
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'wahlfang.urls'
 
@@ -107,6 +118,31 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
+
+# Django Rest Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_api.authentication.VoterJWTAuthentication',
+        'rest_api.authentication.ElectionManagerJWTAuthentication',
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle'
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '100/day',
+    #     'user': '1000/day'
+    # }
+}
+
+# JWT stuff
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'pk',
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=6),
+}
+
+JWT_CLAIM_USER_TYPE = 'user_type'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

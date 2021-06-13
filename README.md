@@ -15,6 +15,7 @@ To just get the current version up and running simply
 $ git clone https://gitlab.stusta.de/stustanet/wahlfang.git
 $ cd wahlfang
 $ pip3 install -r requirements.txt
+$ export WAHLFANG_DEBUG=True
 $ python3 manage.py migrate
 $ python3 manage.py runserver localhost:8000
 ```
@@ -25,6 +26,7 @@ For detailed instructions on how to setup your own wahlfang instance for product
 
 Creating a local election management user:
 ```bash
+$ export WAHLFANG_DEBUG=True
 $ python3 manage.py create_admin
 ```
 
@@ -52,6 +54,7 @@ $ make test
 
 If some model changed, you might have to make and/or apply migrations again:
 ```bash
+$ export WAHLFANG_DEBUG=True
 $ python3 manage.py makemigrations
 $ python3 manage.py migrate
 ```
@@ -59,4 +62,4 @@ Don't forget to add the new migration file to git. If the CI pipeline fails this
 
 ## Development References
 
-- Django 3: https://docs.djangoproject.com/en/3.0/
+- Django 3: https://docs.djangoproject.com/en/3.2/

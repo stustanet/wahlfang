@@ -12,11 +12,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import logging
 import os
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from datetime import timedelta
 
-from corsheaders.defaults import default_headers
 from django.urls import reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,7 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'rest_framework',
     'crispy_forms',
     'vote',
@@ -61,11 +58,13 @@ INSTALLED_APPS = [
     'channels',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += ['corsheaders']
+
 if EXPORT_PROMETHEUS_METRICS:
     INSTALLED_APPS += ['django_prometheus']
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,12 +75,16 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
 ]
 
+if DEBUG:
+    MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
+
 if EXPORT_PROMETHEUS_METRICS:
     MIDDLEWARE = ['django_prometheus.middleware.PrometheusBeforeMiddleware'] + \
                  MIDDLEWARE + \
                  ['django_prometheus.middleware.PrometheusAfterMiddleware']
 
-CORS_ALLOW_ALL_ORIGINS = True
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'wahlfang.urls'
 

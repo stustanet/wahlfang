@@ -271,7 +271,8 @@ class Voter(models.Model):
             email = email_name + '@' + domain_part.lower()
         return email
 
-    def email_user(self, subject, message, from_email=None, **kwargs) -> Tuple[Optional['Voter'], Optional[str]]:
+    def email_user(self, subject, message, from_email=None, **kwargs) -> Tuple[
+        Optional['Voter'], Optional[str]]:  # pylint: disable=E1136
         """Send an email to this user."""
         if self.email is not None:
             try:
@@ -329,7 +330,8 @@ class Voter(models.Model):
 
         Voter.send_invitation(test_voter, "mock-up-access-token", from_email)
 
-    def send_invitation(self, access_code: str, from_email: str) -> Tuple[Optional['Voter'], Optional[str]]:
+    def send_invitation(self, access_code: str, from_email: str) -> Tuple[
+        Optional['Voter'], Optional[str]]:  # pylint: disable=E1136
         if not self.email:
             return None, None
         subject = f'Invitation for {self.session.title}'

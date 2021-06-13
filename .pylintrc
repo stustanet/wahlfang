@@ -48,3 +48,4 @@ disable=print-statement,
         no-member,
         unused-import,
         fixme, # no TODOs
+        too-many-ancestors,

@@ -4,11 +4,10 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from vote.models import Election, Session, Application, Voter, VOTE_CHOICES, VOTE_CHOICES_NO_ABSTENTION, OpenVote, \
-    VOTE_ACCEPT, Vote
+from vote.models import Election, Session, Application, Voter
 
 
-class TokenObtainVoterSerializer(serializers.Serializer):
+class TokenObtainVoterSerializer(serializers.Serializer):  # pylint: disable=W0223
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,11 +23,11 @@ class TokenObtainVoterSerializer(serializers.Serializer):
         except KeyError:
             pass
 
-        self.user = authenticate(**authenticate_kwargs)
-        if not self.user:
+        user = authenticate(**authenticate_kwargs)
+        if not user:
             raise serializers.ValidationError('could not authenticate user')
 
-        refresh = self.get_token(self.user)
+        refresh = self.get_token(user)
         data = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -42,7 +41,7 @@ class TokenObtainVoterSerializer(serializers.Serializer):
         return token
 
 
-class TokenObtainElectionManagerSerializer(TokenObtainPairSerializer):
+class TokenObtainElectionManagerSerializer(TokenObtainPairSerializer):  # pylint: disable=W0223
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)

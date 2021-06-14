@@ -24,6 +24,12 @@ After configuring your database make sure to not forget the required database mi
 $ wahlfang migrate
 ```
 
+After configuring a suitable `STATIC_ROOT` for your deployment which will contain all static assets served by your webserver run 
+
+```shell
+$ wahlfang collectstatic
+```
+
 ### Non-Python Requirements
 
 * Nginx
@@ -79,10 +85,12 @@ server {
     charset utf-8;
 
     location /static {
+        # as configured in settings.py under STATIC_ROOT
         alias /var/www/wahlfang/static;
     }
 
     location /media {
+        # as configured in settings.py under MEDIA_ROOT
         alias /var/www/wahlfang/media;
     }
 
@@ -95,7 +103,7 @@ server {
         
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
 ```

@@ -3,6 +3,7 @@ image: python:3.8-buster
 stages:
   - test
   - package
+  - upload
   - release
 
 variables:
@@ -71,7 +72,7 @@ package:
     expire_in: 2 months
 
 upload_job:
-  stage: release
+  stage: upload
   image: curlimages/curl:latest
   needs:
     - job: package

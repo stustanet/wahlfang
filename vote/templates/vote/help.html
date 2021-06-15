@@ -37,7 +37,7 @@
           <p class="just">The first part of this help page is a manual on how to navigate and operate the vote frontend.
             (If you are
             an election manager and want to have a manual on the management backend, visit
-            <a href="{% url 'vote:index' %}">the management help page</a>). The second part in form of an FAQ will
+            <a href="{% url 'management:help' %}">the management help page</a>). The second part in form of an FAQ will
             answer questions on how the voting mechanism works and why you should prefer this tool instead of let's say
             doodle.
           </p>
@@ -151,21 +151,13 @@
 
           <h2>FAQ</h2>
 
-          # how does stuff work
-          # trust the election manager to some degree, always ask the manager to publish the results and remeber to
-          count
-          the votes
-          # add a description for what the voter applies for
-          # how to get management account -> stustanet oder selbst hosten
-          # why not use blockchain
-
           <h3>How can I create a new election?</h3>
           <p class="just">
             You need to create a management account. For further details see the
             <a href="{% url 'vote:index' %}">the management help page</a>.
           </p>
           <h3>Why is there a need for such a tool?</h3>
-          <p>
+          <p class="just">
             During the 2020 Covid-19 pandemic there was a big need for an online voting tool for having fair elections
             in the Studentenstadt Freimann (there are many events where elections are necessary).
             Because other online voting tools seem insescure (see below), the StuStaNet decided to implement its own
@@ -206,9 +198,10 @@
           </p>
 
           <h3>How to host my own shiny instance of Wahlfang?</h3>
-          Since Wahlfang is an opensource software you can host your own instance if you don't trust us.
+          <p class="just">Since Wahlfang is an opensource software you can host your own instance if you don't trust us.
           There is a <a href="https://github.com/stustanet/wahlfang/blob/master/docs/deploying.md">deploy page</a>
-          on our <a href="https://github.com/stustanet/wahlfang">public github repository</a>.
+            on our <a href="https://github.com/stustanet/wahlfang">public github repository</a>.
+          </p>
 
         </div>
       </div>

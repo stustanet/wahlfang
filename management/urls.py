@@ -20,7 +20,7 @@ session_gauge.set_function(lambda: Session.objects.all().count())
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('help', vote.views.help_page, name='help', kwargs={'management': True}),
+    path('help', views.help_page, name='help'),
 
     # Session
     path('meeting/<int:pk>', views.session_detail, name='session'),

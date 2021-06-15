@@ -134,3 +134,7 @@ table.vote-list .applicant .card-body {
 .pic {
     width: 100%;
 }
+
+.just {
+    text-align: justify;
+}

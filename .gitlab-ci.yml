@@ -80,8 +80,9 @@ upload_job:
   rules:
     - if: $CI_COMMIT_TAG # only run when we publish a new tag
   script:
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file dist/*.whl "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.whl"'
-    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file dist/*.tar.gz "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.tar.gz"'
+    - 'ls dist'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file dist/wahlfang-${CI_COMMIT_TAG}-py3-none-any.whl "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.whl"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file dist/wahlfang-${CI_COMMIT_TAG}.tar.gz "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.tar.gz"'
 
 release_job:
   stage: release

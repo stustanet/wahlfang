@@ -1,0 +1,13 @@
+include requirements.txt
+recursive-include vote *.py *.html *.js *.css *.png *.svg *.po *.txt *.tex
+graft vote/static
+graft vote/templates
+graft vote/static
+graft vote/templatetags
+graft vote/management
+recursive-include management *.py *.html *.js *.css *.png *.svg *.po *.txt *.tex
+graft management/static
+graft management/templates
+graft management/static
+graft management/templatetags
+graft management/management

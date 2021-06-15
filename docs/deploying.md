@@ -30,6 +30,12 @@ After configuring a suitable `STATIC_ROOT` for your deployment which will contai
 $ wahlfang collectstatic
 ```
 
+### Management commands
+You can create a local election management user with:
+```bash
+$ wahlfang create_admin
+```
+
 ### Non-Python Requirements
 
 * Nginx

@@ -10,27 +10,7 @@ votes and elections - Wahlfang does it all.
 If you would like a new feature or have a bug to report please open an [issue](https://github.com/stustanet/wahlfang/issues).
 
 ## Getting Started
-To just get the current version up and running simply
-```bash
-$ git clone https://gitlab.stusta.de/stustanet/wahlfang.git
-$ cd wahlfang
-$ pip3 install -r requirements.txt
-$ export WAHLFANG_DEBUG=True
-$ python3 manage.py migrate
-$ python3 manage.py runserver localhost:8000
-```
-
-For detailed instructions on how to setup your own wahlfang instance for productive use see [deploying](docs/deploying.md).
-
-### Management Access
-
-Creating a local election management user:
-```bash
-$ export WAHLFANG_DEBUG=True
-$ python3 manage.py create_admin
-```
-
-Login to the management interface running at [http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
+To setup your own wahlfang instance for productive use see [deploying](docs/deploying.md).
 
 ### Metrics
 
@@ -41,10 +21,24 @@ in the application settings.
 We use the [django-prometheus](https://github.com/korfuri/django-prometheus) project to export our exports.
 
 ## Contributing
-Install the development requirements in addition to the standard dependencies:
+To just get the current version up and running simply
 ```bash
+$ git clone https://gitlab.stusta.de/stustanet/wahlfang.git
+$ cd wahlfang
+$ pip3 install -r requirements.txt
 $ pip3 install -r requirements_dev.txt
+$ export WAHLFANG_DEBUG=True
+$ export PYTHONPATH="$PYTHONPATH:."
+$ python3 wahlfang/manage.py migrate
+$ python3 wahlfang/manage.py runserver localhost:8000
 ```
+
+Creating a local election management user:
+```bash
+$ python3 wahlfang/manage.py create_admin
+```
+
+Login to the management interface running at [http://127.0.0.1:8000/management/](http://127.0.0.1:8000/management/).
 
 Run the linting and test suite
 ```bash
@@ -54,9 +48,8 @@ $ make test
 
 If some model changed, you might have to make and/or apply migrations again:
 ```bash
-$ export WAHLFANG_DEBUG=True
-$ python3 manage.py makemigrations
-$ python3 manage.py migrate
+$ python3 wahlfang/manage.py makemigrations
+$ python3 wahlfang/manage.py migrate
 ```
 Don't forget to add the new migration file to git. If the CI pipeline fails this is most likely the reason for it.
 

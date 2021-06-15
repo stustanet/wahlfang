@@ -29,7 +29,6 @@ def setup():
 def main():
     setup()
 
-    os.environ['DJANGO_IS_MANAGEMENT_COMMAND'] = '1'
     try:
         from django.core.management import execute_from_command_line  # pylint: disable=import-outside-toplevel
     except ImportError as exc:

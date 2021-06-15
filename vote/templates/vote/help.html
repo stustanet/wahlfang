@@ -151,6 +151,65 @@
 
           <h2>FAQ</h2>
 
+          # how does stuff work
+          # trust the election manager to some degree, always ask the manager to publish the results and remeber to
+          count
+          the votes
+          # add a description for what the voter applies for
+          # how to get management account -> stustanet oder selbst hosten
+          # why not use blockchain
+
+          <h3>How can I create a new election?</h3>
+          <p class="just">
+            You need to create a management account. For further details see the
+            <a href="{% url 'vote:index' %}">the management help page</a>.
+          </p>
+          <h3>Why is there a need for such a tool?</h3>
+          <p>
+            During the 2020 Covid-19 pandemic there was a big need for an online voting tool for having fair elections
+            in the Studentenstadt Freimann (there are many events where elections are necessary).
+            Because other online voting tools seem insescure (see below), the StuStaNet decided to implement its own
+            system.<br>
+            Usually, during a session (say a general assembly of a student dormitory) there will be votes on multiple
+            things. Therefore
+            multiple votes are brought together into a session. This has the big advantage that the voters stay the same
+            and only one email per voter per session is necessary.<br>
+            The original version was created just for the purpose of the StuStaNet house admin elections and has then
+            been adapted to also work for general elections and also support sessions.
+          </p>
+
+
+          <h3>Why not just use Doodle?</h3>
+          <p class="just">The problem with doodle and most polling platforms is that they often have no mechanism build
+            in to prevent a person from voting again because users are not authenticated. This also means that they
+            do not check whether a user is even allowed to vote. Some platforms have a configuration which allows
+            only one vote per IP address. This, however, is no solution if several users hide behind the same NAT.<br>
+            Then there are also real voting platforms that promise real authenticity and anonymity. However, they
+            are often foreign companies that store your data probably not in your country and you have to trust them on
+            their technology as well as the deletion process once the election is over. </p>
+
+
+          <h3>What is Wahlfang, how can I contribute?</h3>
+          <p class="just">Wahlfang is the software behind {% url 'vote:index' %}. It is open source with the source code
+            available on
+            <a href="https://github.com/stustanet/wahlfang">github</a>. It was developed and is currently maintained
+            by the <a href="https://stustanet.de">StuStaNet e.V.</a> a student association which committed itself to
+            host and maintain the network infrastructure of the largest student dormitory in munich, the
+            <a href="https://www.stusta.de">StuSta</a>. If you live in the StuSta and are wanting to actively
+            participate
+            in our society check our website linked above.
+            <br>If you are interested to contribute to this project see the questions below.
+            <br>The name Wahlfang itself is pun of the german words Wahl, Fang and Walfang. Wahl means Election and
+            Walfang means hunting wahles, thus the election the Wahl (instead of the wahle) is in the net referring to
+            the
+            internet.
+          </p>
+
+          <h3>How to host my own shiny instance of Wahlfang?</h3>
+          Since Wahlfang is an opensource software you can host your own instance if you don't trust us.
+          There is a <a href="https://github.com/stustanet/wahlfang/blob/master/docs/deploying.md">deploy page</a>
+          on our <a href="https://github.com/stustanet/wahlfang">public github repository</a>.
+
         </div>
       </div>
     </div>

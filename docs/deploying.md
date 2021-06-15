@@ -1,86 +1,63 @@
-## Deploying Wahlfang for Production Use
-Clone the repository. This guide will assume it has been cloned to `/srv/wahlfang/repo`. 
-If you choose some another location make sure to adapt all paths in the following config files.
+# Deploying Wahlfang for Production Use
 
-Additionally this guide uses `virtualenv` to manage python dependencies. If you cannot or do not want to use it
-you'll have to adapt some of the following parts.
+## Install
+To install `wahlfang` simply install it from PyPi
 
+```shell
+$ pip install wahlfang
+```
+
+## Database
+We recommend setting up a postgresql database for production use, although django allows mysql and sqlite
+(please do not use this one for production use, please) as well. All database backends supported by django
+can be used.
+
+## Settings
+Wahlfang can be customized using a configuration file at `/etc/wahlfang/settings.py`. 
+The path to this configuration file can be changed by setting the `WAHLFANG_CONFIG` environment variable.
+
+A starting point for a minimum production ready settings file can be found [here](settings.py).
+
+After configuring your database make sure to not forget the required database migrations. Simply run
+
+```shell
+$ wahlfang migrate
+```
+
+After configuring a suitable `STATIC_ROOT` for your deployment which will contain all static assets served by your webserver run 
+
+```shell
+$ wahlfang collectstatic
+```
+
+### Management commands
+You can create a local election management user with:
 ```bash
-mkdir /srv/wahlfang
-cd /srv/wahlfang
-git clone https://gitlab.stusta.de/stustanet/wahlfang.git repo
-virtualenv -p /usr/bin/python3 venv
-source venv/bin/activate
-pip install repo/requirements.txt
+$ wahlfang create_admin
 ```
 
-### TODO channels integration
+### Non-Python Requirements
 
-- redis layer
-- asgi webserver, like guvicorn, daphne, ...
+* Nginx
+* Daphne
+* Redis
+* PDFLatex (only needed when you want to print invite lists for elections)
 
-### Configuration
-TODO
+## Nginx + Daphne
 
-### Database
-We recommend setting up a postgresql database for production use, although django allows mysql and sqlite 
-(please do not use this one for production use, please) as well.
+### `daphne.service`
 
-### E-Mail
-TODO
-
-### Periodic tasks
-Create a systemd service to run periodic tasks such as sending reminder e-mails for elections where this feature has
-been enabled.
-
-#### `wahlfang-reminders.timer`
 ```ini
 [Unit]
-Description=Wahlfang Election Reminders Timer
-
-[Timer]
-OnCalendar=*:0/10
-
-[Install]
-WantedBy=timers.target
-```
-
-#### `wahlfang-reminders.service`
-```ini
-[Unit]
-Description=Wahlfang Election reminders
+Description = daphne daemon
+After = network.target
 
 [Service]
-# the specific user that our service will run as
-User=wahlfang
-Group=wahlfang
-Environment=DJANGO_SETTINGS_MODULE=wahlfang.settings
-WorkingDirectory=/srv/wahlfang/repo/
-ExecStart=/srv/wahlfang/venv/bin/python manage.py process_reminders
-TimeoutStopSec=5
-PrivateTmp=true
-```
-
-### Nginx + Gunicorn
-Example gunicorn systemd service. Assumes wahlfang has been cloned to `/srv/wahlfang/repo` with a virtualenv containing
-all requirements and gunicorn in `/srv/wahlfang/venv`.
-
-#### `gunicorn.service`
-```ini
-[Unit]
-Description=gunicorn daemon
-Requires=gunicorn.socket
-After=network.target
-
-[Service]
-Type=notify
-User=wahlfang
-Group=wahlfang
-Environment=DJANGO_SETTINGS_MODULE=wahlfang.settings
-RuntimeDirectory=gunicorn
-WorkingDirectory=/srv/wahlfang/repo/
-ExecStart=/srv/wahlfang/venv/bin/gunicorn wahlfang.wsgi
-ExecReload=/bin/kill -s HUP $MAINPID
+User = www-data
+Group = www-data
+RuntimeDirectory = daphne
+ExecStart = daphne wahlfang.asgi:application
+ExecReload = /bin/kill -s HUP $MAINPID
 KillMode=mixed
 TimeoutStopSec=5
 PrivateTmp=true
@@ -89,31 +66,19 @@ PrivateTmp=true
 WantedBy=multi-user.target
 ```
 
-#### `gunicorn.socket`
-A corresponding systemd.socket file for socket activation.
-
-```ini
-[Unit]
-Description=gunicorn socket
-
-[Socket]
-ListenStream=/run/gunicorn.sock
-# Our service won't need permissions for the socket, since it
-# inherits the file descriptor by socket activation
-# only the nginx daemon will need access to the socket
-User=www-data
-
-[Install]
-WantedBy=sockets.target
-```
-
 Example nginx config.
 
-#### `nginx`
+### `nginx`
+
 ```
+upstream daphne_server {
+    server localhost:8000;
+}
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
+    
+    server_name _;
     
     return 301 https://$host$request_uri;
 }
@@ -126,18 +91,55 @@ server {
     charset utf-8;
 
     location /static {
+        # as configured in settings.py under STATIC_ROOT
         alias /var/www/wahlfang/static;
     }
 
     location /media {
+        # as configured in settings.py under MEDIA_ROOT
         alias /var/www/wahlfang/media;
     }
 
     location / {
-        proxy_pass http://unix:/run/gunicorn.sock;
+        proxy_pass http://daphne_server;
+        
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
+```
+
+## Periodic tasks
+Create a systemd service to run periodic tasks such as sending reminder e-mails for elections where this feature has
+been enabled.
+
+### `wahlfang-reminders.timer`
+```ini
+[Unit]
+Description=Wahlfang Election Reminders Timer
+
+[Timer]
+OnCalendar=*:0/10
+
+[Install]
+WantedBy=timers.target
+```
+
+### `wahlfang-reminders.service`
+```ini
+[Unit]
+Description=Wahlfang Election reminders
+
+[Service]
+# the specific user that our service will run as
+User = www-data
+Group = www-data
+ExecStart = wahlfang process_reminders
+TimeoutStopSec = 5
+PrivateTmp = true
 ```

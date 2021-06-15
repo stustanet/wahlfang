@@ -128,7 +128,7 @@ class VoteForm(forms.Form):
             group = "Election-" + str(self.election.pk)
             async_to_sync(get_channel_layer().group_send)(
                 group,
-                {'type': 'send_reload'}
+                {'type': 'send_reload', 'id': '#votes'}
             )
 
         return votes

@@ -1,0 +1,55 @@
+[build-system]
+requires = [
+    'setuptools>=42',
+    'wheel'
+]
+build-backend = 'setuptools.build_meta'
+
+[tool.pylint]
+[tool.pylint.master]
+ignore = ['migrations', 'settings.py']
+jobs = 1
+load-plugins = 'pylint_django'
+django-settings-module = 'wahlfang.settings.development'
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+    'print-statement',
+    'missing-function-docstring',
+    'missing-module-docstring',
+    'missing-class-docstring',
+    'line-too-long',
+    'invalid-name',
+    'unused-argument',
+    'too-many-locals',
+    'too-many-statements',
+    'too-many-instance-arguments',
+    'too-few-public-methods',
+    'too-many-arguments',
+    'too-many-instance-attributes',
+    'too-many-branches',
+    'too-many-lines',
+    'too-many-public-methods',
+    'bad-indentation',
+    'bad-continuation',
+    'import-error',
+    'wildcard-import',
+    'no-self-use',
+    'duplicate-code',
+    'wrong-import-position',
+    'no-member',
+    'unused-import'
+]
+
+[tool.mypy]
+plugins = [
+    'mypy_django_plugin.main'
+]
+ignore_missing_imports = true
+pretty = true
+
+#[tool.mypy.plugins.'django-stubs']  # FIXME: this does not work with toml apparently
+#django_settings_module = 'wahlfang.settings.development'
+
+[tool.'mypy-*'.'migrations.*']
+ignore_errors = true

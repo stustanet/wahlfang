@@ -4,7 +4,7 @@
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-12">
-      <div class="card shadow ">
+      <div class="card shadow">
         <div class="card-header bg-dark text-light">
           <h4 class="d-inline">{{ session.title }}</h4>
           <div class="d-inline float-right dropdown ml-2">
@@ -33,7 +33,7 @@
             <small>Starts on {{ session.start_date }}</small>
           {% endif %}
         </div>
-        <div class="card-body pt-0">
+        <div class="card-body pt-0" id="electionCard">
           <div class="list-group">
             {% if not existing_elections %}
               <div class="list-group-item mt-3">
@@ -96,21 +96,24 @@
             </div>
           </div>
         </div>
-        <div class="card-body">
-          <div class="list-group list-group-flush">
-            {% if voters %}
-              <div class="list-group-item">
-                <span class="w-25 font-weight-bold">E-Mail</span>
-                <span data-toggle="tooltip" data-placement="right"
-                      title="Mail addresses turn green, as soon as their invite link has been clicked.">
+        {#      The following div is only needed to update the voter's list#}
+        <div id="voterCard">
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              {% if voters %}
+                <div class="list-group-item">
+                  <span class="w-25 font-weight-bold">E-Mail</span>
+                  <span data-toggle="tooltip" data-placement="right"
+                        title="Mail addresses turn green, as soon as their invite link has been clicked.
+                               Mail addresses are red, if the address is invalid and no email was sent.">
                     <img class="pl-1 pb-1" src="{% static "img/question-circle.svg" %}" height="25pt" alt="[?]">
                 </span>
-              </div>
-              <div class="voter-table">
-                {% for voter in voters %}
-                  <div class="list-group-item">
-                    <span class="w-25 {% if voter.logged_in %}text-success{% endif %}"> {{ voter }}</span>
-                    <span class="float-right">
+                </div>
+                <div class="voter-table">
+                  {% for voter in voters %}
+                    <div class="list-group-item">
+                      <span class="w-25 {% if voter.logged_in %}text-success{% elif voter.invalid_email %}text-danger{% endif %}"> {{ voter }}</span>
+                      <span class="float-right">
                   <form action="{% url 'management:delete_voter' voter.pk %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="close btn btn-danger" aria-label="remove voter">
@@ -118,14 +121,15 @@
                     </button>
                   </form>
                 </span>
-                  </div>
-                {% endfor %}
-              </div>
-            {% else %}
-              <div class="list-group-item">
-                <span>No voters were added yet</span>
-              </div>
-            {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="list-group-item">
+                  <span>No voters were added yet</span>
+                </div>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>

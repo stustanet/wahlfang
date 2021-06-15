@@ -7,16 +7,18 @@ For more information on this file, see
 https://docs.djangoproject.com/en/3.0/howto/deployment/asgi/
 """
 
-import os
-
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
-import wahlfang.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wahlfang.settings')
+from wahlfang.manage import setup
+
+setup()
+django_asgi_application = get_asgi_application()
+
+from channels.auth import AuthMiddlewareStack  # pylint: disable=wrong-import-order
+from channels.routing import ProtocolTypeRouter  # pylint: disable=wrong-import-order
+import wahlfang.routing  # pylint: disable=wrong-import-order
 
 application = ProtocolTypeRouter({
-    "https": get_asgi_application(),
+    "https": django_asgi_application,
     "websocket": AuthMiddlewareStack(wahlfang.routing.websocket_urlpatterns),
 })

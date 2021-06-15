@@ -2,9 +2,12 @@ image: python:3.8-buster
 
 stages:
   - test
+  - package
+  - release
 
 variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    PACKAGE_REGISTRY_URL: "$CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/"
 
 all_tests:
   stage: test
@@ -52,3 +55,44 @@ pylint:
     - pip install -U -r requirements_dev.txt
   script:
     - make pylint
+
+package:
+  stage: package
+  before_script:
+    - pip3 install virtualenv
+    - virtualenv -q .venv
+    - source .venv/bin/activate
+    - pip install -U build
+  script:
+    - make package
+  artifacts:
+    paths:
+    - dist/
+    expire_in: 2 months
+
+release_job:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: package
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG  # only run when we publish a new tag
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo 'running release_job'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file dist/*.whl "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.whl"'
+    - 'curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file dist/*.tar.gz "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.tar.gz"'
+  release:
+    name: 'Release $CI_COMMIT_TAG'
+    description: 'Created using the release-cli'
+    tag_name: '$CI_COMMIT_TAG'
+    ref: '$CI_COMMIT_TAG'
+    assets:
+      links:
+        - name: "wahlfang-${CI_COMMIT_TAG}.whl"
+          url: "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.whl"
+        - name: "wahlfang-${CI_COMMIT_TAG}.tar.gz"
+          url: "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang-${CI_COMMIT_TAG}.tar.gz"
+
+# TODO: automatically push to pypi.org when generating a release

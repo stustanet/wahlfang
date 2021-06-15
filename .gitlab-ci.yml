@@ -8,7 +8,7 @@ stages:
 
 variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    PACKAGE_REGISTRY_URL: "$CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/"
+    PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic"
 
 all_tests:
   stage: test

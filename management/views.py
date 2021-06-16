@@ -452,3 +452,7 @@ def spectator(request, pk):
         'pk': session.pk,
     }
     return render(request, template_name='management/spectator_settings.html', context=context)
+
+
+def help_page(request):
+    return render(request, template_name='management/help.html')

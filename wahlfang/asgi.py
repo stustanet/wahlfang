@@ -17,7 +17,7 @@ django_asgi_application = get_asgi_application()
 from channels.auth import AuthMiddlewareStack  # pylint: disable=wrong-import-order
 from channels.routing import ProtocolTypeRouter  # pylint: disable=wrong-import-order
 import wahlfang.routing  # pylint: disable=wrong-import-order
-from rest_api.channelsmiddleware import WebsocketJWTAuthMiddleware  # pylint: disable=wrong-import-order
+from wahlfang_api.channelsmiddleware import WebsocketJWTAuthMiddleware  # pylint: disable=wrong-import-order
 
 application = ProtocolTypeRouter({
     "https": django_asgi_application,

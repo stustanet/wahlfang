@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.views import TokenViewBase
 
-from rest_api.authentication import IsVoter
-from rest_api.serializers import (
+from wahlfang_api.authentication import IsVoter
+from wahlfang_api.serializers import (
     TokenObtainVoterSerializer,
     TokenObtainElectionManagerSerializer,
     ElectionSerializer,

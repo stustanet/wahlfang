@@ -10,10 +10,11 @@ import {isAuthenticated} from "./state";
 import Loading from "./components/Loading";
 import {isTokenValid, loadToken, refreshToken} from "./api";
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
-import Help from "./pages/Help";
+import HelpVote from "./pages/HelpVote";
 import PerformVote from "./pages/PerformVote";
 import {ws} from "./websocket";
 import Application from "./pages/Application";
+import HelpManagement from "./pages/HelpManagement";
 
 
 function App() {
@@ -56,7 +57,10 @@ function App() {
                             </Suspense>
                         </Route>
                         <Route exact path="/help">
-                            <Help/>
+                            <HelpVote/>
+                        </Route>
+                        <Route exact path="/management/help">
+                            <HelpManagement/>
                         </Route>
                         <AuthenticatedRoute>
                             <Route exact path="/about">

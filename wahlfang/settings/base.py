@@ -27,11 +27,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'channels',
     'crispy_forms',
     'vote',
     'management',
-    'rest_api',
-    'channels',
+    'wahlfang_api',
+    'wahlfang_web',
 ]
 
 if DEBUG:
@@ -96,8 +97,8 @@ CHANNEL_LAYERS = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_api.authentication.VoterJWTAuthentication',
-        'rest_api.authentication.ElectionManagerJWTAuthentication',
+        'wahlfang_api.authentication.VoterJWTAuthentication',
+        'wahlfang_api.authentication.ElectionManagerJWTAuthentication',
     ],
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     # 'DEFAULT_THROTTLE_CLASSES': [

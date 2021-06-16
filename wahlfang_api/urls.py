@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from rest_api.views import (
+from wahlfang_api.views import (
     TokenObtainVoterView,
     TokenObtainElectionManagerView,
     ElectionViewset,

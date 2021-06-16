@@ -11,3 +11,12 @@ graft management/templates
 graft management/static
 graft management/templatetags
 graft management/management
+recursive-include wahlfang_api *.py *.html *.js *.css *.png *.svg *.po *.txt *.tex
+graft wahlfang_api/static
+graft wahlfang_api/templates
+graft wahlfang_api/static
+graft wahlfang_api/templatetags
+graft wahlfang_api/management
+
+graft wahlfang_web/static
+prune wahlfang_web/node_modules

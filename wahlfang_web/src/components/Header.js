@@ -1,11 +1,11 @@
 import {Link} from "react-router-dom";
 import {useRecoilValue} from "recoil";
-import {isAuthenticated} from "../state";
+import {isVoterAuthenticated} from "../state";
 import logo from '../assets/logo_inv.png';
 
 
 export default function Header() {
-    const authenticated = useRecoilValue(isAuthenticated);
+    const authenticated = useRecoilValue(isVoterAuthenticated);
 
     return (
     <nav className="navbar navbar-expand navbar-dark bg-dark shadow">

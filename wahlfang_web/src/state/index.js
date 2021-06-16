@@ -1,14 +1,9 @@
 import {atom, selector, selectorFamily} from "recoil";
 import {fetchElections, fetchVoterInfo} from "../api";
-import {ws} from "../websocket";
+import {voterWS} from "../websocket";
 
-// mutable state counter to reset the full recoil state after e.g. a logout
-export const stateCounter = {
-    counter: 0
-};
-
-export const isAuthenticated = atom({
-    key: 'isAuthenticated',
+export const isVoterAuthenticated = atom({
+    key: 'isVoterAuthenticated',
     default: false,
 })
 
@@ -22,7 +17,7 @@ export const voterInfo = atom({
     }),
     effects_UNSTABLE: [
         ({setSelf, trigger}) => {
-            ws.register("session", () => {
+            voterWS.register("session", () => {
                 fetchVoterInfo()
                     .then(result => {
                         setSelf(result);
@@ -42,7 +37,7 @@ export const electionList = atom({
     }),
     effects_UNSTABLE: [
         ({setSelf, trigger}) => {
-            ws.register("election", () => {
+            voterWS.register("election", () => {
                 fetchElections()
                     .then(result => {
                         setSelf(result);

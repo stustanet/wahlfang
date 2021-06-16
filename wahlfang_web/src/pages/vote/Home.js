@@ -1,9 +1,9 @@
 import React from "react";
 import moment from 'moment';
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {useRecoilValue} from "recoil";
-import {openElections, publishedElections, unpublishedElections, upcomingElections, voterInfo} from "../state";
-import Election from "../components/Election";
+import {openElections, publishedElections, unpublishedElections, upcomingElections, voterInfo} from "../../state";
+import Election from "../../components/Election";
 
 export default function Home() {
     const voter = useRecoilValue(voterInfo);

@@ -1,8 +1,8 @@
 import React from "react";
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {Link} from "react-router-dom";
 
-export default function HelpManagement() {
+export default function Help() {
     return (
         <Layout title="Help Management">
 

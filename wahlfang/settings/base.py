@@ -35,9 +35,6 @@ INSTALLED_APPS = [
     'wahlfang_web',
 ]
 
-if DEBUG:
-    INSTALLED_APPS += ['corsheaders']
-
 if EXPORT_PROMETHEUS_METRICS:
     INSTALLED_APPS += ['django_prometheus']
 
@@ -52,16 +49,10 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
 ]
 
-if DEBUG:
-    MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
-
 if EXPORT_PROMETHEUS_METRICS:
     MIDDLEWARE = ['django_prometheus.middleware.PrometheusBeforeMiddleware'] + \
                  MIDDLEWARE + \
                  ['django_prometheus.middleware.PrometheusAfterMiddleware']
-
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'wahlfang.urls'
 

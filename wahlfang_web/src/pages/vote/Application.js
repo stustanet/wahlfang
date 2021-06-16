@@ -1,10 +1,10 @@
 import {Redirect, useHistory, useParams} from "react-router-dom";
 import {useRecoilValue} from "recoil";
-import {electionById} from "../state";
+import {electionById} from "../../state";
 import {Formik} from "formik";
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import React from "react";
-import {updateApplication} from "../api";
+import {updateApplication} from "../../api";
 
 
 export default function Application() {

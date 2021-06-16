@@ -1,13 +1,13 @@
 import React from "react";
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {Link} from "react-router-dom";
-import img_overview_page from "../assets/help/overview_page.png";
-import img_overview_results from "../assets/help/overview_results.png";
-import img_overview_app from "../assets/help/overview_app.png";
-import img_apply_page_numbered from "../assets/help/apply_page_numbered.png";
-import img_vote_page_bernd from "../assets/help/vote_page_bernd.png";
+import img_overview_page from "../../assets/help/overview_page.png";
+import img_overview_results from "../../assets/help/overview_results.png";
+import img_overview_app from "../../assets/help/overview_app.png";
+import img_apply_page_numbered from "../../assets/help/apply_page_numbered.png";
+import img_vote_page_bernd from "../../assets/help/vote_page_bernd.png";
 
-export default function HelpVote() {
+export default function Help() {
     return (
         <Layout title="Help">
 

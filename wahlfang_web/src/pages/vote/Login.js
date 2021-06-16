@@ -1,17 +1,17 @@
 import React from "react";
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {Redirect, useHistory} from "react-router-dom";
 import {Formik} from "formik";
-import {login} from "../api";
+import {loginVoter} from "../../api";
 import {useRecoilState} from "recoil";
-import {isAuthenticated} from "../state";
+import {isVoterAuthenticated} from "../../state";
 
 export default function Login() {
-    const [authenticated, setAuthenticated] = useRecoilState(isAuthenticated);
+    const [authenticated, setAuthenticated] = useRecoilState(isVoterAuthenticated);
     const history = useHistory();
 
     const handleSubmit = (values, {setSubmitting}) => {
-        login(values.accessCode)
+        loginVoter(values.accessCode)
             .then(res => {
                 setAuthenticated(true);
                 setSubmitting(false);

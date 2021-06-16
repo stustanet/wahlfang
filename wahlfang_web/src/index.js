@@ -5,11 +5,10 @@ import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as serviceWorker from './serviceWorker';
 import {RecoilRoot} from "recoil";
-import {stateCounter} from "./state";
 
 ReactDOM.render(
     <React.StrictMode>
-        <RecoilRoot key={stateCounter.counter}>
+        <RecoilRoot>
             <App/>
         </RecoilRoot>
     </React.StrictMode>,

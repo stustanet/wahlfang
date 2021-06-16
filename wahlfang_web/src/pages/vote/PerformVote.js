@@ -1,10 +1,10 @@
 import React from "react";
 import {useHistory, useParams} from "react-router-dom";
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {useFormik} from "formik";
 import {useRecoilValue} from "recoil";
-import {electionById} from "../state";
-import {performVote} from "../api";
+import {electionById} from "../../state";
+import {performVote} from "../../api";
 
 export default function PerformVote() {
     const {id} = useParams();

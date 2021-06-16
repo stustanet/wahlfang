@@ -1,16 +1,15 @@
 import React, {useEffect} from "react";
-import {Redirect} from "react-router-dom";
-import {logout} from "../api";
-import Layout from "../components/Layout";
-import {useRecoilState} from "recoil";
-import {isAuthenticated} from "../state";
-import Loading from "../components/Loading";
+import {logoutVoter} from "../../api";
+import Layout from "../../components/Layout";
+import {useSetRecoilState} from "recoil";
+import {isVoterAuthenticated} from "../../state";
+import Loading from "../../components/Loading";
 
 export default function Logout() {
-    const [authenticated, setAuthenticated] = useRecoilState(isAuthenticated);
+    const setAuthenticated = useSetRecoilState(isVoterAuthenticated);
 
     useEffect(() => {
-        logout().then(result => {
+        logoutVoter().then(result => {
             setAuthenticated(false);
             // TODO: this is a very hacky way of reloading the whole app such that the recoil app state is reset.
             // TODO: find a saner way of resetting the recoil state without having to force reload the whole page.
@@ -20,7 +19,7 @@ export default function Logout() {
 
     return (
         <Layout title="logout">
-            {authenticated ? <Loading/> : <Redirect to="/code"/>}
+            <Loading/>
         </Layout>
     );
 }

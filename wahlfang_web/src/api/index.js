@@ -1,8 +1,6 @@
-import {stateCounter} from "./state";
-
 export const apiURL = (process.env.REACT_APP_SERVER_URL || 'http://localhost:8000') + '/api/v1';
 
-export const routes = {
+export const voteAPIRoutes = {
     login: "/auth/code/token/",
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
@@ -10,7 +8,7 @@ export const routes = {
     electionList: "/vote/elections/",
 }
 
-export async function makeRequest(url = '', type = '',data = null,  headers = {'Content-Type': 'application/json'}) {
+export async function makeRequest(url = '', type = '', data = null, headers = {'Content-Type': 'application/json'}) {
     let request = {
         method: type,
         mode: 'cors',
@@ -27,10 +25,10 @@ export async function makeRequest(url = '', type = '',data = null,  headers = {'
     return await fetch(apiURL + url, request);
 }
 
-export async function makeAuthenticatedRequest(url = '',  type = '', data = null) {
-    let token = loadToken();
+export async function makeAuthenticatedVoterRequest(url = '', type = '', data = null) {
+    let token = loadVoterToken();
     if (!isTokenValid(token.access)) {
-        token = await refreshToken();
+        token = await refreshVoterToken();
     }
     const headers = {
         'Content-Type': 'application/json',
@@ -51,55 +49,54 @@ export const isTokenValid = (token) => {
     return new Date(tokenPayload.exp * 1000) >= new Date()
 }
 
-export const loadToken = () => {
-    return JSON.parse(localStorage.getItem("token"));
+export const loadVoterToken = () => {
+    return JSON.parse(localStorage.getItem("voterToken"));
 }
 
-export const refreshToken = async () => {
-    const response = await makeRequest(routes.refreshToken, 'POST', {
-        refresh: loadToken().refresh
+export const refreshVoterToken = async () => {
+    const response = await makeRequest(voteAPIRoutes.refreshToken, 'POST', {
+        refresh: loadVoterToken().refresh
     })
 
     if (response.status < 300) {
         const token = await response.json();
-        localStorage.setItem("token", JSON.stringify(token));
+        localStorage.setItem("voterToken", JSON.stringify(token));
         return token;
     } else {
         // TODO: error
     }
 }
 
-export const login = async (code) => {
-    localStorage.removeItem("token");
-    const response = await makeRequest(routes.login, 'POST', {access_code: code});
+export const loginVoter = async (code) => {
+    localStorage.removeItem("voterToken");
+    const response = await makeRequest(voteAPIRoutes.login, 'POST', {access_code: code});
 
     if (response.status < 300) {
         const token = await response.json();
-        localStorage.setItem("token", JSON.stringify(token));
+        localStorage.setItem("voterToken", JSON.stringify(token));
         return token;
     } else {
         throw Error("error logging in")
     }
 }
 
-export const logout = async () => {
-    stateCounter.counter++;
-    localStorage.removeItem("token");
+export const logoutVoter = async () => {
+    localStorage.removeItem("voterToken");
     return true;
 }
 
 export const fetchVoterInfo = async () => {
-    const response = await makeAuthenticatedRequest(routes.voterInfo, 'GET');
+    const response = await makeAuthenticatedVoterRequest(voteAPIRoutes.voterInfo, 'GET');
     return await response.json();
 }
 
 export const fetchElections = async () => {
-    const response = await makeAuthenticatedRequest(routes.electionList, 'GET');
+    const response = await makeAuthenticatedVoterRequest(voteAPIRoutes.electionList, 'GET');
     return await response.json();
 }
 
 export const performVote = async (election, vote) => {
-    const response = await makeAuthenticatedRequest(`/vote/elections/${election.id}/perform_vote/`, 'POST', vote);
+    const response = await makeAuthenticatedVoterRequest(`/vote/elections/${election.id}/perform_vote/`, 'POST', vote);
 
     if (response.status === 204) {
         return true;
@@ -109,7 +106,7 @@ export const performVote = async (election, vote) => {
 }
 
 export const updateApplication = async (election, application) => {
-    const response = await makeAuthenticatedRequest(`/vote/elections/${election.id}/application/`, 'POST', application);
+    const response = await makeAuthenticatedVoterRequest(`/vote/elections/${election.id}/application/`, 'POST', application);
 
     if (response.status === 200) {
         return true;
@@ -119,7 +116,7 @@ export const updateApplication = async (election, application) => {
 }
 
 export const deleteApplication = async (election) => {
-    const response = await makeAuthenticatedRequest(`/vote/elections/${election.id}/application/`, 'DELETE');
+    const response = await makeAuthenticatedVoterRequest(`/vote/elections/${election.id}/application/`, 'DELETE');
 
     if (response.status === 204) {
         return true;

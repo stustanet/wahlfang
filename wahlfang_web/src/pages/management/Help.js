@@ -1,0 +1,139 @@
+import React from "react";
+import Layout from "../../components/Layout";
+import {Link} from "react-router-dom";
+
+export default function Help() {
+    return (
+        <Layout title="Help Management">
+
+            <div className="card shadow">
+                <div className="card-header  bg-dark text-light">
+                    <h3 className="d-inline">Help Page - Management</h3>
+                </div>
+                <div className="card-body">
+
+                    <h3>Contents</h3>
+                    <ol>
+                        <li>Create an Account</li>
+                        <li>Sessions and Elections</li>
+                        <li>Advanced Features</li>
+                    </ol>
+
+
+                    <p className="just">This is the management documentation. In case you are a voter and just want to
+                        know how to
+                        participate in a vote please consider <Link to="/help">the voter help page</Link>.
+                    </p>
+                    <h2>Create an Account</h2>
+                    <p className="just">
+                        If you are a member of StuStaNet you are free to create an account for Wahlfang. The following
+                        steps
+                        will guide you to create your own account:</p>
+                    <ol className="just">
+                        <li>Get your membership card at our <a href="https://stustanet.de/en/officehours/">office
+                            hours</a></li>
+                        <li>On the membership card is a number and a password which you can use to login on <a
+                            href="https://account.stustanet.de">accounts.stusta.de</a>.
+                        </li>
+                        <li>Go to "Services", click the checkbox for "wahlfang (online voting tool)" and click the reset
+                            button.
+                        </li>
+                        <li>Remember the password and username which should be firstname.lastname</li>
+                        <li>Then you might need to wait a few minutes until your account gets activated</li>
+                    </ol>
+                    Now, you can go to <Link to="/management">the management login page</Link> and use your
+                    credentials to login.
+
+                    <h2>Sessions and Elections</h2>
+                    <p>Our system is structured into voting sessions which have several elections and the same set of
+                        voters. A
+                        common case for this setup is given during organizational meetings like Heimräte where members
+                        decide about
+                        new offices or spendings of the organization. Voters are usually invited to sessions via email
+                        but can
+                        also be invited via mail with a QR-code or with a token.</p>
+
+                    <h3>Session</h3>
+                    <p>Thus, the first thing is to create a new Session. The session can have a name, a starting date
+                        and a
+                        meeting
+                        URL. The starting date and meeting URL will be display in the invitation. Furthermore, the
+                        meeting URL will
+                        be displayed for the voters in the election view. The session setting can also be changed later
+                        on.</p>
+                    <h3>Election</h3>
+                    <p>After a session has been created one can start adding elections. However, if they are not known
+                        beforehand
+                        it possible to add
+                        a new election at any point. An election can have a name a start time an end time and a maximal
+                        number of
+                        yes votes. Start and end time are both optional.
+                        An election can be started/stopped at any time before the actual given times. If no end time is
+                        given the
+                        default election length is 5 minutes. The maximal number of yes votes is also optional. If no
+                        number is
+                        given
+                        the participants can vote yes for every option/candidate.</p>
+                    <p>Once an election is created, one can click on the election to add options/applicants for the
+                        election. This
+                        view also allows to start and stop the election. When the election is over due to the time limit
+                        or has been
+                        stopped manually the results can be published to the voters.</p>
+                    <h3>Voters</h3>
+                    <p>One can add voters to the election on the session's view. There are three ways to add voters:</p>
+                    <ol>
+                        <li>Via E-Mail invitation: Gather all emails and paste them into the "Add Voters" page one by
+                            one
+                        </li>
+                        <li>Via CSV: Similar to email but can be used to add a lot more participants. This method also
+                            allows to
+                            specify the voters name for a personal invitation
+                        </li>
+                        <li>Via Token: Just add the number of voters where you do not have an email and click "Download
+                            Tokens" on
+                            the hamburger menu. This will create a pdf file that you can print out or send the code via
+                            messenger.
+                        </li>
+                    </ol>
+
+                    <p>Furthermore, it is possible to create a spectator link for all people who are not allowed to cast
+                        a vote
+                        themselves but still want to observe the election's outcome. To create a public link to a side
+                        that just
+                        displays the published results (voters can also only see the results once they are published) go
+                        to the
+                        upper hamburger menu in the session's view and click "Public Spectator Link".
+                        You can now create a link (to which you can also remove the access later on) and distribute
+                        it.</p>
+
+                    <h2>Advanced Features</h2>
+                    <p>The creation pages of sessions and elections have a drop down menu for advanced options which
+                        will be
+                        explained in this section</p>
+                    <h3>Sessions</h3>
+                    <p>In the advanced options of the creation of a session (and also in the edit page) it is possible
+                        to
+                        customize the invite text which is sent to the voters. The table shows variables which can be
+                        used like the
+                        meeting url. Variables shall be used in python format string snytax in the text
+                        e.g. &#123;variable_name&#125;. Once
+                        finished a test email can be send to your email address to check if
+                        all variables render correctly.</p>
+                    <h3>Elections</h3>
+                    <p>When creating an election you can also specify if abstention votes should be disabled.
+                        Furthermore, you can
+                        allow voters to apply themselves. In this way they dont need to be added maually which is useful
+                        for
+                        elections where applicants can apply during the meeting. Furthermore, it is also possible to
+                        send a reminder
+                        email when the election starts. This, however, is only really
+                        useful when the election starts several days after the invitation e.g. because people are
+                        welcomed to apply
+                        for the election. As for sessions it is again possible to customize this remind email with the
+                        same syntax
+                        explained above.</p>
+                </div>
+            </div>
+        </Layout>
+    )
+}

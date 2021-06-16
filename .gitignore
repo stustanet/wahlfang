@@ -1,8 +1,10 @@
-/venv/
+.mypy_cache
+/venv
 *.pyc
 .idea
 *.sqlite3
 /media
+/node_modules
 /build
 /dist
 wahlfang.egg-info

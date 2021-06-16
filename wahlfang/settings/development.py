@@ -10,11 +10,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SECRET_KEY = '$rl7hy0b_$*7py@t0-!^%gdlqdv0f%1+h2s%rza@=2h#1$y1vw'
 
 DEBUG = True
-# will output to your console
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s',
-)
+
+INSTALLED_APPS += ['corsheaders']
+MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 DATABASES = {
     'default': {

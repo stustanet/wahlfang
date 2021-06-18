@@ -10,7 +10,7 @@
     {% endif %}
     <hr>
     <div class="list-group mt-3">
-      {% if election.closed and election.result_published == '1' %}
+      {% if election.closed and not election.result_unpublished %}
         <div class="alert alert-info" role="alert">
           <h4 class="alert-heading">Election result:</h4>
           <hr>

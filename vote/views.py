@@ -73,8 +73,8 @@ def index(request):
 
     open_elections = sorted([e for e in elections if e[0].is_open], key=date_desc)
     upcoming_elections = sorted([e for e in elections if not e[0].started], key=date_asc)
-    published_elections = sorted([e for e in elections if e[0].closed and int(e[0].result_published)], key=date_desc)
-    closed_elections = sorted([e for e in elections if e[0].closed and not int(e[0].result_published)], key=date_desc)
+    published_elections = sorted([e for e in elections if e[0].closed and not e[0].result_unpublished], key=date_desc)
+    closed_elections = sorted([e for e in elections if e[0].closed and e[0].result_unpublished], key=date_desc)
     context = {
         'title': voter.session.title,
         'meeting_link': voter.session.meeting_link,

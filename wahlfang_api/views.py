@@ -6,15 +6,17 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.views import TokenViewBase
 
+from vote.forms import VoteForm
+from vote.models import Election, Voter, Application, Session
 from wahlfang_api.authentication import IsVoter
 from wahlfang_api.serializers import (
     TokenObtainVoterSerializer,
     TokenObtainElectionManagerSerializer,
     ElectionSerializer,
-    VoterDetailSerializer, EditApplicationSerializer
+    VoterDetailSerializer,
+    EditApplicationSerializer,
+    SpectatorSessionSerializer
 )
-from vote.forms import VoteForm
-from vote.models import Election, Voter, Application
 
 
 class TokenObtainVoterView(TokenViewBase):
@@ -42,6 +44,14 @@ class VoterInfoView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class SpectatorView(generics.RetrieveAPIView):
+    queryset = Session.objects.all()
+    serializer_class = SpectatorSessionSerializer
+
+    def get_object(self):
+        return self.queryset.get(spectator_token=self.kwargs['uuid'])
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):

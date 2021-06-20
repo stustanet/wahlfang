@@ -93,6 +93,14 @@ class ElectionSerializer(serializers.ModelSerializer):
         return self.context['request'].user.can_vote(obj)
 
 
+class SpectatorElectionSerializer(serializers.ModelSerializer):
+    election_summary = ElectionSummarySerializer(source='public_election_summary', many=True, read_only=True)
+
+    class Meta:
+        model = Election
+        fields = '__all__'
+
+
 class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
@@ -105,3 +113,11 @@ class VoterDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Voter
         exclude = ['logged_in', 'password']
+
+
+class SpectatorSessionSerializer(serializers.ModelSerializer):
+    elections = SpectatorElectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Session
+        fields = ['title', 'meeting_link', 'elections']

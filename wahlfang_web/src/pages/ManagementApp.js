@@ -16,29 +16,27 @@ export default function ManagementApp() {
     const {path} = useRouteMatch();
 
     useEffect(() => {
-        if (loading && !authenticated) {
-            const authToken = loadManagerToken();
-            if (authToken && isTokenValid(authToken.access)) {
-                setAuthenticated(true);
-                setLoading(false);
-                managementWS.initWs();
-                console.log("found valid access token");
-            } else if (authToken && isTokenValid(authToken.refresh)) {
-                console.log("found valid refresh token");
-                refreshManagerToken()
-                    .then(() => {
-                        setAuthenticated(true);
-                        setLoading(false);
-                        managementWS.initWs();
-                    })
-                    .catch(() => {
-                        setLoading(false);
-                    })
-            } else {
-                setLoading(false);
-            }
+        const authToken = loadManagerToken();
+        if (authToken && isTokenValid(authToken.access)) {
+            setAuthenticated(true);
+            setLoading(false);
+            managementWS.initWs();
+            console.log("found valid access token");
+        } else if (authToken && isTokenValid(authToken.refresh)) {
+            console.log("found valid refresh token");
+            refreshManagerToken()
+                .then(() => {
+                    setAuthenticated(true);
+                    setLoading(false);
+                    managementWS.initWs();
+                })
+                .catch(() => {
+                    setLoading(false);
+                })
+        } else {
+            setLoading(false);
         }
-    }, [loading, setLoading, authenticated, setAuthenticated])
+    }, [setLoading, setAuthenticated])
 
     return (
         <>

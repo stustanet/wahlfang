@@ -21,31 +21,27 @@ export default function VoteApp() {
     const [loading, setLoading] = useState(!authenticated);
 
     useEffect(() => {
-        if (loading && !authenticated) {
-            const authToken = loadVoterToken();
-            if (authToken && isTokenValid(authToken.access)) {
-                setAuthenticated(true);
-                setLoading(false);
-                voterWS.initWs();
-                console.log("found valid access token");
-            } else if (authToken && isTokenValid(authToken.refresh)) {
-                console.log("found valid refresh token");
-                refreshVoterToken()
-                    .then(() => {
-                        setAuthenticated(true);
-                        setLoading(false);
-                        voterWS.initWs();
-                    })
-                    .catch(() => {
-                        setLoading(false);
-                    })
-            } else {
-                setLoading(false);
-            }
+        const authToken = loadVoterToken();
+        if (authToken && isTokenValid(authToken.access)) {
+            setAuthenticated(true);
+            setLoading(false);
+            voterWS.initWs();
+            console.log("found valid access token");
+        } else if (authToken && isTokenValid(authToken.refresh)) {
+            console.log("found valid refresh token");
+            refreshVoterToken()
+                .then(() => {
+                    setAuthenticated(true);
+                    setLoading(false);
+                    voterWS.initWs();
+                })
+                .catch(() => {
+                    setLoading(false);
+                })
+        } else {
+            setLoading(false);
         }
-    }, [loading, setLoading, authenticated, setAuthenticated])
-
-    console.log("vote app loading:", loading);
+    }, [setLoading, setAuthenticated])
 
     return (
         <>

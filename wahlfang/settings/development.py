@@ -32,6 +32,12 @@ EMAIL_SENDER = 'no-reply@stusta.de'
 EMAIL_PORT = 25
 
 # LDAP
+AUTHENTICATION_BACKENDS = {
+    'vote.authentication.AccessCodeBackend',
+    'management.authentication.ManagementBackend',
+    'management.authentication.ManagementBackendLDAP',  # this authentication backend must be enabled for ldap auth
+    'django.contrib.auth.backends.ModelBackend'
+}
 AUTH_LDAP_SERVER_URI = "ldap://ldap.stusta.de"
 AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=account,ou=pnyx,dc=stusta,dc=mhn,dc=de"
 AUTH_LDAP_START_TLS = True

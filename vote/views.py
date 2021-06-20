@@ -21,7 +21,6 @@ class LoginView(auth_views.LoginView):
     redirect_authenticated_user = False
 
     def get(self, request, *args, **kwargs):
-        print(request, args)
         u = request.user
         if u.is_authenticated and isinstance(u, Voter):
             return redirect('vote:index')

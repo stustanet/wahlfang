@@ -1,6 +1,8 @@
 # Wahlfang
+[![PyPI version shields.io](https://img.shields.io/pypi/v/wahlfang.svg)](https://pypi.python.org/pypi/wahlfang/)
+
 > A self-hostable online voting tool developed to include all the 
-> features you would need to hold any online election you can dream of
+> features you would need to hold any online election you can dream of.
 
 Developed by [StuStaNet](https://stustanet.de) Wahlfang is a small-ish Django project
 which aims at being an easy to use solution for online elections. From simple one-time

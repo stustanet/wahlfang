@@ -20,6 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('vote.urls', namespace='vote')),
     path('management/', include('management.urls', namespace='management')),
+    path('api/v1/', include('wahlfang_api.urls', namespace='v1')),  # this namespace name is passed as request.version
 
     # prometheus metrics
     path('', include('django_prometheus.urls')),

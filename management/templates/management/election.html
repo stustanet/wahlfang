@@ -67,35 +67,35 @@
           </div>
         {% endif %}
       </div>
-        <div class="card shadow mt-4">
-            <div class="card-body">
-                {% if not election.closed %}
-                    <h4>
-                        {% if election.voters_self_apply %}Applicants{% else %}Options{% endif %}
-                        {% if election.can_apply %}
-                            <a class="btn btn-success float-right" role="button"
-                               href="{% url 'management:add_application' election.pk %}">
-                                {% if election.voters_self_apply %}Add applicant{% else %}Add option{% endif %}
-                            </a>
-                        {% endif %}
-                    </h4>
+      <div class="card shadow mt-4">
+        <div class="card-body">
+          {% if not election.closed %}
+            <h4>
+              {% if election.voters_self_apply %}Applicants{% else %}Options{% endif %}
+              {% if election.can_apply %}
+                <a class="btn btn-success float-right" role="button"
+                   href="{% url 'management:add_application' election.pk %}">
+                  {% if election.voters_self_apply %}Add applicant{% else %}Add option{% endif %}
+                </a>
+              {% endif %}
+            </h4>
 
-                    <hr>
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for application in applications %}
-                            <tr>
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td>{{ application.get_display_name }}</td>
-                                <td>
-                                    {% if election.can_apply %}
+            <hr>
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
+                <th scope="col"></th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for application in applications %}
+                <tr>
+                  <th scope="row">{{ forloop.counter }}</th>
+                  <td>{{ application.get_display_name }}</td>
+                  <td>
+                    {% if election.can_apply %}
                       <form
                           action="{% url 'management:delete_application' pk=election.pk application_id=application.pk %}"
                           method="post">
@@ -119,14 +119,15 @@
           {% else %}
             <h4>Result</h4>
             {% include 'management/results.html' %}
-            <hr>
-            <h5>Publish result</h5>
-            <form action="{% url 'management:election' election.pk %}" method="post">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="publish">
-              {{ election_upload_application_form |crispy }}
-              <button type="submit" class="btn btn-info">Apply</button>
-            </form>
+
+            {% if election.result_unpublished %}
+              <hr>
+              <form action="{% url 'management:election' election.pk %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="publish">
+                <button type="submit" class="btn btn-info">Publish Results</button>
+              </form>
+            {% endif %}
             <hr>
             <a href="{% url 'management:export_csv' election.pk %}" class="btn btn-primary mr-2">Export result as
               CSV</a>

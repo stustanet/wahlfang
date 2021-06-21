@@ -29,7 +29,6 @@ from management.forms import (
     AddVotersForm,
     ApplicationUploadForm,
     StopElectionForm,
-    ChangeElectionPublicStateForm,
     AddTokensForm,
     CSVUploaderForm,
     SessionSettingsForm
@@ -95,8 +94,8 @@ def session_detail(request, pk=None):
     existing_elections = bool(elections)
     open_elections = [e for e in elections if e.is_open]
     upcoming_elections = [e for e in elections if not e.started]
-    published_elections = [e for e in elections if e.closed and int(e.result_published)]
-    closed_elections = [e for e in elections if e.closed and not int(e.result_published)]
+    published_elections = [e for e in elections if e.closed and not e.result_unpublished]
+    closed_elections = [e for e in elections if e.closed and e.result_unpublished]
     context = {
         'session': session,
         'existing_elections': existing_elections,
@@ -229,7 +228,6 @@ def election_detail(request, pk):
         'applications': election.applications.all(),
         'stop_election_form': StopElectionForm(instance=election),
         'start_election_form': StartElectionForm(instance=election),
-        'election_upload_application_form': ChangeElectionPublicStateForm(instance=election)
     }
 
     if request.POST and request.POST.get('action') == 'close' and election.is_open:
@@ -250,10 +248,8 @@ def election_detail(request, pk):
             context['start_election_form'] = form
 
     if request.POST and request.POST.get('action') == 'publish':
-        form = ChangeElectionPublicStateForm(instance=election, data=request.POST)
-        if form.is_valid():
-            form.save()
-            context['election_upload_application_form'] = form
+        election.result_unpublished = False
+        election.save()
 
     return render(request, template_name='management/election.html', context=context)
 

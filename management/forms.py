@@ -44,18 +44,6 @@ class StopElectionForm(forms.ModelForm):
         return instance
 
 
-class ChangeElectionPublicStateForm(forms.ModelForm):
-    class Meta:
-        model = Election
-        fields = ['result_published']
-        widgets = {
-            'result_published': forms.RadioSelect
-        }
-        labels = {
-            'result_published': '',
-        }
-
-
 class TemplateStringForm:
     def clean_email_text(self, test_data: List[str], field: str):
         """
@@ -220,7 +208,7 @@ class AddElectionForm(forms.ModelForm, TemplateStringForm):
         model = Election
         fields = (
             'title', 'start_date', 'end_date', 'session', 'max_votes_yes', 'voters_self_apply', 'send_emails_on_start',
-            'remind_text', 'disable_abstention')
+            'remind_text', 'disable_abstention', 'result_unpublished')
 
         labels = {
             'title': 'Election Name',
@@ -232,6 +220,7 @@ class AddElectionForm(forms.ModelForm, TemplateStringForm):
             'disable_abstention': 'Disable the option to abstain in this election<br>'
                                   '(only YES and NO votes will be allowed)',
             'remind_text': '',
+            'result_unpublished': 'Disable auto publish of the election results',
         }
 
     def clean_remind_text(self):

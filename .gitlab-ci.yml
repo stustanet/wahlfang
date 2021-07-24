@@ -7,8 +7,8 @@ stages:
   - release
 
 variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic"
 
 all_tests:
   stage: test
@@ -105,4 +105,17 @@ release_job:
         - name: "wahlfang-${CI_COMMIT_TAG}.tar.gz"
           url: "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/wahlfang.tar.gz"
 
-# TODO: automatically push to pypi.org when generating a release
+publish_job:
+  stage: release
+  needs:
+    - job: package
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG # only run when we publish a new tag
+  before_script:
+    - pip3 install virtualenv
+    - virtualenv -q .venv
+    - source .venv/bin/activate
+    - pip install -U twine
+  script:
+    - python -m twine upload dist/*

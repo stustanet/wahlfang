@@ -53,6 +53,14 @@ $ python3 wahlfang/manage.py migrate
 ```
 Don't forget to add the new migration file to git. If the CI pipeline fails this is most likely the reason for it.
 
+## Releasing
+The release process is automated in the gitlab ci.
+
+To make a new release bump the package version number in `wahlfang.__init__.py` and tag the commit with the same version
+number. The CI will then build the package, publish it as a gitlab release and push it to pypi.
+
+The pypi credentials must be set in the gitlab CI settings via the env variables `TWINE_USERNAME` and `TWINE_PASSWORD`.
+
 ## Development References
 
 - Django 3: https://docs.djangoproject.com/en/3.2/

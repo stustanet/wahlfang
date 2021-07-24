@@ -118,4 +118,4 @@ publish_job:
     - source .venv/bin/activate
     - pip install -U twine
   script:
-    - python -m twine upload dist/*
+    - python -m twine upload dist/* -u $TWINE_USERNAME -p $TWINE_PASSWORD --non-interactive

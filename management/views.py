@@ -243,7 +243,7 @@ def election_detail(request, pk):
             context['start_election_form'] = form
 
     if request.POST and request.POST.get('action') == 'publish':
-        election.result_unpublished = False
+        election.result_published = True
         election.save()
 
     return render(request, template_name='management/election.html', context=context)

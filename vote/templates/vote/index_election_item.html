@@ -24,7 +24,7 @@
     <div class="list-group mt-3">
       {% if can_vote %}
         <a class="btn btn-primary" role="button" href="{% url 'vote:vote' election.pk %}">Vote Now!</a>
-      {% elif election.closed and not election.result_unpublished %}
+      {% elif election.closed and election.result_published %}
         <div class="alert alert-info" role="alert">
           <h4 class="alert-heading">Voting Ended:</h4>
           <hr>

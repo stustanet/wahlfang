@@ -1,7 +1,8 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.test import TestCase
 from django.utils import timezone
+from freezegun import freeze_time
 
 from vote.models import Election, Enc32, Voter, Session
 from vote.selectors import closed_elections, open_elections, published_elections, upcoming_elections
@@ -27,10 +28,11 @@ class VoterTestCase(TestCase):
 
 class ElectionSelectorsTest(TestCase):
     def test_election_selectors(self) -> None:
-        now = timezone.now()  # but why does freezegun not work in the query sets
-        before = now - timedelta(minutes=50)
-        bbefore = now - timedelta(minutes=100)
-        after = now + timedelta(minutes=50)
+        now = datetime(year=2021, month=4, day=1, tzinfo=timezone.get_fixed_timezone(5))
+        before = now - timedelta(seconds=5)
+        bbefore = now - timedelta(seconds=10)
+        after = now + timedelta(seconds=5)
+        freeze_time(now).start()
 
         session = Session.objects.create(title="TEST")
         # upcoming elections
@@ -44,9 +46,9 @@ class ElectionSelectorsTest(TestCase):
         # published elections
         all_published = set()
         all_published.add(Election.objects.create(session=session, start_date=bbefore, end_date=before,
-                                                  result_unpublished=False))
+                                                  result_published=True))
         all_published.add(Election.objects.create(session=session, start_date=before, end_date=now,
-                                                  result_unpublished=False))
+                                                  result_published=True))
         # closed (not published) elections
         all_closed = set()
         all_closed.add(Election.objects.create(session=session, start_date=bbefore, end_date=before))
@@ -68,13 +70,13 @@ class ElectionSelectorsTest(TestCase):
         published = published_elections(session)
         self.assertEqual(all_published, set(published))
         for e in published:
-            self.assertTrue(e.started and e.closed and not e.is_open and not e.result_unpublished)
+            self.assertTrue(e.started and e.closed and not e.is_open and e.result_published)
 
         # test closed
         closed = closed_elections(session)
         self.assertEqual(all_closed, set(closed))
         for e in closed:
-            self.assertTrue(e.started and e.closed and not e.is_open and e.result_unpublished)
+            self.assertTrue(e.started and e.closed and not e.is_open and not e.result_published)
 
 
 def gen_data():

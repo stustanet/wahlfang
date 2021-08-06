@@ -24,8 +24,8 @@ def _closed_elections(session: Session):
 
 
 def published_elections(session: Session):
-    return _closed_elections(session).filter(result_unpublished=False)
+    return _closed_elections(session).filter(result_published=True)
 
 
 def closed_elections(session: Session):
-    return _closed_elections(session).filter(result_unpublished=True)
+    return _closed_elections(session).filter(result_published=False)

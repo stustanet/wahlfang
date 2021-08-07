@@ -97,8 +97,8 @@ class Election(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
-    result_unpublished = models.BooleanField(null=False, default=True)
-    disable_abstention = models.BooleanField(default=False)
+    result_published = models.BooleanField(null=False, default=False)
+    enable_abstention = models.BooleanField(default=True)
     voters_self_apply = models.BooleanField(default=False)
     send_emails_on_start = models.BooleanField(default=False)
     remind_text = models.TextField(max_length=8000, blank=True, null=True)
@@ -107,24 +107,24 @@ class Election(models.Model):
     @property
     def started(self):
         if self.start_date is not None:
-            return timezone.now() > self.start_date
+            return timezone.now() >= self.start_date
 
         return False
 
     @property
     def closed(self):
         if self.end_date:
-            return self.end_date < timezone.now()
+            return self.end_date <= timezone.now()
 
         return False
 
     @property
     def is_open(self):
         if self.start_date and self.end_date:
-            return self.start_date < timezone.now() < self.end_date
+            return self.start_date <= timezone.now() < self.end_date
 
         if self.start_date:
-            return self.start_date < timezone.now()
+            return self.start_date <= timezone.now()
 
         return False
 
@@ -134,10 +134,6 @@ class Election(models.Model):
             return timezone.now() < self.start_date
 
         return True
-
-    @property
-    def applications(self):
-        return Application.objects.filter(election=self)
 
     @property
     def election_summary(self):
@@ -163,9 +159,9 @@ class Election(models.Model):
         return self.open_votes.count()
 
     def number_votes_cast(self):
-        if self.applications.count() == 0:
+        if self.applications.all().count() == 0:
             return 0
-        return int(self.votes.count() / self.applications.count())
+        return int(self.votes.count() / self.applications.all().count())
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(force_insert, force_update, using, update_fields)
@@ -290,8 +286,11 @@ class Voter(models.Model):
     def is_active(self):
         return self.has_usable_password()
 
-    def can_vote(self, election):
+    def can_vote(self, election: Election):
         return election.is_open and OpenVote.objects.filter(voter_id=self.voter_id, election_id=election.id).exists()
+
+    def has_applied(self, election: Election):
+        return self.applications.filter(election=election).exists()
 
     @property
     def is_staff(self):
@@ -458,10 +457,10 @@ def avatar_file_name(instance, filename):
 class Application(models.Model):
     text = models.TextField(max_length=250, blank=True)
     avatar = models.ImageField(upload_to=avatar_file_name, null=True, blank=True)
-    election = models.ForeignKey(Election, related_name='application', on_delete=models.CASCADE)
+    election = models.ForeignKey(Election, related_name='applications', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=256)
     email = models.EmailField(null=True, blank=True)
-    voter = models.ForeignKey(Voter, related_name="application", null=True, blank=True, on_delete=models.CASCADE)
+    voter = models.ForeignKey(Voter, related_name="applications", null=True, blank=True, on_delete=models.CASCADE)
 
     _old_avatar = None
 

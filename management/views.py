@@ -34,6 +34,7 @@ from management.forms import (
     SessionSettingsForm
 )
 from vote.models import Election, Application, Voter
+from vote.selectors import open_elections, upcoming_elections, published_elections, closed_elections
 
 logger = logging.getLogger('management.view')
 
@@ -90,19 +91,13 @@ def index(request):
 def session_detail(request, pk=None):
     manager = request.user
     session = manager.sessions.get(id=pk)
-    elections = session.elections.order_by('pk')
-    existing_elections = bool(elections)
-    open_elections = [e for e in elections if e.is_open]
-    upcoming_elections = [e for e in elections if not e.started]
-    published_elections = [e for e in elections if e.closed and not e.result_unpublished]
-    closed_elections = [e for e in elections if e.closed and e.result_unpublished]
     context = {
         'session': session,
-        'existing_elections': existing_elections,
-        'open_elections': open_elections,
-        'upcoming_elections': upcoming_elections,
-        'published_elections': published_elections,
-        'closed_elections': closed_elections,
+        'existing_elections': bool(session.elections),
+        'open_elections': open_elections(session),
+        'upcoming_elections': upcoming_elections(session),
+        'published_elections': published_elections(session),
+        'closed_elections': closed_elections(session),
         'voters': session.participants.all()
     }
     return render(request, template_name='management/session.html', context=context)
@@ -248,7 +243,7 @@ def election_detail(request, pk):
             context['start_election_form'] = form
 
     if request.POST and request.POST.get('action') == 'publish':
-        election.result_unpublished = False
+        election.result_published = True
         election.save()
 
     return render(request, template_name='management/election.html', context=context)

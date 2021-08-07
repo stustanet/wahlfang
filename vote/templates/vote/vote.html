@@ -49,7 +49,7 @@
                         <thead class="thead-light">
                         <tr>
                             <th>{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
-                            {% if not election.disable_abstention %}
+                            {% if election.enable_abstention %}
                                 <th class="choice text-center">Abstention</th>
                             {% endif %}
                             <th class="choice text-center text-success">YES</th>

@@ -3,3 +3,4 @@ pylint~=2.8
 pylint-django~=2.4
 django-stubs
 build
+freezegun

@@ -61,12 +61,12 @@ class VoteBoundField(forms.BoundField):
 
 
 class VoteField(forms.ChoiceField):
-    def __init__(self, *, application, disable_abstention=False, **kwargs):
+    def __init__(self, *, application, enable_abstention=True, **kwargs):
         super().__init__(
             label=application.get_display_name(),
-            choices=VOTE_CHOICES_NO_ABSTENTION if disable_abstention else VOTE_CHOICES,
+            choices=VOTE_CHOICES if enable_abstention else VOTE_CHOICES_NO_ABSTENTION,
             widget=forms.RadioSelect(),
-            initial=None if disable_abstention else VOTE_ABSTENTION,
+            initial=VOTE_ABSTENTION if enable_abstention else None,
             **kwargs
         )
         self.application = application
@@ -84,14 +84,14 @@ class VoteForm(forms.Form):
         if self.election.max_votes_yes is not None:
             self.max_votes_yes = self.election.max_votes_yes
         else:
-            self.max_votes_yes = self.election.applications.count()
+            self.max_votes_yes = self.election.applications.all().count()
 
         # dynamically construct form fields
-        for application in self.election.applications:
+        for application in self.election.applications.all():
             self.fields[f'{application.pk}'] = VoteField(application=application,
-                                                         disable_abstention=self.election.disable_abstention)
+                                                         enable_abstention=self.election.enable_abstention)
 
-        self.num_applications = len(self.election.applications)
+        self.num_applications = self.election.applications.all().count()
 
     def clean(self):
         super().clean()

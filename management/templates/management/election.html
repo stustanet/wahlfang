@@ -120,7 +120,7 @@
             <h4>Result</h4>
             {% include 'management/results.html' %}
 
-            {% if election.result_unpublished %}
+            {% if not election.result_published %}
               <hr>
               <form action="{% url 'management:election' election.pk %}" method="post">
                 {% csrf_token %}

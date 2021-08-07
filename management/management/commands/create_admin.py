@@ -60,4 +60,4 @@ class Command(BaseCommand):
 
         manager.save()
         self.stdout.write(self.style.SUCCESS(
-            f'Successfully created management login with username {username}, email {email}, password: {password}'))
+            f'Successfully created management login with username: {username}, email: {email}'))

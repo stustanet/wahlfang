@@ -11,6 +11,7 @@ from ratelimit.decorators import ratelimit
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, VoteForm, ApplicationUploadFormUser
 from vote.models import Election, Voter, Session
+from vote.selectors import open_elections, upcoming_elections, published_elections, closed_elections
 
 
 class LoginView(auth_views.LoginView):
@@ -57,32 +58,23 @@ def code_login(request, access_code=None):
 
 @voter_login_required
 def index(request):
-    voter = request.user
-    elections = [
-        (e, voter.can_vote(e), voter.application.filter(election=e).exists())
-        for e in voter.session.elections.order_by('pk')
-    ]
+    voter: Voter = request.user
+    session = voter.session
 
-    def date_asc(e):
-        date = e[0].start_date
-        return date.timestamp() if date else sys.maxsize
+    def list_elections(elections):
+        return [
+            (e, voter.can_vote(e), voter.has_applied(e))
+            for e in elections
+        ]
 
-    def date_desc(e):
-        date = e[0].start_date
-        return -date.timestamp() if date else -sys.maxsize
-
-    open_elections = sorted([e for e in elections if e[0].is_open], key=date_desc)
-    upcoming_elections = sorted([e for e in elections if not e[0].started], key=date_asc)
-    published_elections = sorted([e for e in elections if e[0].closed and not e[0].result_unpublished], key=date_desc)
-    closed_elections = sorted([e for e in elections if e[0].closed and e[0].result_unpublished], key=date_desc)
     context = {
-        'title': voter.session.title,
-        'meeting_link': voter.session.meeting_link,
+        'title': session.title,
+        'meeting_link': session.meeting_link,
         'voter': voter,
-        'open_elections': open_elections,
-        'upcoming_elections': upcoming_elections,
-        'published_elections': published_elections,
-        'closed_elections': closed_elections,
+        'open_elections': list_elections(open_elections(session)),
+        'upcoming_elections': list_elections(upcoming_elections(session)),
+        'published_elections': list_elections(published_elections(session)),
+        'closed_elections': list_elections(closed_elections(session)),
     }
 
     # overview
@@ -91,7 +83,7 @@ def index(request):
 
 @voter_login_required
 def vote(request, election_id):
-    voter = request.user
+    voter: Voter = request.user
     try:
         election = voter.session.elections.get(pk=election_id)
     except Election.DoesNotExist:
@@ -99,9 +91,9 @@ def vote(request, election_id):
 
     can_vote = voter.can_vote(election)
     if election.max_votes_yes is not None:
-        max_votes_yes = min(election.max_votes_yes, election.applications.count())
+        max_votes_yes = min(election.max_votes_yes, election.applications.all().count())
     else:
-        max_votes_yes = election.applications.count()
+        max_votes_yes = election.applications.all().count()
 
     context = {
         'title': election.title,
@@ -132,7 +124,7 @@ def apply(request, election_id):
                                                       ' currently not accepted')
         return redirect('vote:index')
 
-    application = voter.application.filter(election__id=election_id)
+    application = voter.applications.filter(election__id=election_id)
     instance = None
     if application.exists():
         instance = application.first()
@@ -158,7 +150,7 @@ def apply(request, election_id):
 def delete_own_application(request, election_id):
     voter = request.user
     election = get_object_or_404(voter.session.elections, pk=election_id)
-    application = voter.application.filter(election__id=election_id)
+    application = voter.applications.filter(election__id=election_id)
     if not election.can_apply:
         messages.add_message(request, messages.ERROR, 'Applications can currently not be deleted')
         return redirect('vote:index')
@@ -176,26 +168,13 @@ def help_page(request):
 
 def spectator(request, uuid):
     session = get_object_or_404(Session.objects, spectator_token=uuid)
-    elections = session.elections.all()
 
-    def date_asc(e):
-        date = e.start_date
-        return date.timestamp() if date else sys.maxsize
-
-    def date_desc(e):
-        date = e.start_date
-        return -date.timestamp() if date else -sys.maxsize
-
-    open_elections = sorted([e for e in elections if e.is_open], key=date_desc)
-    upcoming_elections = sorted([e for e in elections if not e.started], key=date_asc)
-    published_elections = sorted([e for e in elections if e.closed and int(e.result_published)], key=date_desc)
-    closed_elections = sorted([e for e in elections if e.closed and not int(e.result_published)], key=date_desc)
     context = {
         'title': session.title,
         'meeting_link': session.meeting_link,
-        'open_elections': open_elections,
-        'upcoming_elections': upcoming_elections,
-        'published_elections': published_elections,
-        'closed_elections': closed_elections,
+        'open_elections': open_elections(session),
+        'upcoming_elections': upcoming_elections(session),
+        'published_elections': published_elections(session),
+        'closed_elections': closed_elections(session),
     }
     return render(request, template_name='vote/spectator.html', context=context)

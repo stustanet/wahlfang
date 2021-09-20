@@ -1,4 +1,4 @@
-import {loadVoterToken} from "./api";
+import {loadManagerToken} from "./api/management";
 
 export const voterWebsocketURL = 'ws://localhost:8000/api/v1/vote/'
 export const managementWebsocketURL = 'ws://localhost:8000/api/v1/management/'
@@ -10,7 +10,7 @@ export class WahlfangWebsocket {
     }
 
     initWs = () => {
-        const token = loadVoterToken();
+        const token = loadManagerToken();
         const url = this.url + '?token=' + token.access;
         this.ws = new WebSocket(url);
         this.ws.onopen = this.onopen;

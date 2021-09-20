@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {Suspense, useEffect, useState} from 'react';
 import {Route, Switch, useRouteMatch} from "react-router-dom";
 import {useRecoilState} from "recoil";
 import {isManagerAuthenticated} from "../state/management";
 import Loading from "../components/Loading";
 import {isTokenValid} from "../api";
+import LoginManager from './management/Login';
 import {loadManagerToken, refreshManagerToken} from "../api/management";
 import Help from "./management/Help";
 import {managementWS} from "../websocket";
@@ -44,6 +45,11 @@ export default function ManagementApp() {
                 <div id="content">
                     <Header/>
                     <Switch>
+                        <Route exact path={`${path}/login`}>
+                            <Suspense fallback={<Loading/>}>
+                                <LoginManager/>
+                            </Suspense>
+                        </Route>
                         <Route exact path={path}>
                             <Help/>
                         </Route>

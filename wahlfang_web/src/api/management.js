@@ -1,7 +1,7 @@
-import {makeRequest} from "./index";
+import {makeRequest, isTokenValid} from "./index";
 
 export const managementAPIRoutes = {
-    login: "/auth/code/token/",
+    login: "/auth/token/",
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
 }
@@ -21,5 +21,19 @@ export const refreshManagerToken = async () => {
         return token;
     } else {
         // TODO: error
+    }
+}
+
+export const loginManager = async (username, password) => {
+    const response = await makeRequest(managementAPIRoutes.login, 'POST', {
+        username: username,
+        password: password
+    })
+     if (response.status < 300) {
+        const token = await response.json();
+        localStorage.setItem("managerToken", JSON.stringify(token));
+        return token;
+    } else {
+        throw Error("error logging in")
     }
 }

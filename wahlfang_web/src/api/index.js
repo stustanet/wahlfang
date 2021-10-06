@@ -85,11 +85,6 @@ export const logoutVoter = async () => {
     return true;
 }
 
-export const logoutManager = async () => {
-    localStorage.removeItem("managerToken");
-    return true;
-}
-
 export const fetchSpectatorInfo = async (uuid) => {
     const response = await makeRequest(`/vote/spectator/${uuid}/`, 'GET');
     if (response.status === 200) {

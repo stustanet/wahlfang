@@ -37,3 +37,8 @@ export const loginManager = async (username, password) => {
         throw Error("error logging in")
     }
 }
+
+export const logoutManager = async () => {
+    localStorage.removeItem("managerToken");
+    return true;
+}

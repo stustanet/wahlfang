@@ -11,12 +11,14 @@ from wahlfang_api.views import (
     ElectionViewset,
     VoterInfoView,
     SpectatorView,
+    ManagerSessionView
 )
 
 app_name = 'rest_api'
 
 router = routers.SimpleRouter()
 router.register('vote/elections', ElectionViewset)
+router.register('management/add-session', ManagerSessionView)
 
 urlpatterns = [
     path('', include(router.urls)),

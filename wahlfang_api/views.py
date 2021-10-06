@@ -7,6 +7,7 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.views import TokenViewBase
 
 from vote.forms import VoteForm
+from management.forms import AddSessionForm
 from vote.models import Election, Voter, Application, Session
 from wahlfang_api.authentication import IsVoter
 from wahlfang_api.serializers import (
@@ -15,7 +16,8 @@ from wahlfang_api.serializers import (
     ElectionSerializer,
     VoterDetailSerializer,
     EditApplicationSerializer,
-    SpectatorSessionSerializer
+    SpectatorSessionSerializer,
+    SessionSerializer
 )
 
 
@@ -52,6 +54,22 @@ class SpectatorView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.queryset.get(spectator_token=self.kwargs['uuid'])
+
+
+class ManagerSessionView(generics.RetrieveAPIView):
+    queryset = Session.objects.all()
+
+    @action(detail=True, methods=['post'])
+    def create_session(self, request):
+        user = self.request.user.pk
+
+        form = AddSessionForm(request, user, data=request.data)
+        if form.is_valid():
+            form.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(data=form.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):

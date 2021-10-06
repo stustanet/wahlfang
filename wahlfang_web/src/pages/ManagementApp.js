@@ -9,6 +9,8 @@ import {loadManagerToken, refreshManagerToken} from "../api/management";
 import Help from "./management/Help";
 import {managementWS} from "../websocket";
 import Header from "../components/Header";
+import Logout from "./vote/Logout";
+import AuthenticatedRoute from "../components/AuthenticatedRoute";
 
 
 export default function ManagementApp() {
@@ -56,6 +58,13 @@ export default function ManagementApp() {
                         <Route exact path={`${path}/help`}>
                             <Help/>
                         </Route>
+                        <AuthenticatedRoute>
+                            <Route exact path="/logout">
+                                <Suspense fallback={<Loading/>}>
+                                    <Logout/>
+                                </Suspense>
+                            </Route>
+                        </AuthenticatedRoute>
                     </Switch>
                 </div>
             )}

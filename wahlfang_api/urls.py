@@ -18,7 +18,6 @@ app_name = 'rest_api'
 
 router = routers.SimpleRouter()
 router.register('vote/elections', ElectionViewset)
-router.register('management/add-session', ManagerSessionView)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -28,5 +27,6 @@ urlpatterns = [
     path('auth/token/', TokenObtainElectionManagerView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('management/add-session', ManagerSessionView.as_view(), name='add_session'),
     path('drf/', include('rest_framework.urls', namespace='rest_framework'))
 ]

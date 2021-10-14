@@ -9,7 +9,8 @@ from rest_framework_simplejwt.views import TokenViewBase
 from vote.forms import VoteForm
 from management.forms import AddSessionForm
 from vote.models import Election, Voter, Application, Session
-from wahlfang_api.authentication import IsVoter
+from wahlfang_api.authentication import IsVoter, IsElectionManager, ElectionManagerJWTAuthentication, \
+    VoterJWTAuthentication
 from wahlfang_api.serializers import (
     TokenObtainVoterSerializer,
     TokenObtainElectionManagerSerializer,
@@ -40,6 +41,7 @@ class TokenObtainElectionManagerView(TokenViewBase):
 
 
 class VoterInfoView(generics.RetrieveAPIView):
+    authentication_classes = [VoterJWTAuthentication]
     queryset = Voter.objects.all()
     permission_classes = [IsVoter]
     serializer_class = VoterDetailSerializer
@@ -56,23 +58,18 @@ class SpectatorView(generics.RetrieveAPIView):
         return self.queryset.get(spectator_token=self.kwargs['uuid'])
 
 
-class ManagerSessionView(generics.RetrieveAPIView):
+class ManagerSessionView(generics.ListCreateAPIView):
+    authentication_classes = [ElectionManagerJWTAuthentication]
     queryset = Session.objects.all()
+    permission_classes = [IsElectionManager]
+    serializer_class = SessionSerializer
 
-    @action(detail=True, methods=['post'])
-    def create_session(self, request):
-        user = self.request.user.pk
-
-        form = AddSessionForm(request, user, data=request.data)
-        if form.is_valid():
-            form.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        return Response(data=form.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    def perform_create(self, serializer_class):
+        serializer_class.save()
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):
+    authentication_classes = [VoterJWTAuthentication]
     queryset = Election.objects.all()
     permission_classes = [IsVoter]
     serializer_class = ElectionSerializer

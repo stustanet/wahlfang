@@ -5,6 +5,7 @@ import VoteApp from "./pages/VoteApp";
 import ManagementApp from "./pages/ManagementApp";
 import SpectatorView from "./pages/SpectatorView";
 import About from "./pages/About";
+import Help from "./pages/management/Help";
 
 
 function App() {
@@ -28,12 +29,17 @@ function App() {
                                 <ManagementApp/>
                             </Suspense>
                         </Route>
-                        <Route path="/">
-                            <Suspense fallback={<Loading/>}>
-                                <VoteApp/>
-                            </Suspense>
-                        </Route>
-                        <Route path="*">404</Route>
+                        {/*<Route path="/vote" exact={true}>*/}
+                        {/*    <Suspense fallback={<Loading/>}>*/}
+                        {/*        <VoteApp/>*/}
+                        {/*    </Suspense>*/}
+                        {/*</Route>*/}
+                        {/*<Route exact path="/">*/}
+                        {/*    <Suspense fallback={<Loading/>}>*/}
+                        {/*        <Help/>*/}
+                        {/*    </Suspense>*/}
+                        {/*</Route>*/}
+                        {/*<Route>404</Route>*/}
                     </Switch>
                 </Router>
             )}

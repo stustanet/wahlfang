@@ -10,14 +10,14 @@ import Help from "./management/Help";
 import {managementWS} from "../websocket";
 import Header from "../components/Header";
 import Logout from "./vote/Logout";
-import AuthenticatedRoute from "../components/AuthenticatedRoute";
+import ManagerAuthenticatedRoute from "../components/ManagerAuthenticatedRoute";
+import AddSession from "./management/AddSession"
 
 
 export default function ManagementApp() {
     const [authenticated, setAuthenticated] = useRecoilState(isManagerAuthenticated);
     const [loading, setLoading] = useState(!authenticated);
     const {path} = useRouteMatch();
-
     useEffect(() => {
         const authToken = loadManagerToken();
         if (authToken && isTokenValid(authToken.access)) {
@@ -47,24 +47,27 @@ export default function ManagementApp() {
                 <div id="content">
                     <Header/>
                     <Switch>
+                        <Route exact path={path}>
+                            <Help/>
+                        </Route>
                         <Route exact path={`${path}/login`}>
                             <Suspense fallback={<Loading/>}>
                                 <LoginManager/>
                             </Suspense>
                         </Route>
-                        <Route exact path={path}>
-                            <Help/>
-                        </Route>
                         <Route exact path={`${path}/help`}>
                             <Help/>
                         </Route>
-                        <AuthenticatedRoute>
-                            <Route exact path="/logout">
-                                <Suspense fallback={<Loading/>}>
-                                    <Logout/>
-                                </Suspense>
-                            </Route>
-                        </AuthenticatedRoute>
+                        <Route exact path={`${path}/add-session`}>
+                            <AddSession/>
+                        </Route>
+                        <ManagerAuthenticatedRoute>
+                         <Route exact path={`${path}/logout`}>
+                            <Suspense fallback={<Loading/>}>
+                                <Logout/>
+                            </Suspense>
+                        </Route>
+                        </ManagerAuthenticatedRoute>
                     </Switch>
                 </div>
             )}

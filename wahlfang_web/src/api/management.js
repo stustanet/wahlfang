@@ -4,6 +4,7 @@ export const managementAPIRoutes = {
     login: "/auth/token/",
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
+    createSession: "management/add-session",
 }
 
 export const loadManagerToken = () => {
@@ -25,6 +26,7 @@ export const refreshManagerToken = async () => {
 }
 
 export const loginManager = async (username, password) => {
+    console.log(managementAPIRoutes.login)
     const response = await makeRequest(managementAPIRoutes.login, 'POST', {
         username: username,
         password: password
@@ -41,4 +43,13 @@ export const loginManager = async (username, password) => {
 export const logoutManager = async () => {
     localStorage.removeItem("managerToken");
     return true;
+}
+
+export const createSession = async (form_values) => {
+    const response = await makeRequest(managementAPIRoutes.createSession, 'POST', form_values);
+    if (response.status === 204) {
+        return true;
+    } else {
+        throw Error(await response.json())
+    }
 }

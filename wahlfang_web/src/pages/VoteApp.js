@@ -1,5 +1,5 @@
 import React, {Suspense, useEffect, useState} from 'react';
-import {Route, Switch} from "react-router-dom";
+import {Route, Switch, useRouteMatch} from "react-router-dom";
 import {useRecoilState} from "recoil";
 
 import Login from './vote/Login';
@@ -19,6 +19,9 @@ import Header from "../components/Header";
 export default function VoteApp() {
     const [authenticated, setAuthenticated] = useRecoilState(isVoterAuthenticated);
     const [loading, setLoading] = useState(!authenticated);
+    const {path} = useRouteMatch();
+    console.log(path)
+
 
     useEffect(() => {
         const authToken = loadVoterToken();
@@ -49,33 +52,33 @@ export default function VoteApp() {
                 <div id="content">
                     <Header/>
                     <Switch>
-                        <Route exact path="/code">
+                        <Route exact path={`${path}/code`}>
                             <Suspense fallback={<Loading/>}>
                                 <Login/>
                             </Suspense>
                         </Route>
-                        <Route exact path="/help">
+                        <Route exact path={`${path}/help`}>
                             <Help/>
                         </Route>
                         <AuthenticatedRoute>
+                            <Route path={path} exact={true}>
+                                <Suspense fallback={<Loading/>}>
+                                    <Home/>
+                                </Suspense>
+                            </Route>
                             <Route exact path="/logout">
                                 <Suspense fallback={<Loading/>}>
                                     <Logout/>
                                 </Suspense>
                             </Route>
-                            <Route exact path="/election/:id/vote">
+                            <Route exact path={`${path}/election/:id/vote`}>
                                 <Suspense fallback={<Loading/>}>
                                     <PerformVote/>
                                 </Suspense>
                             </Route>
-                            <Route exact path="/election/:id/application">
+                            <Route exact path={`${path}/election/:id/application`} >
                                 <Suspense fallback={<Loading/>}>
                                     <Application/>
-                                </Suspense>
-                            </Route>
-                            <Route exact path="/">
-                                <Suspense fallback={<Loading/>}>
-                                    <Home/>
                                 </Suspense>
                             </Route>
                         </AuthenticatedRoute>

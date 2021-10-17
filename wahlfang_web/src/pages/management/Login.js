@@ -6,7 +6,6 @@ import {loginManager} from "../../api/management";
 import {useRecoilState} from "recoil";
 import {isManagerAuthenticated} from "../../state/management";
 
-
 export default function LoginManager() {
     const [authenticated, setAuthenticated] = useRecoilState(isManagerAuthenticated);
     const history = useHistory();
@@ -16,7 +15,8 @@ export default function LoginManager() {
             .then(res => {
                 setAuthenticated(true);
                 setSubmitting(false);
-                history.push("/");
+                console.log("Successful manager logging attempt")
+                history.push("/management/add-session");
             })
             .catch(err => {
                 setSubmitting(false);
@@ -24,7 +24,7 @@ export default function LoginManager() {
     }
 
     if (authenticated) {
-        return <Redirect to="/"/>
+        return <Redirect to="/help"/>
     }
 
     return (

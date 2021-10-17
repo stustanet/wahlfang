@@ -9,6 +9,7 @@ import {isVoterAuthenticated} from "../../state";
 export default function Login() {
     const [authenticated, setAuthenticated] = useRecoilState(isVoterAuthenticated);
     const history = useHistory();
+    console.log("getting to login")
 
     const handleSubmit = (values, {setSubmitting}) => {
         loginVoter(values.accessCode)

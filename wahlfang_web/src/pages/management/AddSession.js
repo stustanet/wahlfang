@@ -1,17 +1,14 @@
 import React, {useState} from 'react';
-// import {useHistory, useParams} from "react-router-dom";
 import Layout from "../../components/Layout";
-// import {useFormik} from "formik";
-// import {useRecoilValue} from "recoil";
-// import {createSession} from "../../api/management";
-import {toggleAddSession} from "../../state/management"
 import { Formik, Form, Field } from 'formik';
-import {useRecoilState} from "recoil";
 import Collapse from 'react-bootstrap/Collapse';
+import Button from 'react-bootstrap/Button';
+import FormikDateTime from "../../components/FormikDateTime"
 
 
 export default function AddSession() {
     const [toggle, setToggle] = useState(false);
+    const [date, onDateChange] = useState(new Date());
 
 
     const handleSubmit = (values, {setSubmitting}) => {
@@ -52,14 +49,12 @@ export default function AddSession() {
                   isSubmitting
               }) => (
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Create Session</label>
-                    </div>
+                    <h4>Create Session</h4>
                     <div className="mt-3 form-group">
+                        <label>Session's Title*</label>
                         <input type="text"
-                               className="form-control form-control-user text-center"
+                               className="form-control form-control-user"
                                name="sessionTitle"
-                               placeholder="Session's Title"
                                autoFocus={true}
                                onChange={handleChange}
                                onBlur={handleBlur}
@@ -68,35 +63,32 @@ export default function AddSession() {
                         {errors.sessionTitle && touched.sessionTitle && errors.sessionTitle}
                     </div>
                     <div className="mt-3 form-group">
-                        <input type="text"
-                               className="form-control form-control-user text-center"
-                               name="startDate"
-                               placeholder="Start Date, e.g. 12/12/2020 02:23 PM"
-                               autoFocus={true}
-                               onChange={handleChange}
-                               onBlur={handleBlur}
-                               value={values.accessCode}
-                               required={true}/>
-                        {errors.startDate && touched.startDate && errors.startDate}
+                        <label>Meeting start (optional)</label>
+                        <Field name="date" timeFormat={false} component={FormikDateTime} />
                     </div>
                     <div className="mt-3 form-group">
+                        <label>Link to meeting call platform (optional)</label>
                         <input type="text"
-                               className="form-control form-control-user text-center"
+                               className="form-control form-control-user"
                                name="meetingLink"
-                               placeholder="Start Date, e.g. 12/12/2020 02:23 PM"
+                               placeholder="http://bbb.com"
                                autoFocus={true}
                                onChange={handleChange}
                                onBlur={handleBlur}
-                               value={values.accessCode}
-                               required={true}/>
+                               value={values.accessCode}/>
                         {errors.meetingLink && touched.meetingLink && errors.meetingLink}
                     </div>
-                    <div className="card mb-0" onClick={handleToggle}>
-                        <div
-                            className="mycard-header card-header"
-                        >
-                            <span className="card-title">Advanced Options</span>
-                        </div>
+
+                    <div className="card mb-0">
+                        <Button
+                    onClick={handleToggle}
+                    aria-controls="collapseOne"
+                    aria-expanded={toggle}
+                    variant="secondary"
+                    className="mt-3"
+                    >
+                        <span className="card-title">Advanced Options</span>
+                    </Button>
                         <Collapse in={toggle}>
                          <div id="collapseOne"
                          className="card-body ">
@@ -112,14 +104,50 @@ export default function AddSession() {
                                 </thead>
                                 <tbody>
                                 <tr>
-                                    <th scope="row" className="monospace">name</th>
+                                    <th scope="row" className="monospace">&#123;name&#125;</th>
                                     <td>Voter's name if set</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;title&#125;</th>
+                                    <td>Session's title</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;access_code&#125;</th>
+                                    <td>Access code/token for the voter to login</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;login_url&#125;</th>
+                                    <td>URL which instantly logs user in</td>
+                                </tr>
+                                <tr>
+                                   <th scope="row" className="monospace">&#123;base_url&#125;</th>
+                                    <td>Will render to: https://vote.stustanet.de</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;start_time&#125;</th>
+                                    <td>Start time if datetime is set</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;start_date&#125;</th>
+                                    <td>Start date if datetime is set</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;start_time_en&#125;</th>
+                                    <td>Start time in english format e.g. 02:23 PM</td>
+                                </tr>
+                                <tr>
+                                   <th scope="row" className="monospace">&#123;start_date_en&#125;</th>
+                                    <td>Start date in english format e.g. 12/12/2020</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="monospace">&#123;meeting_link&#125;</th>
+                                    <td>Meeting link if set</td>
                                 </tr>
                                 </tbody>
                             </table>
 
-                            Here is an example:<br/>
-                            <p className="monospace">Dear,<br/><br/>You have been invited to our awesome meeting title.
+                            Here is an example: <br/><br/>
+                            <p style={{ fontFamily: 'monospace' }}>Dear,<br/><br/>You have been invited to our awesome meeting title.
                                 We are meeting
                                 on &#123;meeting_link&#125;. It
                                 takes place on the &#123;start_date_en&#125; at &#123;start_time_en&#125;. You can login with the following
@@ -130,27 +158,35 @@ export default function AddSession() {
                                     Your awesome Organizers
                             </p>
 
-                            <p>
-                                Invite Text
-                            </p>
+                            <div className="form-group mt-3">
+                                <textarea  placeholder="Your mail here..." className="form-control" id="exampleFormControlTextarea1" rows="8"></textarea>
+                            </div>
                             <br/><br/>
                                 <h6>Send test mail</h6>
-                                <div className="form-row">
+                                <div className="form-row d-flex">
                                     <div className="col-8">
-                                        Email
+                                             <input type="text"
+                                           className="form-control form-control-user text-center"
+                                           name="testEmail"
+                                           placeholder="your@email.de"
+                                           autoFocus={true}
+                                           onChange={handleChange}
+                                           onBlur={handleBlur}
+                                           value={values.accessCode}
+                                           required={true}/>
                                     </div>
-                                    <div className="col">
-                                        <button type="submit" id="id_btn_send_test"
-                                                className="btn btn-warning btn-block" name="submit_type"
-                                                value="test">
-                                            Send test mail
+                                    <div className="col-4 text-center">
+                                            <button type="submit" id="id_btn_send_test"
+                                            className="btn btn-warning btn-block" name="submit_type"
+                                            value="test">
+                                        Send test mail
                                         </button>
                                     </div>
                                 </div>
                         </div>
                         </Collapse>
                         </div>
-                    <div className="d-grid mt-2">
+                    <div className="d-grid mt-3">
                         <button type="submit" id="id_btn_start" className="btn btn-success">Create Session</button>
                     </div>
                 </form>

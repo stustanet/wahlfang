@@ -15,25 +15,12 @@ export default function AddSession() {
         console.log("Adding session submit")
     }
 
-    // const formik = useFormik({
-    //     onSubmit: values => {
-    //         createSession(values)
-    //             .then(result => {
-    //                 history.push('/')
-    //             })
-    //             .catch(err => {
-    //                 // TODO
-    //             })
-    //     }
-    //
-    // })
-    // Render Prop
 
     const handleToggle = () => {
         setToggle(!toggle)
     }
 
-    const Basic = () => (
+    const AddSessionForm = () => (
       <div className="p-5">
         <Formik
           initialValues={{ title: '', start_date: '', meeting_link: ''}}
@@ -79,7 +66,7 @@ export default function AddSession() {
                         {errors.meetingLink && touched.meetingLink && errors.meetingLink}
                     </div>
 
-                    <div className="card mb-0">
+                    <div className="card border-0">
                         <Button
                     onClick={handleToggle}
                     aria-controls="collapseOne"
@@ -201,7 +188,7 @@ export default function AddSession() {
                 <div className="col-12">
                     <div className="card shadow">
                         <div className="card-body">
-                            <Basic/>
+                            <AddSessionForm/>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,4 @@
-import React from "react";
-import { Collapse } from 'reactstrap';
+import React, {useState} from 'react';
 // import {useHistory, useParams} from "react-router-dom";
 import Layout from "../../components/Layout";
 // import {useFormik} from "formik";
@@ -8,10 +7,11 @@ import Layout from "../../components/Layout";
 import {toggleAddSession} from "../../state/management"
 import { Formik, Form, Field } from 'formik';
 import {useRecoilState} from "recoil";
+import Collapse from 'react-bootstrap/Collapse';
 
 
 export default function AddSession() {
-    const [toggle, setToggle] = useRecoilState(toggleAddSession);
+    const [toggle, setToggle] = useState(false);
 
 
     const handleSubmit = (values, {setSubmitting}) => {
@@ -33,13 +33,7 @@ export default function AddSession() {
     // Render Prop
 
     const handleToggle = () => {
-        if (toggle) {
-            console.log("Value toggle " + toggle)
-            setToggle(false)
-        } else {
-            console.log("Value toggle " + toggle)
-            setToggle(true)
-        }
+        setToggle(!toggle)
     }
 
     const Basic = () => (
@@ -103,7 +97,7 @@ export default function AddSession() {
                         >
                             <span className="card-title">Advanced Options</span>
                         </div>
-                        <Collapse isOpen={toggle}>
+                        <Collapse in={toggle}>
                          <div id="collapseOne"
                          className="card-body ">
                             <h5>Invite email template text</h5>
@@ -154,13 +148,13 @@ export default function AddSession() {
                                     </div>
                                 </div>
                         </div>
-                         </div>
                         </Collapse>
+                        </div>
                     <div className="d-grid mt-2">
                         <button type="submit" id="id_btn_start" className="btn btn-success">Create Session</button>
                     </div>
                 </form>
-            )}
+                )}
         </Formik>
       </div>
     );

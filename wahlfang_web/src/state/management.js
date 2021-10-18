@@ -5,7 +5,3 @@ export const isManagerAuthenticated = atom({
     default: false,
 })
 
-export const toggleAddSession = atom({
-    key: 'toggleAddSession',
-    default: false,
-})

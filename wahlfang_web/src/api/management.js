@@ -4,12 +4,30 @@ export const managementAPIRoutes = {
     login: "/auth/token/",
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
-    createSession: "management/add-session",
+    createSession: "/management/add-session",
 }
+
+// Help functions
 
 export const loadManagerToken = () => {
     return JSON.parse(localStorage.getItem("managerToken"));
 }
+
+export async function makeAuthenticatedManagerRequest(url = '', type = '', data = null) {
+    let token = loadManagerToken();
+    if (!isTokenValid(token.access)) {
+        token = await refreshManagerToken();
+    }
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.access}`,
+    }
+
+    return await makeRequest(url, type, data, headers);
+}
+
+
+// Auth api calls
 
 export const refreshManagerToken = async () => {
     const response = await makeRequest(managementAPIRoutes.refreshToken, 'POST', {
@@ -45,8 +63,10 @@ export const logoutManager = async () => {
     return true;
 }
 
+// API calls
+
 export const createSession = async (form_values) => {
-    const response = await makeRequest(managementAPIRoutes.createSession, 'POST', form_values);
+    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.createSession, 'POST', form_values);
     if (response.status === 204) {
         return true;
     } else {

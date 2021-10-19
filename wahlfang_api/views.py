@@ -60,12 +60,12 @@ class SpectatorView(generics.RetrieveAPIView):
 
 class ManagerSessionView(generics.ListCreateAPIView):
     authentication_classes = [ElectionManagerJWTAuthentication]
-    queryset = Session.objects.all()
     permission_classes = [IsElectionManager]
     serializer_class = SessionSerializer
 
     def perform_create(self, serializer_class):
         serializer_class.save()
+        queryset = Session.objects.all()
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):

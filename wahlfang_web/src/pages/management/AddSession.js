@@ -4,15 +4,42 @@ import { Formik, Form, Field } from 'formik';
 import Collapse from 'react-bootstrap/Collapse';
 import Button from 'react-bootstrap/Button';
 import FormikDateTime from "../../components/FormikDateTime"
+import {createSession} from "../../api/management";
+import {useHistory} from "react-router-dom";
+import moment from "moment";
 
+const DATE_FORMAT = 'DD-MM-YYYY HH:mm'
 
 export default function AddSession() {
     const [toggle, setToggle] = useState(false);
     const [date, onDateChange] = useState(new Date());
-
+    const history = useHistory();
 
     const handleSubmit = (values, {setSubmitting}) => {
-        console.log("Adding session submit")
+        let moment_date = new moment(values.start_date, DATE_FORMAT);
+        // keepOffset must be true, bug info here https://github.com/moment/moment/issues/947
+        values.start_date = moment_date.toISOString(true)
+        console.log(values)
+        createSession(values)
+            .then(res => {
+                setSubmitting(false)
+                console.log("Session correctly added")
+                history.push("/management/add-session")
+            })
+            .catch(err => {
+                console.log(err)
+                setSubmitting(false);
+            })
+        // loginManager(values.username, values.password)
+        //     .then(res => {
+        //         setAuthenticated(true);
+        //         setSubmitting(false);
+        //         console.log("Successful manager logging attempt")
+        //         history.push("/management/add-session");
+        //     })
+        //     .catch(err => {
+        //         setSubmitting(false);
+        //     })
     }
 
 
@@ -41,17 +68,17 @@ export default function AddSession() {
                         <label>Session's Title*</label>
                         <input type="text"
                                className="form-control form-control-user"
-                               name="sessionTitle"
+                               name="title"
                                autoFocus={true}
                                onChange={handleChange}
                                onBlur={handleBlur}
                                value={values.accessCode}
                                required={true}/>
-                        {errors.sessionTitle && touched.sessionTitle && errors.sessionTitle}
+                        {errors.title && touched.title && errors.title}
                     </div>
                     <div className="mt-3 form-group">
                         <label>Meeting start (optional)</label>
-                        <Field name="date" timeFormat={false} component={FormikDateTime} />
+                        <Field name="start_date" timeFormat={false} component={FormikDateTime} />
                     </div>
                     <div className="mt-3 form-group">
                         <label>Link to meeting call platform (optional)</label>
@@ -159,8 +186,7 @@ export default function AddSession() {
                                            autoFocus={true}
                                            onChange={handleChange}
                                            onBlur={handleBlur}
-                                           value={values.accessCode}
-                                           required={true}/>
+                                           value={values.accessCode}/>
                                     </div>
                                     <div className="col-4 text-center">
                                             <button type="submit" id="id_btn_send_test"

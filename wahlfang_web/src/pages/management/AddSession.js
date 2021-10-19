@@ -15,11 +15,11 @@ export default function AddSession() {
     const [date, onDateChange] = useState(new Date());
     const history = useHistory();
 
-    const handleSubmit = (values, {setSubmitting}) => {
+    const handleSubmitAddSessionForm = (values, {setSubmitting}) => {
+        debugger
         let moment_date = new moment(values.start_date, DATE_FORMAT);
         // keepOffset must be true, bug info here https://github.com/moment/moment/issues/947
         values.start_date = moment_date.toISOString(true)
-        console.log(values)
         createSession(values)
             .then(res => {
                 setSubmitting(false)
@@ -27,19 +27,13 @@ export default function AddSession() {
                 history.push("/management/add-session")
             })
             .catch(err => {
-                console.log(err)
+                const err_beauty = JSON.stringify(err, null, 4);
+                console.log(err_beauty)
                 setSubmitting(false);
             })
-        // loginManager(values.username, values.password)
-        //     .then(res => {
-        //         setAuthenticated(true);
-        //         setSubmitting(false);
-        //         console.log("Successful manager logging attempt")
-        //         history.push("/management/add-session");
-        //     })
-        //     .catch(err => {
-        //         setSubmitting(false);
-        //     })
+    }
+    const handleSubmitTestEmail = (values) => {
+        console.log(values)
     }
 
 
@@ -47,11 +41,19 @@ export default function AddSession() {
         setToggle(!toggle)
     }
 
+    const validate = values => {
+        const errors = {}
+        if (!values.testEmail && toggle) {
+            errors.testEmail = "Email must be set for sending the test mail.";
+        }
+        return errors;
+    }
+
     const AddSessionForm = () => (
       <div className="p-5">
         <Formik
-          initialValues={{ title: '', start_date: '', meeting_link: ''}}
-          onSubmit={handleSubmit}
+          initialValues={{ title: '', emailText: '', meeting_link: ''}}
+          onSubmit={handleSubmitAddSessionForm}
         >
             {({
                   values,
@@ -62,7 +64,9 @@ export default function AddSession() {
                   handleSubmit,
                   isSubmitting
               }) => (
-                <form onSubmit={handleSubmit}>
+                <form id="add-session-form" onSubmit={(e) => {
+                    handleSubmit();
+                  }}>
                     <h4>Create Session</h4>
                     <div className="mt-3 form-group">
                         <label>Session's Title*</label>
@@ -72,7 +76,7 @@ export default function AddSession() {
                                autoFocus={true}
                                onChange={handleChange}
                                onBlur={handleBlur}
-                               value={values.accessCode}
+                               value={values.title}
                                required={true}/>
                         {errors.title && touched.title && errors.title}
                     </div>
@@ -89,11 +93,36 @@ export default function AddSession() {
                                autoFocus={true}
                                onChange={handleChange}
                                onBlur={handleBlur}
-                               value={values.accessCode}/>
+                               value={values.meetingLink}/>
                         {errors.meetingLink && touched.meetingLink && errors.meetingLink}
                     </div>
+                </form>
+                )}
+        </Formik>
+      </div>
+    );
 
-                    <div className="card border-0">
+    const SendTestEmailForm = () => (
+         <div>
+        <Formik
+        initialValues={{ testEmail: '', textArea: ''}}
+      validate={validate}
+        onSubmit={handleSubmitTestEmail}
+        >
+            {({
+                  values,
+                  errors,
+                  touched,
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  isSubmitting
+              }) => (
+            <form id="testEmailForm" onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                  }}>
+                <div className="card border-0">
                         <Button
                     onClick={handleToggle}
                     aria-controls="collapseOne"
@@ -173,7 +202,7 @@ export default function AddSession() {
                             </p>
 
                             <div className="form-group mt-3">
-                                <textarea  placeholder="Your mail here..." className="form-control" id="exampleFormControlTextarea1" rows="8"></textarea>
+                                <textarea form="testEmailForm" placeholder="Your mail here..." className="form-control" id="emailText" rows="8"></textarea>
                             </div>
                             <br/><br/>
                                 <h6>Send test mail</h6>
@@ -186,12 +215,12 @@ export default function AddSession() {
                                            autoFocus={true}
                                            onChange={handleChange}
                                            onBlur={handleBlur}
-                                           value={values.accessCode}/>
+                                           value={values.testEmail}/>
+                                       {errors.testEmail && touched.testEmail && errors.testEmail}
                                     </div>
                                     <div className="col-4 text-center">
                                             <button type="submit" id="id_btn_send_test"
-                                            className="btn btn-warning btn-block" name="submit_type"
-                                            value="test">
+                                            className="btn btn-warning btn-block">
                                         Send test mail
                                         </button>
                                     </div>
@@ -199,14 +228,11 @@ export default function AddSession() {
                         </div>
                         </Collapse>
                         </div>
-                    <div className="d-grid mt-3">
-                        <button type="submit" id="id_btn_start" className="btn btn-success">Create Session</button>
-                    </div>
-                </form>
+            </form>
                 )}
         </Formik>
-      </div>
-    );
+         </div>
+    )
 
     return (
         <Layout title="addSession">
@@ -215,6 +241,10 @@ export default function AddSession() {
                     <div className="card shadow">
                         <div className="card-body">
                             <AddSessionForm/>
+                            <SendTestEmailForm/>
+                            <div className="d-grid mt-3">
+                                <button type="submit" id="id_btn_start" className="btn btn-success" form="add-session-form">Create Session</button>
+                         </div>
                         </div>
                     </div>
                 </div>

@@ -3,10 +3,13 @@ import Layout from "../../components/Layout";
 import { Formik, Form, Field } from 'formik';
 import Collapse from 'react-bootstrap/Collapse';
 import Button from 'react-bootstrap/Button';
-import FormikDateTime from "../../components/FormikDateTime"
+import * as yup from 'yup';
 import {createSession} from "../../api/management";
 import {useHistory} from "react-router-dom";
 import moment from "moment";
+import TextField from '@mui/material/TextField';
+import BasicDatePicker from "../../components/BasicDatePicker"
+
 
 const DATE_FORMAT = 'DD-MM-YYYY HH:mm'
 
@@ -16,10 +19,12 @@ export default function AddSession() {
     const history = useHistory();
 
     const handleSubmitAddSessionForm = (values, {setSubmitting}) => {
-        debugger
-        let moment_date = new moment(values.start_date, DATE_FORMAT);
+        let moment_date = new moment(values.start_date);
+        console.log(moment_date)
         // keepOffset must be true, bug info here https://github.com/moment/moment/issues/947
         values.start_date = moment_date.toISOString(true)
+        console.log(values)
+        debugger
         createSession(values)
             .then(res => {
                 setSubmitting(false)
@@ -49,10 +54,17 @@ export default function AddSession() {
         return errors;
     }
 
+    const validationSchema = yup.object({
+      title: yup
+        .string("Session's title")
+        .required('Please provide a session title')
+    });
+
     const AddSessionForm = () => (
       <div className="p-5">
         <Formik
-          initialValues={{ title: '', emailText: '', meeting_link: ''}}
+          initialValues={{ title: '', start_date: '', meeting_link: ''}}
+          validationSchema={validationSchema}
           onSubmit={handleSubmitAddSessionForm}
         >
             {({
@@ -65,36 +77,50 @@ export default function AddSession() {
                   isSubmitting
               }) => (
                 <form id="add-session-form" onSubmit={(e) => {
+                    e.preventDefault();
                     handleSubmit();
                   }}>
                     <h4>Create Session</h4>
                     <div className="mt-3 form-group">
-                        <label>Session's Title*</label>
-                        <input type="text"
-                               className="form-control form-control-user"
-                               name="title"
-                               autoFocus={true}
-                               onChange={handleChange}
-                               onBlur={handleBlur}
-                               value={values.title}
-                               required={true}/>
-                        {errors.title && touched.title && errors.title}
+                        <TextField
+                        style ={{width: '100%'}}
+                        id="title"
+                        variant="standard"
+                        name="title"
+                        label="Session's Title"
+                        value={values.title}
+                        onChange={handleChange}
+                        error={errors.title && touched.title && errors.title}
+                        helperText={touched.title && errors.title}
+                        />
+                        {/*<input type="text"*/}
+                        {/*       className="form-control form-control-user"*/}
+                        {/*       name="title"*/}
+                        {/*       autoFocus={true}*/}
+                        {/*       onChange={handleChange}*/}
+                        {/*       onBlur={handleBlur}*/}
+                        {/*       value={values.title}*/}
+                        {/*       required={true}/>*/}
+                        {/*{errors.title && touched.title && errors.title}*/}
                     </div>
                     <div className="mt-3 form-group">
-                        <label>Meeting start (optional)</label>
-                        <Field name="start_date" timeFormat={false} component={FormikDateTime} />
+                        {/*<label>Meeting start (optional)</label>*/}
+                        {/*<Field name="start_date" timeFormat={false} component={FormikDateTime} />*/}
+                        {/*<BasicDatePicker value={values.start_date}/>*/}
+                        <Field component={BasicDatePicker} name="start_date" onChange={handleChange}/>
                     </div>
                     <div className="mt-3 form-group">
-                        <label>Link to meeting call platform (optional)</label>
-                        <input type="text"
-                               className="form-control form-control-user"
-                               name="meetingLink"
-                               placeholder="http://bbb.com"
-                               autoFocus={true}
-                               onChange={handleChange}
-                               onBlur={handleBlur}
-                               value={values.meetingLink}/>
-                        {errors.meetingLink && touched.meetingLink && errors.meetingLink}
+                        <TextField
+                        style ={{width: '100%'}}
+                        id="meetingLink"
+                        variant="standard"
+                        name="meetingLink"
+                        label="Link to meeting call platform (optional)"
+                        value={values.meetingLink}
+                        onChange={handleChange}
+                        error={errors.meetingLink && touched.meetingLink && errors.meetingLink}
+                        helperText={touched.meetingLink && errors.meetingLink}
+                        />
                     </div>
                 </form>
                 )}

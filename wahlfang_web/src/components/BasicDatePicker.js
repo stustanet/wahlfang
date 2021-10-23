@@ -12,7 +12,6 @@ export default function BasicDatePicker({
 
     }) {
   const [date, setDate] = React.useState(new Date());
-  console.log()
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DateTimePicker

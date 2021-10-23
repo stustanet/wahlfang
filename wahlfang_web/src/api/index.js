@@ -40,12 +40,14 @@ export async function makeAuthenticatedVoterRequest(url = '', type = '', data = 
 
 
 export const getJWTPayload = (token) => {
+    console.log(token)
     const decoded = token.split('.')[1];
     return JSON.parse(atob(decoded));
 }
 
 export const isTokenValid = (token) => {
     const tokenPayload = getJWTPayload(token);
+    console.log(new Date(tokenPayload.exp * 1000) >= new Date())
     return new Date(tokenPayload.exp * 1000) >= new Date()
 }
 

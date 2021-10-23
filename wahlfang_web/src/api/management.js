@@ -44,7 +44,7 @@ export const refreshManagerToken = async () => {
 }
 
 export const loginManager = async (username, password) => {
-    console.log(managementAPIRoutes.login)
+    localStorage.removeItem("managerToken");
     const response = await makeRequest(managementAPIRoutes.login, 'POST', {
         username: username,
         password: password

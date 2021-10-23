@@ -8,8 +8,8 @@ import LoginManager from './management/Login';
 import {loadManagerToken, refreshManagerToken} from "../api/management";
 import Help from "./management/Help";
 import {managementWS} from "../websocket";
-import Header from "../components/Header";
-import Logout from "./vote/Logout";
+import HeaderManagement from "../components/HeaderManagement";
+import Logout from "./management/Logout";
 import ManagerAuthenticatedRoute from "../components/ManagerAuthenticatedRoute";
 import AddSession from "./management/AddSession"
 
@@ -20,12 +20,13 @@ export default function ManagementApp() {
     const {path} = useRouteMatch();
     useEffect(() => {
         const authToken = loadManagerToken();
-        if (authToken && isTokenValid(authToken.access)) {
+        if (authToken && authToken.access && isTokenValid(authToken.access)) {
+            console.log(authToken.access)
             setAuthenticated(true);
             setLoading(false);
             managementWS.initWs();
             console.log("found valid access token");
-        } else if (authToken && isTokenValid(authToken.refresh)) {
+        } else if (authToken && authToken.refresh && isTokenValid(authToken.refresh)) {
             console.log("found valid refresh token");
             refreshManagerToken()
                 .then(() => {
@@ -45,10 +46,10 @@ export default function ManagementApp() {
         <>
             {loading ? <Loading/> : (
                 <div id="content">
-                    <Header/>
+                    <HeaderManagement/>
                     <Switch>
                         <Route exact path={path}>
-                            <Help/>
+                            <LoginManager/>
                         </Route>
                         <Route exact path={`${path}/login`}>
                             <Suspense fallback={<Loading/>}>

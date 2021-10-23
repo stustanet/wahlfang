@@ -34,11 +34,11 @@ function App() {
                         {/*        <VoteApp/>*/}
                         {/*    </Suspense>*/}
                         {/*</Route>*/}
-                        {/*<Route exact path="/">*/}
-                        {/*    <Suspense fallback={<Loading/>}>*/}
-                        {/*        <Help/>*/}
-                        {/*    </Suspense>*/}
-                        {/*</Route>*/}
+                        <Route path={["/", "/vote"]}>
+                            <Suspense fallback={<Loading/>}>
+                                <VoteApp/>
+                            </Suspense>
+                        </Route>
                         {/*<Route>404</Route>*/}
                     </Switch>
                 </Router>

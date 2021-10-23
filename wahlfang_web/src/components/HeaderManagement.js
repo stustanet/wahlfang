@@ -1,11 +1,11 @@
 import {Link} from "react-router-dom";
 import {useRecoilValue} from "recoil";
-import {isVoterAuthenticated} from "../state/index";
+import {isManagerAuthenticated} from "../state/management";
 import logo from '../assets/logo_inv.png';
 
 
-export default function Header() {
-    const authenticated = useRecoilValue(isVoterAuthenticated);
+export default function HeaderManagement() {
+    const authenticated = useRecoilValue(isManagerAuthenticated);
 
     return (
     <nav className="navbar navbar-expand navbar-dark bg-dark shadow">
@@ -24,7 +24,7 @@ export default function Header() {
                         <Link className="nav-link" to="/help">Help</Link>
                     </li>
                     {authenticated ? (
-                        <Link className="nav-link" to="/logout">Logout</Link>
+                        <Link className="nav-link" to="/management/logout">Logout</Link>
                     ): ""}
                 </ul>
             </div>

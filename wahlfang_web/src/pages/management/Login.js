@@ -24,7 +24,7 @@ export default function LoginManager() {
     }
 
     if (authenticated) {
-        return <Redirect to="/help"/>
+        return <Redirect to="/management/add-session"/>
     }
 
     return (

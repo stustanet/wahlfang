@@ -24,6 +24,7 @@ export default function Login() {
     }
 
     if (authenticated) {
+        debugger
         return <Redirect to="/"/>
     }
 

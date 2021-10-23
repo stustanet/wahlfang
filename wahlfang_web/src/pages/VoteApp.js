@@ -19,8 +19,6 @@ import Header from "../components/Header";
 export default function VoteApp() {
     const [authenticated, setAuthenticated] = useRecoilState(isVoterAuthenticated);
     const [loading, setLoading] = useState(!authenticated);
-    const {path} = useRouteMatch();
-    console.log(path)
 
 
     useEffect(() => {
@@ -52,16 +50,16 @@ export default function VoteApp() {
                 <div id="content">
                     <Header/>
                     <Switch>
-                        <Route exact path={`${path}/code`}>
+                        <Route exact path="/vote/code">
                             <Suspense fallback={<Loading/>}>
                                 <Login/>
                             </Suspense>
                         </Route>
-                        <Route exact path={`${path}/help`}>
+                        <Route exact path="/help">
                             <Help/>
                         </Route>
                         <AuthenticatedRoute>
-                            <Route path={path} exact={true}>
+                            <Route path="/vote/home" exact={true}>
                                 <Suspense fallback={<Loading/>}>
                                     <Home/>
                                 </Suspense>
@@ -71,12 +69,12 @@ export default function VoteApp() {
                                     <Logout/>
                                 </Suspense>
                             </Route>
-                            <Route exact path={`${path}/election/:id/vote`}>
+                            <Route exact path="vote/election/:id/vote">
                                 <Suspense fallback={<Loading/>}>
                                     <PerformVote/>
                                 </Suspense>
                             </Route>
-                            <Route exact path={`${path}/election/:id/application`} >
+                            <Route exact path="vote/election/:id/application" >
                                 <Suspense fallback={<Loading/>}>
                                     <Application/>
                                 </Suspense>

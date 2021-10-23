@@ -24,7 +24,7 @@ export default function LoginManager() {
     }
 
     if (authenticated) {
-        return <Redirect to="/management/add-session"/>
+        return <Redirect to="/management/sessions"/>
     }
 
     return (

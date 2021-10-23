@@ -1,4 +1,4 @@
-import {makeRequest, isTokenValid} from "./index";
+import {makeRequest, isTokenValid, makeAuthenticatedVoterRequest, voteAPIRoutes} from "./index";
 
 export const managementAPIRoutes = {
     login: "/auth/token/",
@@ -67,9 +67,15 @@ export const logoutManager = async () => {
 
 export const createSession = async (form_values) => {
     const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.createSession, 'POST', form_values);
-    if (response.status === 204) {
+    if (response.status === 201) {
         return true;
     } else {
         throw Error(await response.json())
     }
+}
+
+export const fetchSessions = async () => {
+    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.createSession, 'GET');
+    console.log(response)
+    return await response.json();
 }

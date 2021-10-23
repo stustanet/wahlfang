@@ -63,9 +63,17 @@ class ManagerSessionView(generics.ListCreateAPIView):
     permission_classes = [IsElectionManager]
     serializer_class = SessionSerializer
 
-    def perform_create(self, serializer_class):
-        serializer_class.save()
-        queryset = Session.objects.all()
+    # def perform_create(self, serializer_class):
+    #     serializer_class.save()
+
+    def perform_create(self, serializer):
+        serializer.save(manager=self.request.user)
+
+    def get_queryset(self):
+        manager = self.request.user
+        return manager.sessions.order_by('-pk')
+
+
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):

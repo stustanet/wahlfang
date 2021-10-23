@@ -11,6 +11,7 @@ import {managementWS} from "../websocket";
 import HeaderManagement from "../components/HeaderManagement";
 import Logout from "./management/Logout";
 import ManagerAuthenticatedRoute from "../components/ManagerAuthenticatedRoute";
+import ManagerSessions from "./management/ManagerSessions"
 import AddSession from "./management/AddSession"
 
 
@@ -61,6 +62,9 @@ export default function ManagementApp() {
                         </Route>
                         <Route exact path={`${path}/add-session`}>
                             <AddSession/>
+                        </Route>
+                        <Route exact path={`${path}/sessions`}>
+                            <ManagerSessions/>
                         </Route>
                         <ManagerAuthenticatedRoute>
                          <Route exact path={`${path}/logout`}>

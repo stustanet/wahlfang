@@ -4,7 +4,7 @@ from rest_framework import serializers, fields
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
+from management.models import ElectionManager
 from vote.models import Election, Session, Application, Voter
 
 
@@ -102,12 +102,27 @@ class SpectatorElectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ElectionManagerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ElectionManager
+        fields = '__all__'
+
+
 class SessionSerializer(serializers.ModelSerializer):
+    election_managers = ElectionManagerSerializer(many=True, read_only=True)
 
     class Meta:
         model = Session
-        fields = ['title', 'start_date']
+        # fields = ['title', 'start_date']
+        fields = '__all__'
 
+    def create(self, validated_data):
+        election_manager = validated_data.pop("manager", None)
+        session = Session.objects.create(**validated_data)
+        if election_manager:
+            session.managers.add(election_manager.pk)
+        return session
 
 class VoterDetailSerializer(serializers.ModelSerializer):
     session = SessionSerializer(many=False, read_only=True)

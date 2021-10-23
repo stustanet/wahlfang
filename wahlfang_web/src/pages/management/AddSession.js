@@ -20,16 +20,12 @@ export default function AddSession() {
 
     const handleSubmitAddSessionForm = (values, {setSubmitting}) => {
         let moment_date = new moment(values.start_date);
-        console.log(moment_date)
         // keepOffset must be true, bug info here https://github.com/moment/moment/issues/947
         values.start_date = moment_date.toISOString(true)
-        console.log(values)
-        debugger
         createSession(values)
             .then(res => {
                 setSubmitting(false)
-                console.log("Session correctly added")
-                history.push("/management/add-session")
+                history.push("/management/sessions")
             })
             .catch(err => {
                 const err_beauty = JSON.stringify(err, null, 4);
@@ -59,6 +55,16 @@ export default function AddSession() {
         .string("Session's title")
         .required('Please provide a session title')
     });
+
+    const validationSchemaTestEmail = yup.object({
+        testEmail: yup
+            .string("Test Email")
+            .email("Not a valid email")
+            .required('Email must be set for sending the test mail.'),
+        textArea: yup
+            .string("Email here")
+            .required('Email text cannot be empty.')
+    })
 
     const AddSessionForm = () => (
       <div className="p-5">
@@ -132,7 +138,7 @@ export default function AddSession() {
          <div>
         <Formik
         initialValues={{ testEmail: '', textArea: ''}}
-      validate={validate}
+        validationSchema={validationSchemaTestEmail}
         onSubmit={handleSubmitTestEmail}
         >
             {({
@@ -228,21 +234,34 @@ export default function AddSession() {
                             </p>
 
                             <div className="form-group mt-3">
-                                <textarea form="testEmailForm" placeholder="Your mail here..." className="form-control" id="emailText" rows="8"></textarea>
+                                <TextField
+                                    style ={{width: '100%'}}
+                                    id="textArea"
+                                    label="Your mail here..."
+                                    multiline
+                                    rows={8}
+                                    variant="standard"
+                                    onChange={handleChange}
+                                    values={values.textArea}
+                                    error={errors.textArea && touched.textArea && errors.textArea}
+                                    helperText={touched.textArea && errors.textArea}
+                                />
                             </div>
                             <br/><br/>
                                 <h6>Send test mail</h6>
                                 <div className="form-row d-flex">
                                     <div className="col-8">
-                                             <input type="text"
-                                           className="form-control form-control-user text-center"
-                                           name="testEmail"
-                                           placeholder="your@email.de"
-                                           autoFocus={true}
-                                           onChange={handleChange}
-                                           onBlur={handleBlur}
-                                           value={values.testEmail}/>
-                                       {errors.testEmail && touched.testEmail && errors.testEmail}
+                                        <TextField
+                                            style ={{width: '100%'}}
+                                            id="testEmail"
+                                            variant="standard"
+                                            name="meetingLink"
+                                            label="your@email.de"
+                                            values={values.testEmail}
+                                            onChange={handleChange}
+                                            error={errors.testEmail && touched.testEmail && errors.testEmail}
+                                            helperText={touched.testEmail && errors.testEmail}
+                                            />
                                     </div>
                                     <div className="col-4 text-center">
                                             <button type="submit" id="id_btn_send_test"

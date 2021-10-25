@@ -5,10 +5,12 @@ import Collapse from 'react-bootstrap/Collapse';
 import Button from 'react-bootstrap/Button';
 import * as yup from 'yup';
 import {createSession} from "../../api/management";
-import {useHistory} from "react-router-dom";
+import {Redirect, useHistory} from "react-router-dom";
 import moment from "moment";
 import TextField from '@mui/material/TextField';
 import BasicDatePicker from "../../components/BasicDatePicker"
+import {useRecoilState} from "recoil";
+import {sessionList} from "../../state/management";
 
 
 const DATE_FORMAT = 'DD-MM-YYYY HH:mm'
@@ -16,7 +18,11 @@ const DATE_FORMAT = 'DD-MM-YYYY HH:mm'
 export default function AddSession() {
     const [toggle, setToggle] = useState(false);
     const [date, onDateChange] = useState(new Date());
+   const [sessions, setSessions] = useRecoilState(sessionList);
+
+
     const history = useHistory();
+
 
     const handleSubmitAddSessionForm = (values, {setSubmitting}) => {
         let moment_date = new moment(values.start_date);
@@ -25,7 +31,9 @@ export default function AddSession() {
         createSession(values)
             .then(res => {
                 setSubmitting(false)
-                history.push("/management/sessions")
+                window.location.assign('/management/sessions');
+                // TODO: Find out why recoil state is not reloaded when pushing the history
+                // history.push("/management/sessions")
             })
             .catch(err => {
                 const err_beauty = JSON.stringify(err, null, 4);
@@ -99,20 +107,8 @@ export default function AddSession() {
                         error={errors.title && touched.title && errors.title}
                         helperText={touched.title && errors.title}
                         />
-                        {/*<input type="text"*/}
-                        {/*       className="form-control form-control-user"*/}
-                        {/*       name="title"*/}
-                        {/*       autoFocus={true}*/}
-                        {/*       onChange={handleChange}*/}
-                        {/*       onBlur={handleBlur}*/}
-                        {/*       value={values.title}*/}
-                        {/*       required={true}/>*/}
-                        {/*{errors.title && touched.title && errors.title}*/}
                     </div>
                     <div className="mt-3 form-group">
-                        {/*<label>Meeting start (optional)</label>*/}
-                        {/*<Field name="start_date" timeFormat={false} component={FormikDateTime} />*/}
-                        {/*<BasicDatePicker value={values.start_date}/>*/}
                         <Field component={BasicDatePicker} name="start_date" onChange={handleChange}/>
                     </div>
                     <div className="mt-3 form-group">

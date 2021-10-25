@@ -5,16 +5,17 @@ import VoteApp from "./pages/VoteApp";
 import ManagementApp from "./pages/ManagementApp";
 import SpectatorView from "./pages/SpectatorView";
 import About from "./pages/About";
-import Help from "./pages/management/Help";
-
+import {createBrowserHistory} from 'history';
+import {RecoilRoot} from 'recoil';
 
 function App() {
     const [loading, setLoading] = useState(false);
+    const historyInstance = createBrowserHistory();
 
     return (
-        <>
+        <RecoilRoot>
             {loading ? <Loading/> : (
-                <Router>
+                <Router history={historyInstance}>
                     <Switch>
                         <Route exact path="/about">
                             <About/>
@@ -43,7 +44,7 @@ function App() {
                     </Switch>
                 </Router>
             )}
-        </>
+        </RecoilRoot>
     );
 }
 

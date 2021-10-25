@@ -13,12 +13,28 @@ import { Typography } from '@mui/material';
 import { useHistory } from "react-router-dom";
 import moment from "moment";
 import {deleteSession} from "../../api/management"
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 
 
 export default function ManagerSessions() {
+    const [open, setOpen] = React.useState(false);
+    const [index, setIndex] = React.useState(0);
     const [sessions, setSessions] = useRecoilState(sessionList);
     const history = useHistory();
+
+      const handleClickOpen = (index) => {
+        setOpen(true);
+        setIndex(index);
+      };
+
+      const handleClose = () => {
+        setOpen(false);
+      };
 
     const formatDate = (start_date) => {
         return moment(start_date).format("LLLL")
@@ -38,6 +54,7 @@ export default function ManagerSessions() {
             .catch(err => {
                 console.log(err)
             })
+        handleClose();
     }
 
     return (
@@ -48,19 +65,35 @@ export default function ManagerSessions() {
                     <div className="card shadow">
                         <div className="card-body">
                              <h4>My Sessions</h4>
-                            {sessions.map(session => (
+                            {sessions.map((session, index) => (
                                 <Box key={session.id} pb={3} sx={{ width: '100%', bgcolor: 'background.paper', }}>
                                       <List component="nav" aria-label="main mailbox folders">
                                         <ListItemButton>
                                          <ListItemText disableTypography
                                             primary={<Typography type="body2" style={{ color: '#495057' }}>{session.title}</Typography>} />
                                             {session.start_date && <ListItemText sx={{pr: 2}} primary={<Typography align="right" type="overline" style={{ color: '#495057' }}>{formatDate(session.start_date)}</Typography>}/>}
-                                            <Button onClick={() => handleDelete(session.id)} variant="outlined" startIcon={<DeleteIcon />} color="error"> Delete </Button>
+                                            <Button onClick={() => handleClickOpen(index)} variant="outlined" startIcon={<DeleteIcon />} color="error"> Delete </Button>
                                         </ListItemButton>
                                       </List>
                                       <Divider />
                                     </Box>
                             ))}
+                            <Dialog
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                          >
+                            <DialogTitle id="alert-dialog-title">
+                              {"Are you sure you want to delete this session?"}
+                            </DialogTitle>
+                            <DialogActions>
+                              <Button onClick={handleClose}>Cancel</Button>
+                              <Button color="error" onClick={() => handleDelete(sessions[index].id)} autoFocus>
+                                Delete
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
                         <Button onClick={toCreateSession} variant="contained" color="success">Create Session</Button>
                      </div>
                 </div>

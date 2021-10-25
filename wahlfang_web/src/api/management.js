@@ -4,7 +4,8 @@ export const managementAPIRoutes = {
     login: "/auth/token/",
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
-    createSession: "/management/add-session",
+    manageSessions: "/management/add-session",
+
 }
 
 // Help functions
@@ -65,8 +66,10 @@ export const logoutManager = async () => {
 
 // API calls
 
+// sessions
+
 export const createSession = async (form_values) => {
-    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.createSession, 'POST', form_values);
+    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.manageSessions, 'POST', form_values);
     if (response.status === 201) {
         return true;
     } else {
@@ -75,7 +78,18 @@ export const createSession = async (form_values) => {
 }
 
 export const fetchSessions = async () => {
-    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.createSession, 'GET');
-    console.log(response)
+    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.manageSessions, 'GET');
     return await response.json();
+}
+
+export const deleteSession = async (pk) => {
+    const url = `${managementAPIRoutes.manageSessions}?pk=${pk}`
+    console.log(url)
+    const response = await makeAuthenticatedManagerRequest(url, 'DELETE')
+    console.log(response)
+    if (response.status === 204) {
+        return true;
+    } else {
+        throw new Error(await response.json())
+    }
 }

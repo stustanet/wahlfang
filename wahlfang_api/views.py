@@ -2,6 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.views import TokenViewBase
@@ -57,14 +58,17 @@ class SpectatorView(generics.RetrieveAPIView):
     def get_object(self):
         return self.queryset.get(spectator_token=self.kwargs['uuid'])
 
+## Management Sessions ##
 
-class ManagerSessionView(generics.ListCreateAPIView):
+
+class ManagerSessionView(generics.ListCreateAPIView, generics.DestroyAPIView):
     authentication_classes = [ElectionManagerJWTAuthentication]
     permission_classes = [IsElectionManager]
     serializer_class = SessionSerializer
 
-    # def perform_create(self, serializer_class):
-    #     serializer_class.save()
+    def get_object(self):
+        session = get_object_or_404(Session, pk=self.request.query_params.get('pk'))
+        return session
 
     def perform_create(self, serializer):
         serializer.save(manager=self.request.user)
@@ -73,7 +77,10 @@ class ManagerSessionView(generics.ListCreateAPIView):
         manager = self.request.user
         return manager.sessions.order_by('-pk')
 
-
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):

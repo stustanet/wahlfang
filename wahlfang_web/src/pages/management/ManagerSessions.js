@@ -57,6 +57,10 @@ export default function ManagerSessions() {
         handleClose();
     }
 
+    const toSessionDetail = (pk) => {
+        history.push(`/management/sessions/${pk}`)
+    }
+
     return (
 
           <Layout>
@@ -68,7 +72,7 @@ export default function ManagerSessions() {
                             {sessions.map((session, index) => (
                                 <Box key={session.id} pb={3} sx={{ width: '100%', bgcolor: 'background.paper', }}>
                                       <List component="nav" aria-label="main mailbox folders">
-                                        <ListItemButton>
+                                        <ListItemButton onClick={() => toSessionDetail(session.id)}>
                                          <ListItemText disableTypography
                                             primary={<Typography type="body2" style={{ color: '#495057' }}>{session.title}</Typography>} />
                                             {session.start_date && <ListItemText sx={{pr: 2}} primary={<Typography align="right" type="overline" style={{ color: '#495057' }}>{formatDate(session.start_date)}</Typography>}/>}

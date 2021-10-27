@@ -79,7 +79,7 @@ export const createSession = async (form_values) => {
 
 export const fetchSessions = async () => {
     const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.manageSessions, 'GET');
-    return await response.json();
+    return await response.json()
 }
 
 export const deleteSession = async (pk) => {

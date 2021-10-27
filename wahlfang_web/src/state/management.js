@@ -1,6 +1,7 @@
 import {atom, selector, selectorFamily} from "recoil";
 import {fetchSessions} from "../api/management";
 import {managementWS} from "../websocket";
+import {electionList} from "./index";
 
 
 export const isManagerAuthenticated = atom({
@@ -27,4 +28,13 @@ export const sessionList = atom ({
             })
         },
     ]
+})
+
+
+export const sessionById = selectorFamily({
+    key: "sessionById",
+    get: (sessionId) => async ({get}) => {
+        const sessions = await get(sessionList);
+        return sessions.find(session => session.id === sessionId)
+    }
 })

@@ -72,11 +72,18 @@ class ElectionSummarySerializer(serializers.ModelSerializer):
         exclude = ['email', 'voter']
 
 
+class ElectionSerializerManager(serializers.ModelSerializer):
+
+    class Meta:
+        model = Election
+        fields = '__all__'
+
+
 class ElectionSerializer(serializers.ModelSerializer):
     # TODO: also include whether the voter already voted
     applications = ApplicationSerializer(many=True, read_only=True)
-    can_vote = serializers.SerializerMethodField()
     election_summary = ElectionSummarySerializer(source='public_election_summary', many=True, read_only=True)
+    can_vote = serializers.SerializerMethodField()
     voter_application = serializers.SerializerMethodField()
 
     class Meta:
@@ -91,7 +98,8 @@ class ElectionSerializer(serializers.ModelSerializer):
         return EditApplicationSerializer(application, read_only=True, many=False).data
 
     def get_can_vote(self, obj):
-        return self.context['request'].user.can_vote(obj)
+        can_vote = self.context['request'].user.can_vote(obj)
+        return can_vote
 
 
 class SpectatorElectionSerializer(serializers.ModelSerializer):
@@ -111,10 +119,10 @@ class ElectionManagerSerializer(serializers.ModelSerializer):
 
 class SessionSerializer(serializers.ModelSerializer):
     election_managers = ElectionManagerSerializer(many=True, read_only=True)
+    elections = ElectionSerializerManager(many=True, read_only=True)
 
     class Meta:
         model = Session
-        # fields = ['title', 'start_date']
         fields = '__all__'
 
     def create(self, validated_data):
@@ -123,6 +131,7 @@ class SessionSerializer(serializers.ModelSerializer):
         if election_manager:
             session.managers.add(election_manager.pk)
         return session
+
 
 class VoterDetailSerializer(serializers.ModelSerializer):
     session = SessionSerializer(many=False, read_only=True)

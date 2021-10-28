@@ -50,7 +50,6 @@ export const loginManager = async (username, password) => {
         username: username,
         password: password
     })
-    debugger
      if (response.status < 300) {
         const token = await response.json();
         localStorage.setItem("managerToken", JSON.stringify(token));

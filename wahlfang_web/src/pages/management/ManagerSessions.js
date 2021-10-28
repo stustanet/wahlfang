@@ -27,7 +27,9 @@ export default function ManagerSessions() {
     const [sessions, setSessions] = useRecoilState(sessionList);
     const history = useHistory();
 
-      const handleClickOpen = (index) => {
+      const handleClickOpen = (e, index) => {
+        e.stopPropagation();
+        console.log("click on handle open")
         setOpen(true);
         setIndex(index);
       };
@@ -58,6 +60,7 @@ export default function ManagerSessions() {
     }
 
     const toSessionDetail = (pk) => {
+        console.log("Stopping in detail view")
         history.push(`/management/sessions/${pk}`)
     }
 
@@ -76,7 +79,8 @@ export default function ManagerSessions() {
                                          <ListItemText disableTypography
                                             primary={<Typography type="body2" style={{ color: '#495057' }}>{session.title}</Typography>} />
                                             {session.start_date && <ListItemText sx={{pr: 2}} primary={<Typography align="right" type="overline" style={{ color: '#495057' }}>{formatDate(session.start_date)}</Typography>}/>}
-                                            <Button onClick={() => handleClickOpen(index)} variant="outlined" startIcon={<DeleteIcon />} color="error"> Delete </Button>
+                                            <Button onClick={(e) => handleClickOpen(e, index)}
+                                                variant="outlined" startIcon={<DeleteIcon />} color="error"> Delete </Button>
                                         </ListItemButton>
                                       </List>
                                       <Divider />

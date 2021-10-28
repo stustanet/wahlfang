@@ -4,7 +4,7 @@ export const managementAPIRoutes = {
     login: "/auth/token/",
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
-    manageSessions: "/management/add-session",
+    manageSessions: "/manager/add-session",
 
 }
 
@@ -50,6 +50,7 @@ export const loginManager = async (username, password) => {
         username: username,
         password: password
     })
+    debugger
      if (response.status < 300) {
         const token = await response.json();
         localStorage.setItem("managerToken", JSON.stringify(token));

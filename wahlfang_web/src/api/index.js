@@ -1,4 +1,4 @@
-export const apiURL = (process.env.REACT_APP_SERVER_URL || 'http://localhost:8000') + '/api/v1';
+export const apiURL = (process.env.REACT_APP_SERVER_URL || 'http://127.0.0.1:8000') + '/api/v1';
 
 export const voteAPIRoutes = {
     login: "/auth/code/token/",

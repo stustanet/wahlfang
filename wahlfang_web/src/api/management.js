@@ -5,6 +5,7 @@ export const managementAPIRoutes = {
     refreshToken: "/auth/token/refresh/",
     verifyToken: "/auth/token/verify/",
     manageSessions: "/manager/add-session",
+    manageElections: "/manager/election"
 
 }
 
@@ -93,3 +94,24 @@ export const deleteSession = async (pk) => {
         throw new Error(await response.json())
     }
 }
+
+// Elections
+
+export const fetchElections = async (sessionId) => {
+    const url = `${managementAPIRoutes.manageElections}`
+    const response = await makeAuthenticatedManagerRequest(url, 'GET');
+    return await response.json()
+}
+
+
+export const deleteElection = async (pk) => {
+    const url = `${managementAPIRoutes.manageElections}?pk=${pk}`
+    const response = await makeAuthenticatedManagerRequest(url, 'DELETE')
+    console.log(response)
+    if (response.status === 204) {
+        return true;
+    } else {
+        throw new Error(await response.json())
+    }
+}
+

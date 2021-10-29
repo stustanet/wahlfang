@@ -19,7 +19,8 @@ from wahlfang_api.serializers import (
     VoterDetailSerializer,
     EditApplicationSerializer,
     SpectatorSessionSerializer,
-    SessionSerializer
+    SessionSerializer,
+    ElectionSerializerManager
 )
 
 
@@ -76,6 +77,26 @@ class ManagerSessionView(generics.ListCreateAPIView, generics.DestroyAPIView):
     def get_queryset(self):
         manager = self.request.user
         return manager.sessions.order_by('-pk')
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ManagerElectionView(generics.ListCreateAPIView, generics.DestroyAPIView):
+    authentication_classes = [ElectionManagerJWTAuthentication]
+    permission_classes = [IsElectionManager]
+    serializer_class = ElectionSerializerManager
+
+    def get_object(self):
+        election = get_object_or_404(Election, pk=self.request.query_params.get('pk'))
+        return election
+
+    def get_queryset(self):
+        manager_sesions = self.request.user.sessions.all()
+        elections_manager = Election.objects.filter(session__in=manager_sesions)
+        return elections_manager
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

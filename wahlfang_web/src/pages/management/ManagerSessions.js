@@ -29,7 +29,6 @@ export default function ManagerSessions() {
 
       const handleClickOpen = (e, index) => {
         e.stopPropagation();
-        console.log("click on handle open")
         setOpen(true);
         setIndex(index);
       };

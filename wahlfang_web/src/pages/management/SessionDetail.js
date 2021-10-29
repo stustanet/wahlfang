@@ -1,18 +1,16 @@
 import React, {useEffect} from 'react';
 import Layout from "../../components/Layout";
 import {useParams} from "react-router-dom";
-import {useRecoilValue} from "recoil";
-import {sessionById} from "../../state/management"
+import {useRecoilValue, useSetRecoilState} from "recoil";
+import {sessionById, electionsManagerBySessionId, electionsListManager} from "../../state/management"
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Box from "@mui/material/Box";
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { CardHeader, Divider, IconButton } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -23,33 +21,65 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
 import { red } from '@mui/material/colors';
+import {deleteElection} from "../../api/management";
 
 
 
 export default function SessionDetail() {
     const [openDialog, setOpenDialog] = React.useState(false);
-    const [index, setIndex] = React.useState(0);
+    const [selectedElectionId, setSelectedElectionId] = React.useState(0);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
     const {id} = useParams();
     const session = useRecoilValue(sessionById(parseInt(id)))
+    const elections = useRecoilValue(electionsManagerBySessionId(parseInt(id)))
+    const setElectionState = useSetRecoilState(electionsListManager)
+    console.log(elections)
 
-    const formatDate = (start_date) => {
-        const start_date_moment = new moment(start_date)
-        if (start_date_moment.isBefore()) {
-            return "Closed"
+
+    const formatDate = (election) => {
+        let displayDate = '';
+        if (election.end_date && moment(election.end_date).isAfter()) {
+            displayDate = "Closed"
+        } else if (election.start_date && moment(election.start_date).isBefore()) {
+            displayDate = `Open, needs to be closed manually`
+        } else if (election.start_date && moment(election.start_date).isAfter()) {
+            const start_date_moment = new moment(election.start_date)
+            displayDate = `Starts on ${start_date_moment.format('LLLL')}`
         } else {
-            start_date_moment.format("LLLL")
+            displayDate = "Needs to be started manually"
         }
+        return displayDate
     }
      const handleClickOpen = (e, index) => {
         e.stopPropagation();
-        console.log("click on handle open")
         setOpenDialog(true);
-        setIndex(index);
+        setSelectedElectionId(index);
       };
 
      const handleCloseDialog = () => {
         setOpenDialog(false);
       };
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+
+    const handleDeleteElection = (electionId) => {
+        deleteElection(electionId)
+            .then(res => {
+                const elections_left = elections.filter(election => election.id !== electionId)
+                setElectionState(elections_left)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        handleCloseDialog();
+    }
 
     const electionCard = (
         <React.Fragment>
@@ -57,16 +87,15 @@ export default function SessionDetail() {
             <Divider/>
             <CardContent>
                 {
-                session.elections.map((election, index) => (
+                elections.map((election, index) => (
                 <Box key={election.id} pb={3} sx={{ width: '100%', bgcolor: 'background.paper', }}>
                       <List component="nav" aria-label="main mailbox folders">
                         <ListItemButton>
                          <ListItemText disableTypography
                             primary={<Typography style={{ color: '#495057' }}>{election.title}</Typography>} />
-                            {election.end_date &&
                             <ListItemText sx={{pr: 2}}
                                   primary={<Typography fontSize={14} align="right" type="overline" style={{ color: '#495057' }}>
-                                      {formatDate(election.end_date)}</Typography>}/>}
+                                      {formatDate(election)}</Typography>}/>
                               <IconButton variant="outlined" sx={{ color: red[500] }} onClick={(e) => handleClickOpen(e, index)}>
                                   <DeleteIcon/>
                               </IconButton>
@@ -88,24 +117,14 @@ export default function SessionDetail() {
             </DialogTitle>
             <DialogActions>
               <Button onClick={handleCloseDialog}>Cancel</Button>
-              <Button color="error" autoFocus>
+              <Button onClick ={() => handleDeleteElection(elections[selectedElectionId].id)} color="error" autoFocus>
                 Delete
               </Button>
             </DialogActions>
           </Dialog>
         </React.Fragment>
     )
-    console.log(session)
 
-
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
     return (
         <Layout>
             <Box
@@ -172,7 +191,7 @@ export default function SessionDetail() {
                     p: 1,
                 }}
                 >
-                    {session.elections ?
+                    {elections ?
                         electionCard
                         : <CardContent>
                         There are no elections

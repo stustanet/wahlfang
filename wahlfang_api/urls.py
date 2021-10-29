@@ -11,7 +11,8 @@ from wahlfang_api.views import (
     ElectionViewset,
     VoterInfoView,
     SpectatorView,
-    ManagerSessionView
+    ManagerSessionView,
+    ManagerElectionView
 )
 
 app_name = 'rest_api'
@@ -28,5 +29,6 @@ urlpatterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('manager/add-session', ManagerSessionView.as_view(), name='add_session'),
+    path('manager/election', ManagerElectionView.as_view(), name='manage_elections'),
     path('drf/', include('rest_framework.urls', namespace='rest_framework'))
 ]

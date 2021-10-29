@@ -13,7 +13,6 @@ import {useRecoilState} from "recoil";
 import {sessionList} from "../../state/management";
 
 
-const DATE_FORMAT = 'DD-MM-YYYY HH:mm'
 
 export default function AddSession() {
     const [toggle, setToggle] = useState(false);

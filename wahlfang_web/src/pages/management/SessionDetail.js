@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import Layout from "../../components/Layout";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {sessionById, electionsManagerBySessionId, electionsListManager} from "../../state/management"
 import Button from '@mui/material/Button';
@@ -34,7 +34,8 @@ export default function SessionDetail() {
     const session = useRecoilValue(sessionById(parseInt(id)))
     const elections = useRecoilValue(electionsManagerBySessionId(parseInt(id)))
     const setElectionState = useSetRecoilState(electionsListManager)
-    console.log(elections)
+
+    const history = useHistory();
 
 
     const formatDate = (election) => {
@@ -50,6 +51,9 @@ export default function SessionDetail() {
             displayDate = "Needs to be started manually"
         }
         return displayDate
+    }
+    const handleToCreateElection = () => {
+        history.push('/management/election')
     }
      const handleClickOpen = (e, index) => {
         e.stopPropagation();
@@ -143,6 +147,7 @@ export default function SessionDetail() {
                     <Button
                             id="add-election-btn"
                             variant="contained"
+                            onClick={handleToCreateElection}
                           >
                         Add Election
                           </Button>

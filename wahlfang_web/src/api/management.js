@@ -103,6 +103,14 @@ export const fetchElections = async (sessionId) => {
     return await response.json()
 }
 
+export const createElection = async (values) => {
+    const response = await makeAuthenticatedManagerRequest(managementAPIRoutes.manageElections, 'POST', values);
+    if (response.status === 201) {
+        return true;
+    } else {
+        throw Error(await response.json())
+    }
+}
 
 export const deleteElection = async (pk) => {
     const url = `${managementAPIRoutes.manageElections}?pk=${pk}`

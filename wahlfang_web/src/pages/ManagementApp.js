@@ -14,6 +14,7 @@ import ManagerAuthenticatedRoute from "../components/ManagerAuthenticatedRoute";
 import ManagerSessions from "./management/ManagerSessions"
 import SessionDetail from "./management/SessionDetail"
 import AddSession from "./management/AddSession"
+import CreateElection from "./management/CreateElection"
 
 
 export default function ManagementApp() {
@@ -69,6 +70,9 @@ export default function ManagementApp() {
                         </Route>
                         <Route exact path={`${path}/sessions/:id`}>
                             <SessionDetail/>
+                        </Route>
+                        <Route exact path={`${path}/election`}>
+                            <CreateElection/>
                         </Route>
                         <ManagerAuthenticatedRoute>
                          <Route exact path={`${path}/logout`}>

@@ -24,7 +24,7 @@ export default function Login() {
     }
 
     if (authenticated) {
-        return <Redirect to="/"/>
+        return <Redirect to="/vote/home"/>
     }
 
     return (

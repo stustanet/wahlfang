@@ -10,7 +10,7 @@ export default function HeaderManagement() {
     return (
     <nav className="navbar navbar-expand navbar-dark bg-dark shadow">
         <div className="container">
-            <Link className="navbar-brand" to="/">
+            <Link className="navbar-brand" to="/management/sessions">
                 <img src={logo} alt="StuStaNet" width="192px"/>
             </Link>
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -21,7 +21,7 @@ export default function HeaderManagement() {
                 <div className="navbar-text me-auto">Online Voting System</div>
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <Link className="nav-link" to="/help">Help</Link>
+                        <Link className="nav-link" to="/management/help">Help</Link>
                     </li>
                     {authenticated ? (
                         <Link className="nav-link" to="/management/logout">Logout</Link>

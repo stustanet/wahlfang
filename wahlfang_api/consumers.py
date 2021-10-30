@@ -3,6 +3,9 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
+from management.models import ElectionManager
+from vote.models import Voter
+
 
 class VoteAPIConsumer(AsyncWebsocketConsumer):
 
@@ -26,8 +29,11 @@ class VoteAPIConsumer(AsyncWebsocketConsumer):
         #     uuid = self.scope['url_route']['kwargs']['uuid']
         #     session = Session.objects.get(spectator_token=uuid)
         # else:
-        session = self.scope['user'].session
-        return f'api-vote-session-{session.pk}'
+        if isinstance(self.scope['user'], Voter):
+            session = self.scope['user'].session
+            return f'api-vote-session-{session.pk}'
+        else:
+            raise RuntimeError('error, trying to connect to voter websocket with an election manager')
 
 
 class ManagementAPIConsumer(AsyncWebsocketConsumer):
@@ -48,5 +54,8 @@ class ManagementAPIConsumer(AsyncWebsocketConsumer):
         }))
 
     def get_manager_key(self):
-        manager_key = self.scope['user'].id
-        return f'api-election-manager-{manager_key}'
+        if isinstance(self.scope['user'], ElectionManager):
+            manager_key = self.scope['user'].id
+            return f'api-election-manager-{manager_key}'
+        else:
+            raise RuntimeError('error, trying to connect to voter websocket with an election manager')

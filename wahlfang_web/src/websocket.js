@@ -1,16 +1,18 @@
 import {loadManagerToken} from "./api/management";
+import {loadVoterToken} from "./api";
 
 export const voterWebsocketURL = 'ws://localhost:8000/api/v1/vote/'
 export const managementWebsocketURL = 'ws://localhost:8000/api/v1/management/'
 
 export class WahlfangWebsocket {
-    constructor(url) {
+    constructor(url, isVoter) {
         this.url = url;
+        this.isVoter = isVoter;
         this.handlers = {}; // map of table name to callback
     }
 
     initWs = () => {
-        const token = loadManagerToken();
+        const token = this.isVoter ? loadVoterToken() : loadManagerToken();
         const url = this.url + '?token=' + token.access;
         this.ws = new WebSocket(url);
         this.ws.onopen = this.onopen;
@@ -43,5 +45,5 @@ export class WahlfangWebsocket {
     }
 }
 
-export const voterWS = new WahlfangWebsocket(voterWebsocketURL)
-export const managementWS = new WahlfangWebsocket(managementWebsocketURL)
+export const voterWS = new WahlfangWebsocket(voterWebsocketURL, true);
+export const managementWS = new WahlfangWebsocket(managementWebsocketURL, false);

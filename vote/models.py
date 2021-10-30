@@ -487,9 +487,9 @@ class Application(models.Model):
              update_fields=None):
         if self.avatar and self._old_avatar != self.avatar:
             # remove old file
-            if self._old_avatar and os.path.isfile(self._old_avatar.path):
+            if self._old_avatar and os.path.isfile(self._old_avatar.path):  # pylint: disable=E1101
                 # let's not play russian roulette
-                path = os.path.normpath(self._old_avatar.path)
+                path = os.path.normpath(self._old_avatar.path)  # pylint: disable=E1101
                 if path.startswith(os.path.join(settings.MEDIA_ROOT, 'avatars')):
                     os.remove(path)
 

@@ -2,7 +2,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from prometheus_client import Gauge
 
-import vote.views
 from management import views
 from management.models import ElectionManager
 from vote.models import Election, Session

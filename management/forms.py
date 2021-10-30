@@ -62,13 +62,15 @@ class TemplateStringForm:
         checks if the cleaned_text fails when formatted on the test_data.
         """
         test_data_dict = {i: "" for i in test_data}
-        cleaned_text = self.cleaned_data[field]
+        cleaned_text = self.cleaned_data[field]  # pylint: disable=no-member
         try:
             cleaned_text.format(**test_data_dict)
         except (KeyError, ValueError, IndexError):
             x = re.findall(r"\{\w*\}", cleaned_text)
             test_data = set(x) - {f"{{{i}}}" for i in test_data}
-            self.add_error(field, "The following variables are not allowed: " + ", ".join(test_data))
+            self.add_error(  # pylint: disable=no-member
+                field, "The following variables are not allowed: " + ", ".join(test_data)
+            )
         return cleaned_text
 
 

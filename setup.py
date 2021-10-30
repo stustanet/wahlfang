@@ -1,6 +1,6 @@
 import os
 import shutil
-from subprocess import run
+from subprocess import run  # nosec
 
 from setuptools import setup
 
@@ -13,7 +13,7 @@ os.chdir(ui_dir)
 static_dir = os.path.join(ui_dir, 'static')
 if os.path.exists(static_dir):
     shutil.rmtree(static_dir)
-run(['yarn', 'build'], check=True)
+run(['yarn', 'build'], check=True)  # nosec
 os.chdir(curr_dir)
 
 setup()

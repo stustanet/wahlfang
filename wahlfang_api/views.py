@@ -8,7 +8,6 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.views import TokenViewBase
 
 from vote.forms import VoteForm
-from management.forms import AddSessionForm
 from vote.models import Election, Voter, Application, Session
 from wahlfang_api.authentication import IsVoter, IsElectionManager, ElectionManagerJWTAuthentication, \
     VoterJWTAuthentication

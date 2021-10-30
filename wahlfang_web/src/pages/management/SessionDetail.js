@@ -53,7 +53,7 @@ export default function SessionDetail() {
         return displayDate
     }
     const handleToCreateElection = () => {
-        history.push('/management/election')
+        history.push(`/management/sessions/${id}/election`)
     }
      const handleClickOpen = (e, index) => {
         e.stopPropagation();

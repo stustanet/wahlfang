@@ -10,7 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Typography } from '@mui/material';
-import { useHistory } from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import moment from "moment";
 import {deleteSession} from "../../api/management"
 import Dialog from '@mui/material/Dialog';
@@ -26,6 +26,7 @@ export default function ManagerSessions() {
     const [index, setIndex] = React.useState(0);
     const [sessions, setSessions] = useRecoilState(sessionList);
     const history = useHistory();
+
 
       const handleClickOpen = (e, index) => {
         e.stopPropagation();

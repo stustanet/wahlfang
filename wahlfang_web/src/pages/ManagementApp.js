@@ -24,7 +24,6 @@ export default function ManagementApp() {
     useEffect(() => {
         const authToken = loadManagerToken();
         if (authToken && authToken.access && isTokenValid(authToken.access)) {
-            console.log(authToken.access)
             setAuthenticated(true);
             setLoading(false);
             managementWS.initWs();
@@ -71,7 +70,7 @@ export default function ManagementApp() {
                         <Route exact path={`${path}/sessions/:id`}>
                             <SessionDetail/>
                         </Route>
-                        <Route exact path={`${path}/election`}>
+                        <Route exact path={`${path}/sessions/:id/election`}>
                             <CreateElection/>
                         </Route>
                         <ManagerAuthenticatedRoute>

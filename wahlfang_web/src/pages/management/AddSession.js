@@ -17,9 +17,7 @@ import {sessionList} from "../../state/management";
 export default function AddSession() {
     const [toggle, setToggle] = useState(false);
     const [date, onDateChange] = useState(new Date());
-   const [sessions, setSessions] = useRecoilState(sessionList);
-
-
+    const [sessions, setSessions] = useRecoilState(sessionList);
     const history = useHistory();
 
 
@@ -128,7 +126,7 @@ export default function AddSession() {
         </Formik>
       </div>
     );
-
+    // TODO: Change advanced options to accordion
     const SendTestEmailForm = () => (
          <div>
         <Formik

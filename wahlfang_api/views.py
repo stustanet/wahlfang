@@ -94,7 +94,7 @@ class ManagerElectionView(generics.ListCreateAPIView, generics.DestroyAPIView):
         return election
 
     def perform_create(self, serializer):
-        serializer.save(manager=self.request.user)
+        serializer.save()
 
     def get_queryset(self):
         manager_sesions = self.request.user.sessions.all()

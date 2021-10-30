@@ -5,7 +5,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import Button from 'react-bootstrap/Button';
 import * as yup from 'yup';
 import {createElection} from "../../api/management";
-import {Redirect, useHistory} from "react-router-dom";
+import {Redirect, useHistory, useParams} from "react-router-dom";
 import moment from "moment";
 import TextField from '@mui/material/TextField';
 import BasicDatePicker from "../../components/BasicDatePicker"
@@ -18,13 +18,16 @@ export default function CreateSession() {
     const [toggle, setToggle] = useState(false);
     const [date, onDateChange] = useState(new Date());
     const [elections, setElections] = useRecoilState(electionsListManager);
+    // get session id from url
+    const {id} = useParams();
 
 
-    const handleSubmitAddSessionForm = (values, {setSubmitting}) => {
+    const handleSubmitAddElectionForm = (values, {setSubmitting}) => {
         let moment_date = new moment(values.start_date);
         // keepOffset must be true, bug info here https://github.com/moment/moment/issues/947
         values.start_date = moment_date.toISOString(true)
         values.end_date = moment_date.toISOString(true)
+        values.session = id
         createElection(values)
             .then(res => {
                 setSubmitting(false)
@@ -50,7 +53,7 @@ export default function CreateSession() {
         <Formik
           initialValues={{ title: '', start_date: '', end_date: '', maximum_votes: 0}}
           validationSchema={validationSchema}
-          onSubmit={handleSubmitAddSessionForm}
+          onSubmit={handleSubmitAddElectionForm}
         >
             {({
                   values,
@@ -88,7 +91,7 @@ export default function CreateSession() {
                     <div className="mt-3 form-group">
                         <TextField
                         style ={{width: '100%'}}
-                        id="maximumVotes"
+                        id="maximum_votes"
                         type="number"
                         label="Maximum number of votes"
                         variant="standard"

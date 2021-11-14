@@ -1,8 +1,13 @@
 import React, {useEffect} from 'react';
 import Layout from "../../components/Layout";
 import {useHistory, useParams} from "react-router-dom";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {sessionById, electionsManagerBySessionId, electionsListManager} from "../../state/management"
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {
+    sessionById,
+    electionsManagerBySessionId,
+    electionsListManager,
+    sessionParticipants
+} from "../../state/management"
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -34,6 +39,7 @@ export default function SessionDetail() {
     const session = useRecoilValue(sessionById(parseInt(id)))
     const elections = useRecoilValue(electionsManagerBySessionId(parseInt(id)))
     const setElectionState = useSetRecoilState(electionsListManager)
+    const voters = useRecoilValue(sessionParticipants(parseInt(id)))
 
     const history = useHistory();
 
@@ -129,6 +135,12 @@ export default function SessionDetail() {
         </React.Fragment>
     )
 
+    const voterCard = (
+        <React.Fragment>
+
+        </React.Fragment>
+    )
+
     return (
         <Layout>
             <Box
@@ -157,7 +169,7 @@ export default function SessionDetail() {
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined}
                             onClick={handleClick}
-                            startIcon={<MenuIcon />}
+                            startIcon={<MenuIcon style={{fontSize: 32}} />}
                           >
                           </Button>
                           <Menu
@@ -200,6 +212,75 @@ export default function SessionDetail() {
                         electionCard
                         : <CardContent>
                         There are no elections
+                    </CardContent>}
+
+                </Card>
+            </Box>
+
+            <Box
+            sx = {{
+                 boxShadow: 1,
+                 display: 'flex',
+                 justifyContent: 'space-between',
+                 p: 2,
+                 mt:2,
+                bgcolor: 'common.black'
+            }}
+            >
+                <Typography variant="h4" color="common.white" component="div">
+                Voters
+                </Typography>
+                <Box>
+                    <Button
+                        id="demo-positioned-button"
+                        aria-controls="demo-positioned-menu"
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}
+                        startIcon={<MenuIcon style={{fontSize: 32}}/>}
+                      >
+                      </Button>
+                      <Menu
+                        id="demo-positioned-menu"
+                        aria-labelledby="demo-positioned-button"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'left',
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'left',
+                        }}
+                      >
+                        <MenuItem onClick={handleClose}>Add Voters</MenuItem>
+                        <MenuItem onClick={handleClose}>Import from CSV</MenuItem>
+                        <MenuItem onClick={handleClose}>Add Tokens</MenuItem>
+                        <MenuItem onClick={handleClose}>Download Tokens</MenuItem>
+                      </Menu>
+                </Box>
+            </Box>
+            <Box
+            sx = {{
+                boxShadow: 1,
+                display: 'flex',
+                p: 2,
+                justifyContent: 'left',
+            }}
+            >
+                <Card
+                sx = {{
+                    border: "none",
+                    width: "100%",
+                    p: 1,
+                }}
+                >
+                    {voters ?
+                        voterCard
+                        : <CardContent>
+                        No voters were added yet
                     </CardContent>}
 
                 </Card>

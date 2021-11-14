@@ -1,6 +1,7 @@
 import {atom, selector, selectorFamily, atomFamily} from "recoil";
-import {fetchElections, fetchSessions} from "../api/management";
+import {fetchElections, fetchSessionParticipants, fetchSessions} from "../api/management";
 import {managementWS} from "../websocket";
+import {electionList} from "./index";
 
 export const isManagerAuthenticated = atom({
     key: 'isManagerAuthenticated',
@@ -38,6 +39,18 @@ export const sessionById = selectorFamily({
 });
 
 
+
+export const sessionParticipants = atomFamily({
+    key: "sessionParticipants",
+    default: selectorFamily({
+        key: "sessionParticipants/default",
+        get: (sessionId) => async ({get}) => {
+        return fetchSessionParticipants(sessionId)
+    }
+    })
+})
+
+
 export const electionsListManager = atom ({
     key: "electionsListManager",
     default: selector({
@@ -56,3 +69,5 @@ export const electionsManagerBySessionId = selectorFamily({
         return elections.filter(election => election.session === sessionId)
     }
 });
+
+

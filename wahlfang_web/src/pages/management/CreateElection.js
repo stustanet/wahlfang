@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import BasicDatePicker from "../../components/BasicDatePicker"
 import {useRecoilState} from "recoil";
 import {electionsListManager} from "../../state/management";
+import {DateTime} from 'luxon';
 
 
 
@@ -45,7 +46,18 @@ export default function CreateSession() {
     const validationSchema = yup.object({
       title: yup
         .string("Election name")
-        .required('Please provide an election name')
+        .required('Please provide an election name'),
+      start_date: yup.string().test("is-after-now", "start time should not be in the past", function(value){
+          const now = new DateTime.now()
+          return value > now
+      }),
+      end_date: yup
+        .string()
+        .test("is-greater", "end time should be greater", function(value) {
+            console.log(this.parent.start_date)
+            console.log(value)
+            return value > this.parent.start_date
+    })
     });
 
     const CreateElectionForm = () => (

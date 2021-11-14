@@ -147,4 +147,3 @@ class SpectatorSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = ['title', 'meeting_link', 'elections']
-

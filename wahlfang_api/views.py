@@ -58,8 +58,8 @@ class SpectatorView(generics.RetrieveAPIView):
     def get_object(self):
         return self.queryset.get(spectator_token=self.kwargs['uuid'])
 
-## Management Sessions ##
 
+# Management Sessions #
 
 class ManagerSessionView(generics.ListCreateAPIView, generics.DestroyAPIView):
     authentication_classes = [ElectionManagerJWTAuthentication]
@@ -67,6 +67,7 @@ class ManagerSessionView(generics.ListCreateAPIView, generics.DestroyAPIView):
     serializer_class = SessionSerializer
 
     def get_object(self):
+        # TODO: Replace query parameter with correct REST guideline /:pk
         session = get_object_or_404(Session, pk=self.request.query_params.get('pk'))
         return session
 
@@ -104,6 +105,19 @@ class ManagerElectionView(generics.ListCreateAPIView, generics.DestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ManagerSessionVoterView(generics.ListCreateAPIView, generics.DestroyAPIView):
+    """
+    Deals with Voters within a session
+    """
+    authentication_classes = [ElectionManagerJWTAuthentication]
+    permission_classes = [IsElectionManager]
+    serializer_class = VoterDetailSerializer
+
+    def get_queryset(self):
+        session = get_object_or_404(Session, pk=self.kwargs['pk'])
+        return session.participants
 
 
 class ElectionViewset(viewsets.ReadOnlyModelViewSet):

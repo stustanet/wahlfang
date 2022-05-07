@@ -11,7 +11,7 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Create election</h4>
+          <h4>Create election in {{ session.title }}</h4>
           <form class="user" action="{% url 'management:add_election' pk=session.id %}" method="post">
             {% csrf_token %}
 

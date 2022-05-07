@@ -78,7 +78,11 @@
             </div>
 
             <br>
-            <button type="submit" id="id_btn_start" class="btn btn-success">Create Session</button>
+              <button type="submit" id="id_btn_start" class="btn btn-primary btn-block">Create Session</button>
+
+              <a class="btn btn-secondary btn-block"
+              href="{% url 'management:index' %}">Cancel</a>
+
             <div id="dtBox"></div>
           </form>
         </div>

@@ -86,9 +86,11 @@
             </div>
             <br>
 
-            <button type="submit" id="id_btn_send_test" class="btn btn-success" name="submit_type" value="commit">
+            <button type="submit" id="id_btn_send_test" class="btn btn-primary btn-block" name="submit_type" value="commit">
               Submit
             </button>
+              <a class="btn btn-secondary btn-block"
+              href="{% url 'management:session' session.pk %}">Cancel</a>
             <div id="dtBox"></div>
           </form>
         </div>

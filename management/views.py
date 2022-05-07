@@ -61,7 +61,8 @@ def index(request):
     manager = request.user
 
     if request.GET.get("action") == "add_session":
-        form = AddSessionForm(request=request, user=request.user, data=request.POST or None)
+        form = AddSessionForm(
+            request=request, user=request.user, data=request.POST or None)
         if request.POST and form.is_valid():
 
             if request.POST.get("submit_type") != "test":
@@ -71,7 +72,8 @@ def index(request):
             messages.add_message(request, messages.INFO, 'Test email sent.')
             Voter.send_test_invitation(
                 title=form.cleaned_data['title'],
-                start_date=form.cleaned_data['start_date'] if form.cleaned_data['start_date'] else timezone.now(),
+                start_date=form.cleaned_data['start_date'] if form.cleaned_data['start_date'] else timezone.now(
+                ),
                 meeting_link=form.cleaned_data['meeting_link'],
                 invite_text=form.cleaned_data['invite_text'],
                 to_email=form.cleaned_data['email'],
@@ -93,7 +95,7 @@ def session_detail(request, pk=None):
     session = manager.sessions.get(id=pk)
     context = {
         'session': session,
-        'existing_elections': bool(session.elections),
+        'existing_elections': (session.elections.count() > 0),
         'open_elections': open_elections(session),
         'upcoming_elections': upcoming_elections(session),
         'published_elections': published_elections(session),
@@ -108,14 +110,17 @@ def session_settings(request, pk=None):
     manager = request.user
     session = manager.sessions.get(pk=pk)
 
-    form = SessionSettingsForm(instance=session, request=request, user=request.user, data=request.POST or None)
+    form = SessionSettingsForm(
+        instance=session, request=request, user=request.user, data=request.POST or None)
     if request.POST:
         if form.is_valid():
             if request.POST.get("submit_type") == "test":
-                messages.add_message(request, messages.INFO, 'Test email sent.')
+                messages.add_message(
+                    request, messages.INFO, 'Test email sent.')
                 Voter.send_test_invitation(
                     title=form.cleaned_data['title'],
-                    start_date=form.cleaned_data['start_date'] if form.cleaned_data['start_date'] else timezone.now(),
+                    start_date=form.cleaned_data['start_date'] if form.cleaned_data['start_date'] else timezone.now(
+                    ),
                     meeting_link=form.cleaned_data['meeting_link'],
                     invite_text=form.cleaned_data['invite_text'],
                     to_email=form.cleaned_data['email'],
@@ -123,7 +128,8 @@ def session_settings(request, pk=None):
                 )
             else:
                 form.save()
-                messages.add_message(request, messages.INFO, 'Session updated successfully!')
+                messages.add_message(request, messages.INFO,
+                                     'Session updated successfully!')
                 return redirect('management:session', session.id)
 
     context = {
@@ -144,7 +150,8 @@ def add_election(request, pk=None):
         'session': session,
     }
 
-    form = AddElectionForm(session=session, request=request, user=manager, data=request.POST if request.POST else None)
+    form = AddElectionForm(session=session, request=request,
+                           user=manager, data=request.POST if request.POST else None)
     context['form'] = form
     context['variables'] = form.variables
     if request.POST and form.is_valid():
@@ -163,7 +170,8 @@ def add_election(request, pk=None):
                 "end_date": form.cleaned_data['end_date'],
             })
 
-            Voter.send_reminder(test_voter, manager.sender_email, test_election)
+            Voter.send_reminder(
+                test_voter, manager.sender_email, test_election)
         else:
             form.save()
             return redirect('management:session', pk=session.pk)
@@ -179,7 +187,8 @@ def add_voters(request, pk):
         'session': session,
         'form': AddVotersForm(session=session)
     }
-    form = AddVotersForm(session=session, data=request.POST if request.POST else None)
+    form = AddVotersForm(
+        session=session, data=request.POST if request.POST else None)
     context['form'] = form
     if request.POST and form.is_valid():
         form.save()
@@ -196,7 +205,8 @@ def add_tokens(request, pk):
         'session': session,
         'form': AddTokensForm(session=session)
     }
-    form = AddTokensForm(session=session, data=request.POST if request.POST else None)
+    form = AddTokensForm(
+        session=session, data=request.POST if request.POST else None)
     context['form'] = form
     if request.POST and form.is_valid():
         form.save()
@@ -238,7 +248,8 @@ def election_detail(request, pk):
             form.save()
             if election.send_emails_on_start:
                 for voter in session.participants.all():
-                    voter.send_reminder(session.managers.all().first().sender_email, election)
+                    voter.send_reminder(
+                        session.managers.all().first().sender_email, election)
         else:
             context['start_election_form'] = form
 
@@ -254,7 +265,8 @@ def election_upload_application(request, pk, application_id=None):
     _, election, _ = _unpack(request, pk)
 
     if not election.can_apply:
-        messages.add_message(request, messages.ERROR, 'Applications are currently not accepted')
+        messages.add_message(request, messages.ERROR,
+                             'Applications are currently not accepted')
         return redirect('management:election', pk=pk)
 
     if application_id:
@@ -268,7 +280,8 @@ def election_upload_application(request, pk, application_id=None):
     if request.method == 'GET':
         form = ApplicationUploadForm(election, request, instance=instance)
     else:
-        form = ApplicationUploadForm(election, request, data=request.POST, files=request.FILES, instance=instance)
+        form = ApplicationUploadForm(
+            election, request, data=request.POST, files=request.FILES, instance=instance)
         if form.is_valid():
             form.save()
             return redirect('management:election', election.pk)
@@ -339,9 +352,11 @@ def print_token(request, pk):
         return HttpResponseNotFound('Session does not exist')
     session = session.first()
     participants = session.participants
-    tokens = [participant.new_access_token() for participant in participants.all() if participant.is_anonymous]
+    tokens = [participant.new_access_token()
+              for participant in participants.all() if participant.is_anonymous]
     if len(tokens) == 0:
-        messages.add_message(request, messages.ERROR, 'No tokens have yet been generated.')
+        messages.add_message(request, messages.ERROR,
+                             'No tokens have yet been generated.')
         return redirect('management:session', pk=session.pk)
 
     img = [qrcode.make(f'https://{settings.URL}' + reverse('vote:link_login', kwargs={'access_code': access_code}))
@@ -359,7 +374,8 @@ def print_token(request, pk):
         path_i = os.path.join(tmp_qr_path, 'qr_{}.png'.format(idx))
         i.save(path_i)
         paths.append(path_i)
-    zipped = [{'path': path, 'token': token} for path, token in zip(paths, tokens)]
+    zipped = [{'path': path, 'token': token}
+              for path, token in zip(paths, tokens)]
     context = {
         'session': session,
         'tokens': zipped,
@@ -378,7 +394,8 @@ def generate_pdf(template_name: str, context: Dict, tex_path: str):
     template = get_template(template_name).render(context).encode('utf8')
     with open("/tmp/template.tex", "wb") as f:
         f.write(template)
-    pdf = PdfLatexBuilder(pdflatex='pdflatex').build_pdf(template, texinputs=[tex_path, ''])
+    pdf = PdfLatexBuilder(pdflatex='pdflatex').build_pdf(
+        template, texinputs=[tex_path, ''])
     return pdf
 
 

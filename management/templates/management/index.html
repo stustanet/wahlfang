@@ -5,8 +5,12 @@
   <div class="row justify-content-center">
     <div class="col-12">
       <div class="card shadow">
+        <div class="card-header bg-dark text-light">
+          <h4 class="d-inline">My Sessions</h4>
+          <a class="btn btn-success float-right"
+             href="{% url 'management:index' %}?action=add_session">Create New Session</a>
+        </div>
         <div class="card-body">
-          <h4>My Sessions</h4>
           <div class="list-group">
             {% for session in sessions %}
               <div class="list-group-item list-group-item-action">
@@ -25,9 +29,6 @@
               </div>
             {% endfor %}
           </div>
-          <hr>
-          <a class="btn btn-success"
-             href="{% url 'management:index' %}?action=add_session">Create Session</a>
         </div>
       </div>
     </div>

@@ -93,7 +93,7 @@ def session_detail(request, pk=None):
     session = manager.sessions.get(id=pk)
     context = {
         'session': session,
-        'existing_elections': bool(session.elections),
+        'existing_elections': (session.elections.count() > 0),
         'open_elections': open_elections(session),
         'upcoming_elections': upcoming_elections(session),
         'published_elections': published_elections(session),

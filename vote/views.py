@@ -71,6 +71,7 @@ def index(request):
         'title': session.title,
         'meeting_link': session.meeting_link,
         'voter': voter,
+        'existing_elections': (session.elections.count() > 0),
         'open_elections': list_elections(open_elections(session)),
         'upcoming_elections': list_elections(upcoming_elections(session)),
         'published_elections': list_elections(published_elections(session)),
@@ -172,6 +173,7 @@ def spectator(request, uuid):
     context = {
         'title': session.title,
         'meeting_link': session.meeting_link,
+        'existing_elections': (session.elections.count() > 0),
         'open_elections': open_elections(session),
         'upcoming_elections': upcoming_elections(session),
         'published_elections': published_elections(session),

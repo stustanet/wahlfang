@@ -14,7 +14,11 @@
         </div>
       </div>
       <div id="electionCard">
-        {% if open_elections %}
+        {% if not existing_elections %}
+              <div class="list-group-item mt-3">
+                <span>There are no elections for this session</span>
+              </div>
+        {% elif open_elections %}
           <div class="card shadow mb-2">
             <div class="card-header">
               <h4>Open Elections</h4>

@@ -97,7 +97,7 @@ class Election(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     max_votes_yes = models.IntegerField(blank=True, null=True)
     session = models.ForeignKey(Session, related_name='elections', on_delete=CASCADE)
-    result_published = models.BooleanField(null=False, default=False)
+    result_published = models.BooleanField(null=False, default=True)
     enable_abstention = models.BooleanField(default=True)
     voters_self_apply = models.BooleanField(default=False)
     send_emails_on_start = models.BooleanField(default=False)

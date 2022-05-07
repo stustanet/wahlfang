@@ -414,11 +414,17 @@ def export_csv(request, pk):
     if e.max_votes_yes is not None:
         header.append('elected')
     writer.writerow(header)
-    for i, applicant in enumerate(e.election_summary):
-        row = [i + 1, applicant.get_display_name(), applicant.email, applicant.votes_accept, applicant.votes_reject,
+    nr_elected = 0
+    for idx, applicant in enumerate(e.election_summary):
+        row = [idx + 1, applicant.get_display_name(), applicant.email, applicant.votes_accept, applicant.votes_reject,
                applicant.votes_abstention]
         if e.max_votes_yes is not None:
-            row.append(i < e.max_votes_yes)
+            if applicant.votes_accept > applicant.votes_reject and nr_elected < e.max_votes_yes:
+                # elected if: more yes than no, within the persons with the most yes votes
+                row.append(True)
+                nr_elected += 1
+            else:
+                row.append(False)
         writer.writerow(row)
 
     return response

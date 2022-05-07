@@ -135,7 +135,7 @@ class SessionSettingsForm(AddSessionForm):
 
     class Meta:
         model = Session
-        fields = ('start_date', 'meeting_link', 'invite_text')
+        fields = ('title', 'start_date', 'meeting_link', 'invite_text')
         labels = {
             'start_date': 'Meeting start (optional)',
             'meeting_link': 'Link to meeting call platform (optional)',

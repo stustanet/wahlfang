@@ -28,6 +28,7 @@
         <div class="alert alert-info" role="alert">
           <h4 class="alert-heading">Voting Ended:</h4>
           <hr>
+          <div class="table-responsive">
           <table class="table table-striped">
             <thead class="thead-dark">
             <tr>
@@ -49,7 +50,7 @@
               </tr>
             {% endfor %}
             </tbody>
-          </table>
+          </table></div>
         </div>
       {% elif not electon.started and not election.is_open and not election.closed %}
         <a class="btn btn-outline-dark disabled" role="button" href="#">

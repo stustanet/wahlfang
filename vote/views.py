@@ -92,7 +92,8 @@ def vote(request, election_id):
 
     can_vote = voter.can_vote(election)
     if election.max_votes_yes is not None:
-        max_votes_yes = min(election.max_votes_yes, election.applications.all().count())
+        max_votes_yes = min(election.max_votes_yes,
+                            election.applications.all().count())
     else:
         max_votes_yes = election.applications.all().count()
 
@@ -133,7 +134,8 @@ def apply(request, election_id):
     if request.method == 'GET':
         form = ApplicationUploadFormUser(election, request, instance=instance)
     else:
-        form = ApplicationUploadFormUser(election, request, data=request.POST, files=request.FILES, instance=instance)
+        form = ApplicationUploadFormUser(
+            election, request, data=request.POST, files=request.FILES, instance=instance)
         if form.is_valid():
             form.save()
             return redirect('vote:index')
@@ -153,7 +155,8 @@ def delete_own_application(request, election_id):
     election = get_object_or_404(voter.session.elections, pk=election_id)
     application = voter.applications.filter(election__id=election_id)
     if not election.can_apply:
-        messages.add_message(request, messages.ERROR, 'Applications can currently not be deleted')
+        messages.add_message(request, messages.ERROR,
+                             'Applications can currently not be deleted')
         return redirect('vote:index')
     if application.exists():
         instance = application.first()

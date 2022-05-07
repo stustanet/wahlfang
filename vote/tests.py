@@ -37,12 +37,12 @@ class ElectionSelectorsTest(TestCase):
         session = Session.objects.create(title="TEST")
         # upcoming elections
         all_upcoming = set()
-        all_upcoming.add(Election.objects.create(session=session))
-        all_upcoming.add(Election.objects.create(session=session, start_date=after))
+        all_upcoming.add(Election.objects.create(session=session, result_published=False))
+        all_upcoming.add(Election.objects.create(session=session, start_date=after, result_published=False))
         # open elections
         all_opened = set()
-        all_opened.add(Election.objects.create(session=session, start_date=now))
-        all_opened.add(Election.objects.create(session=session, start_date=before, end_date=after))
+        all_opened.add(Election.objects.create(session=session, start_date=now, result_published=False))
+        all_opened.add(Election.objects.create(session=session, start_date=before, end_date=after, result_published=False))
         # published elections
         all_published = set()
         all_published.add(Election.objects.create(session=session, start_date=bbefore, end_date=before,
@@ -51,8 +51,8 @@ class ElectionSelectorsTest(TestCase):
                                                   result_published=True))
         # closed (not published) elections
         all_closed = set()
-        all_closed.add(Election.objects.create(session=session, start_date=bbefore, end_date=before))
-        all_closed.add(Election.objects.create(session=session, start_date=before, end_date=now))
+        all_closed.add(Election.objects.create(session=session, start_date=bbefore, end_date=before, result_published=False))
+        all_closed.add(Election.objects.create(session=session, start_date=before, end_date=now, result_published=False))
 
         # test upcoming
         upcoming = upcoming_elections(session)

@@ -17,7 +17,9 @@
           <form class="user" action="{% url 'management:add_tokens' session.pk %}" method="post">
             {% csrf_token %}
             {{ form|crispy }}
-            <button type="submit" id="id_btn_start" class="btn btn-success">Submit</button>
+            <button type="submit" id="id_btn_start" class="btn btn-primary btn-block">Submit</button>
+              <a class="btn btn-secondary btn-block"
+              href="{% url 'management:session' session.pk %}">Cancel</a>
           </form>
         </div>
       </div>

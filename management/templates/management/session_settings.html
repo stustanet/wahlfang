@@ -91,7 +91,12 @@
             </div>
 
             <br>
-            <button type="submit" id="id_btn_start" class="btn btn-success">Update</button>
+            <button type="submit" id="id_btn_start" class="btn btn-primary btn-block">Update</button>
+
+
+              <a class="btn btn-secondary btn-block"
+              href="{% url 'management:session' session.pk %}">Cancel</a>
+
             <div id="dtBox"></div>
           </form>
         </div>

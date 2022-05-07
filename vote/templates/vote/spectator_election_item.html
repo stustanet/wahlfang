@@ -2,30 +2,31 @@
   <div class="card-body">
     <h4 class="mb-0">{{ election.title }}</h4>
     {% if election.end_date %}
-      <small class="text-muted">Voting Period: {{ election.start_date|date:"D Y-m-d H:i:s" }}
-        - {{ election.end_date|date:"D Y-m-d H:i:s" }} (UTC{{ election.end_date|date:"O" }})</small>
-      <!-- hidden start and end time for javascript  | is used to delimit values-->
-      <div class="d-none time">{{ election.start_date|date:"U" }}|</div>
-      <div class="d-none time">{{ election.end_date|date:"U" }}|</div>
+    <small class="text-muted">Voting Period: {{ election.start_date|date:"D Y-m-d H:i:s" }}
+      - {{ election.end_date|date:"D Y-m-d H:i:s" }} (UTC{{ election.end_date|date:"O" }})</small>
+    <!-- hidden start and end time for javascript  | is used to delimit values-->
+    <div class="d-none time">{{ election.start_date|date:"U" }}|</div>
+    <div class="d-none time">{{ election.end_date|date:"U" }}|</div>
     {% endif %}
     <hr>
     <div class="list-group mt-3">
       {% if election.closed and election.result_published %}
-        <div class="alert alert-info" role="alert">
-          <h4 class="alert-heading">Election result:</h4>
-          <hr>
+      <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">Election result:</h4>
+        <hr>
+        <div class="table-responsive">
           <table class="table table-striped">
             <thead class="thead-dark">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
-              <th scope="col">Yes</th>
-              <th scope="col">No</th>
-              <th scope="col">Abstention</th>
-            </tr>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">{% if election.voters_self_apply %}Applicant{% else %}Option{% endif %}</th>
+                <th scope="col">Yes</th>
+                <th scope="col">No</th>
+                <th scope="col">Abstention</th>
+              </tr>
             </thead>
             <tbody>
-            {% for application in election.election_summary %}
+              {% for application in election.election_summary %}
               <tr>
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ application.get_display_name }}</td>
@@ -33,24 +34,25 @@
                 <td>{{ application.votes_reject }}</td>
                 <td>{{ application.votes_abstention }}</td>
               </tr>
-            {% endfor %}
+              {% endfor %}
             </tbody>
           </table>
         </div>
+      </div>
       {% elif not election.is_open and not election.closed %}
-        <a class="btn btn-outline-dark disabled" role="button" href="#">
-          Election has not started yet.
-        </a>
+      <a class="btn btn-outline-dark disabled" role="button" href="#">
+        Election has not started yet.
+      </a>
 
       {% elif election.is_open and not election.closed %}
-        <a class="btn btn-outline-dark disabled" role="button" href="#">
-          Election is currently ongoing.
-        </a>
+      <a class="btn btn-outline-dark disabled" role="button" href="#">
+        Election is currently ongoing.
+      </a>
       {% else %}
-        <a class="btn btn-outline-dark disabled" role="button" href="#">
-          Election is over but results haven't been published yet. Please ask your election manager to do so
-          and refresh the page.
-        </a>
+      <a class="btn btn-outline-dark disabled" role="button" href="#">
+        Election is over but results haven't been published yet. Please ask your election manager to do so
+        and refresh the page.
+      </a>
       {% endif %}
     </div>
   </div>

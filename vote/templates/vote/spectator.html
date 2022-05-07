@@ -10,7 +10,7 @@
       <div class="card-body">
         <h4 class="text-center d-inline">{{ title }} - Spectator View</h4>
         {% if meeting_link %}
-        <div><small>Meeting at <a href="{{ meeting_link }}">{{ meeting_link }}</a></small></div>
+          <div><small>Meeting at <a href="{{ meeting_link }}">{{ meeting_link }}</a></small></div>
         {% endif %}
       </div>
     </div>
@@ -26,7 +26,7 @@
         </div>
         <div class="card-body">
           {% for election in open_elections %}
-          {% include 'vote/spectator_election_item.html' %}
+            {% include 'vote/spectator_election_item.html' %}
           {% endfor %}
         </div>
       </div>
@@ -38,7 +38,7 @@
         </div>
         <div class="card-body">
           {% for election in upcoming_elections %}
-          {% include 'vote/spectator_election_item.html' %}
+            {% include 'vote/spectator_election_item.html' %}
           {% endfor %}
         </div>
       </div>
@@ -50,7 +50,7 @@
         </div>
         <div class="card-body">
           {% for election in published_elections %}
-          {% include 'vote/spectator_election_item.html' %}
+            {% include 'vote/spectator_election_item.html' %}
           {% endfor %}
         </div>
       </div>
@@ -62,7 +62,7 @@
         </div>
         <div class="card-body">
           {% for election in closed_elections %}
-          {% include 'vote/spectator_election_item.html' %}
+            {% include 'vote/spectator_election_item.html' %}
           {% endfor %}
         </div>
       </div>

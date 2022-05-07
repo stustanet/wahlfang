@@ -11,7 +11,7 @@
     <div class="col-12">
       <div class="card shadow">
         <div class="card-body">
-          <h4>Session Settings</h4>
+          <h4>Session Settings of {{ session.title }}</h4>
           <form class="user" action="{% url 'management:session_settings' session.pk %}" method="post">
             {% csrf_token %}
 

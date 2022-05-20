@@ -84,7 +84,8 @@ def index(request):
                       context={'form': form, 'variables': form.variables})
 
     context = {
-        'sessions': manager.sessions.order_by('-pk')
+        'sessions': manager.sessions.order_by('-pk'),
+        'len_sessions': manager.sessions.count(),
     }
     return render(request, template_name='management/index.html', context=context)
 

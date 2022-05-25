@@ -5,8 +5,11 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.http.response import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 from vote.authentication import voter_login_required
 from vote.forms import AccessCodeAuthenticationForm, VoteForm, ApplicationUploadFormUser
@@ -52,6 +55,13 @@ def code_login(request, access_code=None):
         return redirect('vote:code_login')
 
     login(request, user)
+
+    if user.qr:
+        group = "QR-Reload-" + str(user.session.pk)
+        async_to_sync(get_channel_layer().group_send)(
+            group,
+            {'type': 'send_reload', 'link': reverse('management:add_mobile_voter', args=[user.session.pk])}
+        )
 
     return redirect('vote:index')
 

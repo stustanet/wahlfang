@@ -198,10 +198,9 @@ class Voter(models.Model):
     def __str__(self):
         if self.email:
             return self.email
-        elif self.name:
+        if self.name:
             return self.name
-        else:
-            return f'anonymous-{self.pk}'
+        return f'anonymous-{self.pk}'
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

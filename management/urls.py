@@ -28,6 +28,7 @@ urlpatterns = [
     path('meeting/<int:pk>/delete_session', views.delete_session, name='delete_session'),
     path('meeting/<int:pk>/add_voters', views.add_voters, name='add_voters'),
     path('meeting/<int:pk>/add_tokens', views.add_tokens, name='add_tokens'),
+    path('meeting/<int:pk>/add_mobile_voter', views.add_mobile_voter_get, name='add_mobile_voter'),
     path('meeting/<int:pk>/add_election', views.add_election, name='add_election'),
     path('meeting/<int:pk>/print_token', views.print_token, name='print_token'),
     path('meeting/<int:pk>/import_csv', views.import_csv, name='import_csv'),

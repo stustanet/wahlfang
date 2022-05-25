@@ -6,7 +6,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class ElectionConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        self.group = "Election-" + self.scope['url_route']['kwargs']['pk']  # pylint: disable=W0201
+        self.group = "Election-" + \
+            self.scope['url_route']['kwargs']['pk']  # pylint: disable=W0201
         await self.channel_layer.group_add(self.group, self.channel_name)
         await self.accept()
 
@@ -47,4 +48,21 @@ class SessionConsumer(AsyncWebsocketConsumer):
     async def send_succ(self, event):
         await self.send(text_data=json.dumps({
             'succ': event['msg'],
+        }))
+
+
+class AddMobileConsumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+        self.group = "QR-Reload-" + \
+            self.scope['url_route']['kwargs']['pk']  # pylint: disable=W0201
+        await self.channel_layer.group_add(self.group, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(self.group, self.channel_name)
+
+    async def send_reload(self, event):
+        await self.send(text_data=json.dumps({
+            'open': event['link'],
         }))

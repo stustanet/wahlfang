@@ -5,6 +5,10 @@ $(document).ready(() => {
     setup_date_reload();
   }
 
+  function open(link){
+    window.open(link,"_self")
+  }
+
   function reload(reload_id="#content") {
     console.log("Reloading " + reload_id)
     $(reload_id).load(location.pathname + " " + reload_id, reload_callback)
@@ -41,6 +45,8 @@ $(document).ready(() => {
         let succ_div = $('#message-success');
         succ_div.find('div').html(message.succ);
         succ_div.toggleClass('hide');
+      }else if(message.open){
+        open(message.open);
       }
     }
     ws.onopen = function (e) {

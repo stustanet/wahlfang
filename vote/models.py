@@ -183,6 +183,7 @@ class Voter(models.Model):
     invalid_email = models.BooleanField(default=False)
     session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)
     logged_in = models.BooleanField(default=False)
+    qr = models.BooleanField(default=False)
     name = models.CharField(max_length=256, blank=True, null=True)
 
     # Stores the raw password if set_password() is called so that it can
@@ -195,10 +196,11 @@ class Voter(models.Model):
         unique_together = ('session', 'email')
 
     def __str__(self):
-        if self.email is None:
-            return f'anonymous-{self.pk}'
-
-        return self.email
+        if self.email:
+            return self.email
+        if self.name:
+            return self.name
+        return f'anonymous-{self.pk}'
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -426,11 +428,12 @@ class Voter(models.Model):
         return voter_id, password
 
     @classmethod
-    def from_data(cls, session, email=None, name=None) -> Tuple['Voter', str]:
+    def from_data(cls, session, email=None, name=None, qr=False) -> Tuple['Voter', str]:
         voter = Voter(
             session=session,
             email=email,
             name=name,
+            qr=qr,
         )
         password = voter.set_password()
         voter.save()

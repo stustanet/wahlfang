@@ -88,6 +88,8 @@
                  href="{% url 'management:import_csv' pk=session.pk %}">Import from CSV</a>
               <a class="dropdown-item"
                  href="{% url 'management:add_tokens' pk=session.pk %}">Add Tokens</a>
+              <a class="dropdown-item"
+                href="{% url 'management:add_mobile_voter' pk=session.pk %}">QR-Codes</a>
               <button type="button" class="dropdown-item" data-toggle="modal"
                       data-target="#downloadToken"
                       aria-label="download tokens">

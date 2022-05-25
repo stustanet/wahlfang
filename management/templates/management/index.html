@@ -12,6 +12,11 @@
         </div>
         <div class="card-body">
           <div class="list-group">
+            {% if len_sessions == 0 %}
+              <div class="list-group-item mt-3">
+                <span>You have no sessions currently.</span>
+              </div>
+            {% endif %}
             {% for session in sessions %}
               <div class="list-group-item list-group-item-action">
                 <a class="main-link" href="{% url 'management:session' session.id %}"></a>

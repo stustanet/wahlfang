@@ -1,0 +1,48 @@
+{% extends 'management/base.html' %}
+{% load static %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div id="qr-img">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-body">
+          <h4>Add Voters via QR Code</h4>
+          <span>Show the following QR code to the people you want to add to your election session.
+          </span>
+          <hr>
+          <h5 class="text-center">{{ name }}</h5>
+          <img src="data:image/png;base64,{{ qr }}" alt="QR Code" class="centerimg">
+          <hr>
+          <span>The page refreshes automatically if it is scanned. However, you can also request a
+            new one manually if somebody has a bad Internet connection.
+          </span>
+          <br><br>
+          <a class="btn btn-primary btn-block" href="{% url 'management:add_mobile_voter' session.pk %}">Add New</a>
+          <br>
+          <form class="user" action="{% url 'management:add_mobile_voter' session.pk %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="cancel" value="{{ voter }}">
+            <button type="submit" id="id_btn_start" class="btn btn-secondary btn-block">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer_scripts %}
+{# Automatic reload of the page: #}
+{# - either if the start date / end date of a election is due#}
+{# - or if the admin started / stopped one election and the page is notified with a websocket#}
+{# - or if a voter has logged in #}
+<script src="{% static " js/jquery-3.5.1.min.js" %}"
+  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
+<script src="{% static " js/reload.js" %}"></script>
+
+<script src="{% static " js/popper-1.16.1.min.js" %}"
+  integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"></script>
+<script src="{% static " bootstrap-4.5.3-dist/js/bootstrap.min.js" %}"
+  integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"></script>
+{% endblock %}

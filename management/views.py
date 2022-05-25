@@ -1,4 +1,6 @@
+import base64
 import csv
+from io import BytesIO
 import logging
 import os
 from argparse import Namespace
@@ -347,6 +349,58 @@ def delete_session(request, pk):
 
 
 @management_login_required
+def add_mobile_voter_get(request, pk):
+    if request.method == "POST":
+        return add_mobile_voter_post(request, pk)
+
+    manager = request.user
+    session = manager.sessions.filter(pk=pk)
+    if not session.exists():
+        return HttpResponseNotFound('Session does not exist')
+    session = session.first()
+
+    context = {
+        'session': session,
+    }
+    return render(request, template_name='management/add_mobile_voter_name.html', context=context)
+
+
+@csrf_protect
+def add_mobile_voter_post(request, pk):
+    manager = request.user
+    session = manager.sessions.filter(pk=pk)
+    if not session.exists():
+        return HttpResponseNotFound('Session does not exist')
+    session = session.first()
+
+    if request.POST.get("cancel"):
+        # delete the just created voter if manager cancels
+        voter = session.participants.filter(pk=int(request.POST.get("cancel")))
+        if not voter.exists():
+            messages.add_message(request, messages.ERROR,
+                                'Error: Could not delete QR code participant!')
+        else:
+            voter.delete()
+        return redirect('management:session', pk=session.pk)
+
+    name = request.POST.get("name")
+    voter, access_code = Voter.from_data(session=session, qr=True, name=name)
+    link = f'https://{settings.URL}' + reverse('vote:link_login', kwargs={'access_code': access_code})
+    img = qrcode.make(link)
+
+    buffered = BytesIO()
+    img.save(buffered, "PNG")
+    context = {
+        'session': session,
+        'qr': base64.b64encode(buffered.getvalue()).decode('utf-8'),
+        'voter': voter.pk,
+        'name': name,
+        'link': link,
+    }
+    return render(request, template_name='management/add_mobile_voter_qr.html', context=context)
+
+
+@management_login_required
 def print_token(request, pk):
     session = request.user.sessions.filter(pk=pk)
     if not session.exists():
@@ -354,7 +408,7 @@ def print_token(request, pk):
     session = session.first()
     participants = session.participants
     tokens = [participant.new_access_token()
-              for participant in participants.all() if participant.is_anonymous]
+              for participant in participants.all() if participant.is_anonymous and not participant.qr]
     if len(tokens) == 0:
         messages.add_message(request, messages.ERROR,
                              'No tokens have yet been generated.')

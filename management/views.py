@@ -351,7 +351,10 @@ def delete_session(request, pk):
 @management_login_required
 def add_mobile_voter_get(request, pk):
     if request.method == "POST":
+        # if we get a post we will create a voter and show the qr code
         return add_mobile_voter_post(request, pk)
+
+    # for get we show the page where the user has to type the voter's name
 
     manager = request.user
     session = manager.sessions.filter(pk=pk)

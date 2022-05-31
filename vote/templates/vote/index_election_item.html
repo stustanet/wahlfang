@@ -8,9 +8,7 @@
       <a class="btn btn-danger float-right ml-3" href="{% url 'vote:delete_own_application' election.pk %}"> Delete
         application </a>
       {% endif %}
-      <a class="btn btn-dark float-right" href="{% url 'vote:apply' election.pk %}"> {% if edit %} Edit application {%
-        else %}
-        Apply {% endif %}</a>
+      <a class="btn btn-dark float-right" href="{% url 'vote:apply' election.pk %}"> {% if edit %} Edit application {% else %} Apply {% endif %}</a>
       {% endif %}
     </h4>
     {% if election.end_date %}

@@ -34,6 +34,10 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'vote:logout' %}">Logout</a>
             </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'management:login' %}">Management</a>
+            </li>
           {% endif %}
         </ul>
       </div>

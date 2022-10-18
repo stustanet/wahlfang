@@ -20,9 +20,15 @@
 <div id="content">
   <nav class="navbar navbar-expand navbar-dark bg-dark shadow">
     <div class="container-md">
-      <a class="navbar-brand" href="{% url 'management:index' %}">
-        <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
-      </a>
+      {% if user.is_authenticated %}
+        <a class="navbar-brand" href="{% url 'management:index' %}">
+          <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
+        </a>
+      {% else %}
+        <a class="navbar-brand" href="{% url 'vote:index' %}">
+          <img src="{% static "img/logo_inv.png" %}" alt="StuStaNet">
+        </a>
+      {% endif %}
       <div class="navbar-text">Wahlfang</div>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +42,10 @@
           {% if user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'management:logout' %}">Logout</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'management:login' %}">Management</a>
             </li>
           {% endif %}
         </ul>
